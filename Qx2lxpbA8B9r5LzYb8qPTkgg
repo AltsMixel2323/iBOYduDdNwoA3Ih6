@@ -1,4 +1,4 @@
---[[
+if not script_key then
 getgenv().DitPSX = {
     ["Auto Triple Damage Boost"] = {
         ["Boost"] = true,
@@ -29,7 +29,8 @@ getgenv().DitPSX = {
     ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
     ["White Screen"] = true,
 }
-]]
+end
+
 if Executed then return end
 getgenv().Executed = true
 if not DitPSX then return end
@@ -199,7 +200,8 @@ end
 if DitPSX["Auto Leave"]["Got kicked"] then 
     spawn(function()
         while wait(5) do
-            if game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt") then
+            if game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt")
+            and not string.find(game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt").MessageArea.ErrorFrame.ErrorMessage.Text, "Attempted to teleport to a place that is restricted") then
                 game:Shutdown()
                 wait(10)
             end
