@@ -302,7 +302,7 @@ if not Run1Time then
         end
     end)
     spawn(function()
-        while wait(5) do
+        while wait(2) do
             if noclip and not plr.Character.HumanoidRootPart:FindFirstChild("coems") then
                 local BV = Instance.new("BodyVelocity", plr.Character.HumanoidRootPart)
                 BV.Name = "coems"
