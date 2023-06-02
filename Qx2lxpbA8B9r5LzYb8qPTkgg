@@ -169,26 +169,19 @@ if DitPSX["Auto Leave"]["Ping Froze"] then
             return game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
         end
         function AntiFrozePing()
-            function AntiFrozePing()
-                local CurrentPing = GetPing()
-                if CurrentPing == 0 then return end
-                if NewPing and NewPing == GetPing() then
-                    LastCheck = tick()
-                else
-                    NewCheck = tick()
-                end
-                if LastCheck and NewCheck
-                and LastCheck - NewCheck > 20 then 
-                    game:Shutdown()
-                    wait(10)
-                end
-                NewPing = GetPing()
+            local CurrentPing = GetPing()
+            if CurrentPing == 0 then return end
+            if NewPing and NewPing == GetPing() then
+                LastCheck = tick()
+            else
+                NewCheck = tick()
             end
-            while wait(1) do
-                pcall(function()
-                    AntiFrozePing()
-                end)
+            if LastCheck and NewCheck
+            and LastCheck - NewCheck > 20 then 
+                game:Shutdown()
+                wait(10)
             end
+            NewPing = GetPing()
         end
         while wait(1) do
             pcall(function()
