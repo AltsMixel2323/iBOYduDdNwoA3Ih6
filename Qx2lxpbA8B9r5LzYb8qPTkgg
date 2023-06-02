@@ -303,8 +303,8 @@ if not Run1Time then
     end)
     spawn(function()
         while wait(5) do
-            if noclip and not plr.Character.Torso:FindFirstChild("coems") then
-                local BV = Instance.new("BodyVelocity", plr.Character.Torso)
+            if noclip and not plr.Character.HumanoidRootPart:FindFirstChild("coems") then
+                local BV = Instance.new("BodyVelocity", plr.Character.HumanoidRootPart)
                 BV.Name = "coems"
                 BV.Velocity = Vector3.new(0, 0, 0)
                 BV.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
