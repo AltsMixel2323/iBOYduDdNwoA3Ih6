@@ -11,7 +11,7 @@ getgenv().DitPSX = {
     ["Auto Mailbox"] = { -- Auto send Diamonds to a person thru Mailbox when your Diamonds more than set diamond
         ["Enable"] = true,
         ["Send to"] = "egodwastaken",
-        ["Above amount"] = 100000000000
+        ["Above amount"] = 500000000000
     },
     ["Auto Leave"] = {
         ["Ping Froze"] = true,
