@@ -150,16 +150,18 @@ spawn(function()
     getgenv().OldDiamond = plr.leaderstats.Diamonds.Value
     wait(10)
     while wait(.5) do
-        if StartedHopServer then
-            SetText(DiamondsGained, "Hopping Server")
-        else
-            local olddg = DiamondsGained.Amount_odometerGUIFX.Text:split("\n")[1]
-            local dg = formatNumber(plr.leaderstats.Diamonds.Value - OldDiamond)
-            SetText(DiamondsGained, dg .. "\n" .. S_Timer)
-            if not string.find(olddg, dg) then
-                getsenv(plr.PlayerScripts.Scripts.GUIs.Currency).BloatCurrencyFrame(DiamondsGained)
+        pcall(function()
+            if StartedHopServer then
+                SetText(DiamondsGained, "Hopping Server")
+            else
+                local olddg = DiamondsGained.Amount_odometerGUIFX.Text:split("\n")[1]
+                local dg = formatNumber(plr.leaderstats.Diamonds.Value - OldDiamond)
+                SetText(DiamondsGained, dg .. "\n" .. S_Timer)
+                if not string.find(olddg, dg) then
+                    getsenv(plr.PlayerScripts.Scripts.GUIs.Currency).BloatCurrencyFrame(DiamondsGained)
+                end
             end
-        end
+        end)
     end
 end)
 
@@ -193,11 +195,13 @@ end
 if DitPSX["Auto Leave"]["Got kicked"] then 
     spawn(function()
         while wait(5) do
-            if game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt")
-            and not string.find(game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt").MessageArea.ErrorFrame.ErrorMessage.Text, "Attempted to teleport to a place that is restricted") then
-                game:Shutdown()
-                wait(10)
-            end
+            pcall(function()
+                if game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt")
+                and not string.find(game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt").MessageArea.ErrorFrame.ErrorMessage.Text, "Attempted to teleport to a place that is restricted") then
+                    game:Shutdown()
+                    wait(10)
+                end
+            end)
         end
     end)
 end
@@ -205,10 +209,12 @@ if DitPSX["Auto Leave"]["Leave Timer"].Enable then
     spawn(function()
         local TimerLeave = tick()
         while wait(5) do
-            if tick() - TimerLeave >= DitPSX["Auto Leave"]["Leave Timer"]["After seconds"] then
-                game:Shutdown()
-                wait(10)
-            end
+            pcall(function()
+                if tick() - TimerLeave >= DitPSX["Auto Leave"]["Leave Timer"]["After seconds"] then
+                    game:Shutdown()
+                    wait(10)
+                end
+            end)
         end
     end)
 end
@@ -234,12 +240,20 @@ require(game.ReplicatedStorage.Framework.Library).WorldCmds.CanDoAction = functi
 wait(10)
 
 if not Run1Time then
-    spawn(function()
+    function CollectLoots()
         for i, v in pairs(wThings.Orbs:GetChildren()) do 
             getsenv(plr.PlayerScripts.Scripts.Game.Orbs).Collect(v)
         end
         for i, v in pairs(wThings.Lootbags:GetChildren()) do 
             getsenv(plr.PlayerScripts.Scripts.Game.Lootbags).Collect(v)
+        end
+    end
+    spawn(function()
+        while wait() do
+            pcall(function()
+                CollectLoots()
+                wait(30)
+            end)
         end
     end)
     wThings.Orbs.ChildAdded:Connect(function(v)
