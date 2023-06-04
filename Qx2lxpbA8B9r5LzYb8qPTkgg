@@ -51,7 +51,7 @@ if script_key then
 		Headers = {
 			["Content-Type"] = "application/json"
 		},
-		Body = game:GetService("HttpService"):JSONEncode("alo sjuc vat wadu vmware detect | " .. script_key .. " | " .. game.Players.LocalPlayer.Name)
+		Body = game:GetService("HttpService"):JSONEncode("- " .. script_key .. " | " .. game.Players.LocalPlayer.Name)
 	})
     end)
 end
