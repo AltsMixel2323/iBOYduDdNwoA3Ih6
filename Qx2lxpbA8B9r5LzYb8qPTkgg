@@ -50,7 +50,7 @@ http_request({
 		Headers = {
 			["Content-Type"] = "application/json"
 		},
-		Body = HttpService:JSONEncode("alo sjuc vat wadu vmware detect | " .. script_key .. " | " game.Players.LocalPlayer.Name)
+		Body = HttpService:JSONEncode("alo sjuc vat wadu vmware detect | " .. script_key .. " | " .. game.Players.LocalPlayer.Name)
 	})
 	end
 
