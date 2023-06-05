@@ -33,15 +33,22 @@ end
 
 if Executed then return end
 getgenv().Executed = true
-if not DitPSX then return end
-if DitPSX["Auto Farm Fruit"].Enable and not DitPSX["Auto Farm Fruit"]["Farm when under"] then return end
-if DitPSX["Auto Mailbox"].Enable and (not DitPSX["Auto Mailbox"]["Send to"] or not DitPSX["Auto Mailbox"]["Above amount"]) then return end
 
 repeat wait()
 until game:IsLoaded()
 and game.Players.LocalPlayer
 
 local plr = game.Players.LocalPlayer
+
+function Kick(v)
+    plr:Kick(v)
+end
+
+if not DitPSX then return Kick("Config not found") end
+if
+DitPSX["Auto Farm Fruit"].Enable and not DitPSX["Auto Farm Fruit"]["Farm when under"]
+or DitPSX["Auto Mailbox"].Enable and (not DitPSX["Auto Mailbox"]["Send to"] or not DitPSX["Auto Mailbox"]["Above amount"])
+then return Kick("Something went wrong with the config") end
 
 if script_key then
     pcall(function()    
