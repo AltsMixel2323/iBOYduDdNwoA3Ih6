@@ -272,18 +272,18 @@ if not Run1Time then
         while wait() do
             pcall(function()
                 CollectLoots()
-                wait(30)
+                wait(10)
             end)
         end
     end)
     wThings.Orbs.ChildAdded:Connect(function(v)
-        wait(1)
+        wait(2)
         if v and v.Parent then
             getsenv(plr.PlayerScripts.Scripts.Game.Orbs).Collect(v)
         end
     end)
     wThings.Lootbags.ChildAdded:Connect(function(v)
-        wait(1)
+        wait(2)
         if v and v.Parent then
             getsenv(plr.PlayerScripts.Scripts.Game.Lootbags).Collect(v)
         end
