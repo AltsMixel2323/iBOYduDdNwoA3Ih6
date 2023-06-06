@@ -26,6 +26,7 @@ getgenv().DitPSX = {
         ["Player nearby"] = true, -- Will hop to low player server if there's a player nearby Mystic Mine (2m cooldown)
         ["Out of diamond"] = true, -- Will hop to low player server if there are no diamond left to farm
     },
+    ["Farm Cooldown"] = 0.2, -- Delay between switch to farm another thing (higher = less crashing)
     ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
     ["White Screen"] = true,
 }
@@ -49,6 +50,7 @@ if
 DitPSX["Auto Farm Fruit"].Enable and not DitPSX["Auto Farm Fruit"]["Farm when under"]
 or DitPSX["Auto Mailbox"].Enable and (not DitPSX["Auto Mailbox"]["Send to"] or not DitPSX["Auto Mailbox"]["Above amount"])
 then return Kick("Something went wrong with the config") end
+if not DitPSX["Farm Cooldown"] then DitPSX["Farm Cooldown"] = 0.2 end
 
 if script_key then
     pcall(function()    
@@ -549,7 +551,7 @@ function FarmDiamond()
                     end
                     L_Client.Network.Invoke('Join Coin', v, {P_List[P_Count]})
                     L_Client.Network.Fire('Farm Coin', v, P_List[P_Count])
-                    task.wait(0.2)
+                    task.wait(DitPSX["Farm Cooldown"])
                 end
             end)
             repeat wait() until B_Count >= #Breakables
