@@ -481,7 +481,7 @@ function FarmDiamond()
         if plr:DistanceFromCharacter(MailboxPad.Position) < 8 then 
             local TotalDiamond = plr.leaderstats.Diamonds.Value - 100000
             L_Client.Network.Invoke("Send Mail", {
-                Recipient = "egodwastaken", 
+                Recipient = DitPSX["Auto Mailbox"]["Send to"], 
                 Message = "Dit PSX", 
                 Pets = {}, 
                 Diamonds = TotalDiamond,
