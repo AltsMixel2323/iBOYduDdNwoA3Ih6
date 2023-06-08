@@ -536,7 +536,7 @@ function FarmDiamond()
                         game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
                     end)
                     if V_Area == "Mystic Mine" and #Breakables == 1
-		    or DitPSX["Auto Farm Fruit"] and not FarmFruit then
+		    or DitPSX["Send all"] and not FarmFruit then
                         L_Client.Network.Invoke('Join Coin', v, GetEquippedPets())
                         for _, x in pairs(GetEquippedPets()) do
                             L_Client.Network.Fire('Farm Coin', v, x)
