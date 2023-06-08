@@ -434,7 +434,7 @@ function TPReturner()
                 wait()
                 game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, plr)
             end)
-            wait(20)
+            wait(5)
         end
         wait(.1)
     end
