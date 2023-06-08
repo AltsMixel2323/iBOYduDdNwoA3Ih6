@@ -27,6 +27,7 @@ getgenv().DitPSX = {
         ["Out of diamond"] = true, -- Will hop to low player server if there are no diamond left to farm
     },
     ["Farm Cooldown"] = 0.2, -- Delay between switch to farm another thing (higher = less crashing)
+    ["Send all"] = true, -- Send all pet to break or not, false will send single to break
     ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
     ["White Screen"] = true,
 }
@@ -534,7 +535,8 @@ function FarmDiamond()
                         game.workspace.Camera.CFrame = CFrame.new(m.X, m.Y + 40, m.Z, 0, -1, 0, 0, 0, 1, -1, 0, 0)
                         game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
                     end)
-                    if V_Area == "Mystic Mine" and #Breakables == 1 then
+                    if V_Area == "Mystic Mine" and #Breakables == 1
+		    or DitPSX["Auto Farm Fruit"] and not FarmFruit then
                         L_Client.Network.Invoke('Join Coin', v, GetEquippedPets())
                         for _, x in pairs(GetEquippedPets()) do
                             L_Client.Network.Fire('Farm Coin', v, x)
