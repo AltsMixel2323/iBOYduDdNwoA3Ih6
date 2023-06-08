@@ -553,7 +553,11 @@ function FarmDiamond()
                     end
                     L_Client.Network.Invoke('Join Coin', v, {P_List[P_Count]})
                     L_Client.Network.Fire('Farm Coin', v, P_List[P_Count])
-                    task.wait(DitPSX["Farm Cooldown"])
+		    if FarmFruit then
+		    	wait()
+	            else
+                    	task.wait(DitPSX["Farm Cooldown"])
+		    end
                 end
             end)
             repeat wait() until B_Count >= #Breakables
