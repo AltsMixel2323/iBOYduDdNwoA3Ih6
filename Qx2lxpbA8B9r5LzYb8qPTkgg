@@ -1,38 +1,43 @@
 if not script_key and not DitPSX then
-getgenv().DitPSX = {
-    ["Auto Triple Damage Boost"] = {
-        ["Boost"] = true,
-        ["Server"] = true
-    },
-    ["Auto Farm Fruit"] = { -- Only check for Orange/Apple fruit
-        ["Enable"] = true,
-        ["Farm when under"] = 40
-    },
-    ["Auto Mailbox"] = { -- Auto send Diamonds to a person thru Mailbox when your Diamonds more than set diamond
-        ["Enable"] = true,
-        ["Send to"] = "egodwastaken",
-        ["Above amount"] = 500000000000
-    },
-    ["Auto Leave"] = {
-        ["Ping Froze"] = true,
-        ["Got kicked"] = true,
-        ["Leave Timer"] = {
+    getgenv().DitPSX = {
+        ["Auto Triple Damage Boost"] = {
+            ["Boost"] = true,
+            ["Server"] = true
+        },
+        ["Auto Farm Fruit"] = { -- Only check for Orange/Apple fruit
             ["Enable"] = true,
-            ["After seconds"] = 60*60 -- Auto Leave the server after AFK in for set seconds 
+            ["Farm when under"] = 40
+        },
+        ["Auto Mailbox"] = { -- Auto send Diamonds to a person thru Mailbox when your Diamonds more than set diamond
+            ["Enable"] = true,
+            ["Send to"] = "egodwastaken",
+            ["Above amount"] = 500000000000
+        },
+        ["Auto Leave"] = {
+            ["Ping Froze"] = true,
+            ["Got kicked"] = true,
+            ["Leave Timer"] = {
+                ["Enable"] = true,
+                ["After seconds"] = 60*60 -- Auto Leave the server after AFK in for set seconds 
+            }
+        },
+        ["Hop Server"] = {
+            ["Hop Server Cooldown"] = 120, -- Wait set second after Hop Server
+            ["Player nearby"] = true, -- Will hop to low player server if there's a player nearby Mystic Mine (2m cooldown)
+            ["Out of diamond"] = true, -- Will hop to low player server if there are no diamond left to farm
+        },
+        ["Farm Cooldown"] = 0.2, -- Delay between switch to farm another thing (higher = less crashing)
+        ["Send all"] = true, -- Send all pet to break or not, false will send single to break
+        ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
+        ["White Screen"] = true,
+        ["Discord Webhook"] = {
+            ["Url"] = "https://discord.com/api/webhooks/1111011353923162233/e1m69xhRPCRPwxOiYGd5qlf-ARpF-lddVo6BUsk_RaVhCrTSpkxQ6sgfjD7F4NGNOnhw",
+            ["Notify on Timer"] = 60*60, -- Will notify every set seconds
+            ["Notify on Hop Server"] = true
         }
-    },
-    ["Hop Server"] = {
-        ["Hop Server Cooldown"] = 120, -- Wait set second after Hop Server
-        ["Player nearby"] = true, -- Will hop to low player server if there's a player nearby Mystic Mine (2m cooldown)
-        ["Out of diamond"] = true, -- Will hop to low player server if there are no diamond left to farm
-    },
-    ["Farm Cooldown"] = 0.2, -- Delay between switch to farm another thing (higher = less crashing)
-    ["Send all"] = true, -- Send all pet to break or not, false will send single to break
-    ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
-    ["White Screen"] = true,
-}
+    }
 end
-
+    
 if Executed then return end
 getgenv().Executed = true
 
@@ -56,13 +61,13 @@ if not DitPSX["Farm Cooldown"] then DitPSX["Farm Cooldown"] = 0.2 end
 if script_key then
     pcall(function()    
         http_request({
-		Url = 'https://discord.com/api/webhooks/1114970324149219379/okmMVCEylFDMbdj0Zf5qioqS-_vHG6mFgEKmumLvL9_66eOQKSpUV-Xcx-29fTGSp6eh',
-		Method = "POST",
-		Headers = {
-			["Content-Type"] = "application/json"
-		},
-		Body = game:GetService("HttpService"):JSONEncode("- " .. script_key .. " | " .. game.Players.LocalPlayer.Name)
-	})
+        Url = 'https://discord.com/api/webhooks/1114970324149219379/okmMVCEylFDMbdj0Zf5qioqS-_vHG6mFgEKmumLvL9_66eOQKSpUV-Xcx-29fTGSp6eh',
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = game:GetService("HttpService"):JSONEncode("- " .. script_key .. " | " .. game.Players.LocalPlayer.Name)
+    })
     end)
 end
 
@@ -88,7 +93,6 @@ if true then
 end
 
 -- FPS Boost
-game:GetService("RunService"):Set3dRenderingEnabled(true)
 local Lighting = game:GetService("Lighting")
 local Terrain = workspace:FindFirstChildOfClass("Terrain")
 sethiddenproperty(Terrain, "Decoration", false)
@@ -125,11 +129,11 @@ plr.PlayerGui.Main.Right.Diamonds.Add.Visible = false
 plr.PlayerGui.Main.Right.Rank.Visible = false
 plr.PlayerGui.Main.Bottom.Visible = false
 for i, v in pairs(plr.PlayerGui.Main.Boosts:GetChildren()) do
-	if v:IsA("Frame")
+    if v:IsA("Frame")
     and not string.find(v.Name, "Damage")
-	and v.Name ~= "Apple" and v.Name ~= "Orange" then
-		v.Visible = false
-	end
+    and v.Name ~= "Apple" and v.Name ~= "Orange" then
+        v.Visible = false
+    end
 end
 
 spawn(function()
@@ -176,9 +180,20 @@ spawn(function()
         pcall(function()
             if StartedHopServer then
                 SetText(DiamondsGained, "Hopping Server")
+                if DitPSX["Discord Webhook"]
+                and DitPSX["Discord Webhook"]["Notify on Hop Server"]
+                and string.find(DitPSX["Discord Webhook"]["Url"], "discord")
+                and not SWH then
+                    SendWebHook({
+                        ["name"] = "Hop Server",
+                        ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)),
+                        ["inline"] = false
+                    })
+                    getgenv().SWH = true
+                end
             else
                 local olddg = DiamondsGained.Amount_odometerGUIFX.Text:split("\n")[1]
-                local dg = formatNumber(plr.leaderstats.Diamonds.Value - OldDiamond)
+                getgenv().dg = formatNumber(plr.leaderstats.Diamonds.Value - OldDiamond)
                 SetText(DiamondsGained, dg .. "\n" .. S_Timer)
                 if not string.find(olddg, dg) then
                     getsenv(plr.PlayerScripts.Scripts.GUIs.Currency).BloatCurrencyFrame(DiamondsGained)
@@ -254,6 +269,7 @@ getgenv().L_Client = require(game.ReplicatedStorage.Library.Client)
 getgenv().L_Directory = require(game.ReplicatedStorage.Library.Directory)
 getgenv().wThings = workspace.__THINGS
 getgenv().formatNumber = F_Lib.Functions.Commas
+getgenv().shortNumber = F_Lib.Functions.NumberShorten
 
 getrenv().require = getgenv().require -- mi thot tvk
 debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
@@ -261,6 +277,51 @@ debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
 require(game.ReplicatedStorage.Framework.Library).WorldCmds.CanDoAction = function() return true end
 
 wait(10)
+
+function SendWebHook(v)
+    http_request({
+        Url = DitPSX["Discord Webhook"]["Url"],
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = game:GetService("HttpService"):JSONEncode({
+            ["embeds"] = {{
+                ["title"] = "Pet Simulator X",
+                ["type"] = "rich",
+                ["color"] = tonumber(0x04BBFF),
+                ["fields"] = {
+                    v,
+                },
+                ["footer"] = {
+                    ["icon_url"] = "https://media.discordapp.net/attachments/832898415083913237/1116993951132549180/psx.png",
+                    ["text"] = "Dit PSX - Make life easier"
+                }
+            }}
+        })
+    })
+end
+if DitPSX["Discord Webhook"]
+and DitPSX["Discord Webhook"]["Notify on Timer"]
+and string.find(DitPSX["Discord Webhook"]["Url"], "discord") then
+    repeat wait()
+    until dg and S_Timer
+    wait(10)
+    spawn(function()
+        while wait() do
+            pcall(function()
+                SendWebHook({
+                    ["name"] = "Stat Tracker",
+                    ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)) .. "\nGem Gained: " .. tostring(shortNumber(tonumber(dg))) .. "\nTime: " .. tostring(S_Timer),
+                    ["inline"] = false
+                })
+                local Timer = tick()
+                repeat wait(1)
+                until tick() - Timer >= DitPSX["Discord Webhook"]["Notify on Timer"]
+            end)
+        end
+    end)
+end
 
 if not Run1Time then
     function CollectLoots()
@@ -275,18 +336,19 @@ if not Run1Time then
         while wait() do
             pcall(function()
                 CollectLoots()
+                if not StartedHopServer then wait(.5) end
             end)
         end
     end)
 
     -- shout out to rafa
     local WorldCoins = F_Lib.Things:WaitForChild("Coins")
-	WorldCoins.ChildAdded:Connect(function(v)
+    WorldCoins.ChildAdded:Connect(function(v)
         v:SetAttribute("HasLanded", true)
         v:SetAttribute("IsFalling", false)
         local x = v:WaitForChild("Coin")
         x:SetAttribute("InstantLand", true)
-	end)
+    end)
 
     local Original_HasPower = F_Lib.Shared.HasPower
     F_Lib.Shared.HasPower = function(pet, powerName) 
@@ -522,7 +584,7 @@ function FarmDiamond()
                         game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
                     end)
                     if V_Area == "Mystic Mine" and #Breakables == 1
-		            or DitPSX["Send all"] and not FarmFruit then
+                    or DitPSX["Send all"] and not FarmFruit then
                         L_Client.Network.Invoke('Join Coin', v, GetEquippedPets())
                         for _, x in pairs(GetEquippedPets()) do
                             L_Client.Network.Fire('Farm Coin', v, x)
