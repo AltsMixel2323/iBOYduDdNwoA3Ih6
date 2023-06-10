@@ -460,6 +460,7 @@ function FarmDiamond()
             end
         end
     end
+    getgenv().FarmFruit = true
     if DitPSX["Auto Mailbox"].Enable and plr.Name ~= DitPSX["Auto Mailbox"]["Send to"] and plr.leaderstats.Diamonds.Value >= DitPSX["Auto Mailbox"]["Above amount"] then
         local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
         getgenv().noclip = false
@@ -522,7 +523,7 @@ function FarmDiamond()
                         game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
                     end)
                     if V_Area == "Mystic Mine" and #Breakables == 1
-		    or DitPSX["Send all"] and not FarmFruit then
+		            or DitPSX["Send all"] and not FarmFruit then
                         L_Client.Network.Invoke('Join Coin', v, GetEquippedPets())
                         for _, x in pairs(GetEquippedPets()) do
                             L_Client.Network.Fire('Farm Coin', v, x)
@@ -539,15 +540,15 @@ function FarmDiamond()
                     end
                     L_Client.Network.Invoke('Join Coin', v, {P_List[P_Count]})
                     L_Client.Network.Fire('Farm Coin', v, P_List[P_Count])
-		    if FarmFruit then
-		    	wait()
-	            else
-                    	task.wait(DitPSX["Farm Cooldown"])
-		    end
+                    if FarmFruit then
+                        task.wait()
+                    else
+                        task.wait(DitPSX["Farm Cooldown"])
+                    end
                 end
             end)
             repeat wait() until B_Count >= #Breakables
-            or not wThings.Coins:FindFirstChild("HUD", true)
+            or not wThings.Coins:FindFirstChild("HUD", true) or FarmFruit
         end
     end
 end
