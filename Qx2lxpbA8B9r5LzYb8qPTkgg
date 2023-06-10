@@ -135,6 +135,9 @@ for i, v in pairs(plr.PlayerGui.Main.Boosts:GetChildren()) do
         v.Visible = false
     end
 end
+pcall(function()
+    plr.PlayerGui.Main.SummerEvent.Visible = false
+end)
 
 spawn(function()
     while wait(.25) do
