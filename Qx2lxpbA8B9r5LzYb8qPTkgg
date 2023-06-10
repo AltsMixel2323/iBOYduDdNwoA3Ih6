@@ -460,7 +460,6 @@ function FarmDiamond()
             end
         end
     end
-    getgenv().FarmFruit = true
     if DitPSX["Auto Mailbox"].Enable and plr.Name ~= DitPSX["Auto Mailbox"]["Send to"] and plr.leaderstats.Diamonds.Value >= DitPSX["Auto Mailbox"]["Above amount"] then
         local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
         getgenv().noclip = false
