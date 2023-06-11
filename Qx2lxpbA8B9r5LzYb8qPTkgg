@@ -297,12 +297,12 @@ getgenv().shortNumber = F_Lib.Functions.NumberShorten
 
 getrenv().require = getgenv().require -- mi thot tvk
 debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
-wait(2)
+wait(3)
 debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
-wait(2)
+wait(3)
 require(game.ReplicatedStorage.Framework.Library).WorldCmds.CanDoAction = function() return true end
 
-wait(6)
+wait(4)
 
 if DitPSX["Discord Webhook"]
 and DitPSX["Discord Webhook"]["Stats Tracker"]
