@@ -101,7 +101,6 @@ spawn(function()
 end)
 
 -- Disable UIs
---[[
 if game.CoreGui.RobloxGui:FindFirstChild("PerformanceStats") then 
     UserSettings().GameSettings.PerformanceStatsVisible = false
 end
@@ -130,7 +129,6 @@ end
 pcall(function()
     plr.PlayerGui.Main.SummerEvent.Visible = false
 end)
-]]
 
 function SendWebHook(v, x)
     http_request({
@@ -502,7 +500,7 @@ function IsPlayerNearDiamondFarm()
         end
     end
 end
-function Diting_PSX()
+function Ditting_PSX()
     local V_World, V_Area, V_Pos = "Diamond Mine", "Mystic Mine", CFrame.new(9022, -40, 2507)
     if TempFarmCyber then
         V_Area, V_Pos = "Cyber Cavern", CFrame.new(8784, -40, 3037)
@@ -652,8 +650,8 @@ function Diting_PSX()
 end
 spawn(function()
     while wait() do
-        --pcall(Diting_PSX)
-        Diting_PSX()
+        pcall(Ditting_PSX)
+        --Ditting_PSX()
     end
 end)
 spawn(function()
