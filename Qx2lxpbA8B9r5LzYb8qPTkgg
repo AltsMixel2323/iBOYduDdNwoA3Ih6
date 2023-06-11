@@ -572,10 +572,12 @@ function Ditting_PSX()
                 wait(1)
                 if Req1 then
                     L_Client.Network.Invoke("Daycare: Claim")
+                    wait(5)
+                    return
                 else
                     L_Client.Network.Invoke("Daycare: Enroll", GetEnrollPet())
+                    wait(5)
                 end
-                wait(5)
             end
         end
         getgenv().LastCheckDaycare = tick()
