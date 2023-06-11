@@ -613,32 +613,34 @@ function Ditting_PSX()
         local GiftsUUID = {}
         local DiamondCount = 0
         local Mail = F_Lib.Network.Invoke("Get Mail")
-        if Mail.Inbox then
-            for i, v in pairs(Mail.Inbox) do
-                if v.Message == "Dit PSX" then
-                    table.insert(GiftsUUID, v.uuid)
-                    DiamondCount = DiamondCount + v.Diamonds
+        pcall(function()
+            if Mail.Inbox then
+                for i, v in pairs(Mail.Inbox) do
+                    if v.Message == "Dit PSX" then
+                        table.insert(GiftsUUID, v.uuid)
+                        DiamondCount = DiamondCount + v.Diamonds
+                    end
                 end
-            end
-            if #GiftsUUID ~= 0 then
-                local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
-                getgenv().noclip = false
-                plr.Character.HumanoidRootPart.CFrame = MailboxPad.CFrame
-                wait(1)
-                if plr:DistanceFromCharacter(MailboxPad.Position) < 8 then 
-                    F_Lib.Network.Invoke("Claim Mail", GiftsUUID)
-                    if DitPSX["Discord Webhook"]
-                    and DitPSX["Discord Webhook"]["Mailbox"]
-                    and string.find(DitPSX["Discord Webhook"]["Mailbox"], "discord") then
-                        SendWebHook({
-                            ["name"] = "Claim Mailbox",
-                            ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)) .. "\nTotal Gem Claimed: " .. tostring(shortNumber(DiamondCount)),
-                            ["inline"] = false
-                        }, DitPSX["Discord Webhook"]["Mailbox"])
+                if #GiftsUUID ~= 0 then
+                    local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
+                    getgenv().noclip = false
+                    plr.Character.HumanoidRootPart.CFrame = MailboxPad.CFrame
+                    wait(1)
+                    if plr:DistanceFromCharacter(MailboxPad.Position) < 8 then 
+                        F_Lib.Network.Invoke("Claim Mail", GiftsUUID)
+                        if DitPSX["Discord Webhook"]
+                        and DitPSX["Discord Webhook"]["Mailbox"]
+                        and string.find(DitPSX["Discord Webhook"]["Mailbox"], "discord") then
+                            SendWebHook({
+                                ["name"] = "Claim Mailbox",
+                                ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)) .. "\nTotal Gem Claimed: " .. tostring(shortNumber(DiamondCount)),
+                                ["inline"] = false
+                            }, DitPSX["Discord Webhook"]["Mailbox"])
+                        end
                     end
                 end
             end
-        end
+        end)
         getgenv().LastCheckMail = tick()
     end
     local V_World, V_Area, V_Pos = "Diamond Mine", "Mystic Mine", CFrame.new(9022, -40, 2507)
