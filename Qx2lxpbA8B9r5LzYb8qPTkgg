@@ -14,6 +14,7 @@ if not script_key and not DitPSX then
             ["Above amount"] = 100000000000
         },
         ["Auto Claim Mailbox"] = true, -- Claim Diamonds on the account received the Diamonds from Auto Mailbox
+        ["Auto Daycare"] = true, -- Auto Claim Daycare and Enroll unequipped/unlocked Pets in your Inventory
         ["Auto Leave"] = {
             ["Ping Froze"] = true,
             ["Got kicked"] = true,
@@ -296,10 +297,12 @@ getgenv().shortNumber = F_Lib.Functions.NumberShorten
 
 getrenv().require = getgenv().require -- mi thot tvk
 debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
+wait(2)
 debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
+wait(2)
 require(game.ReplicatedStorage.Framework.Library).WorldCmds.CanDoAction = function() return true end
 
-wait(10)
+wait(6)
 
 if DitPSX["Discord Webhook"]
 and DitPSX["Discord Webhook"]["Stats Tracker"]
@@ -503,24 +506,79 @@ function IsPlayerNearDiamondFarm()
         end
     end
 end
-function Ditting_PSX()
-    local V_World, V_Area, V_Pos = "Diamond Mine", "Mystic Mine", CFrame.new(9022, -40, 2507)
-    if TempFarmCyber then
-        V_Area, V_Pos = "Cyber Cavern", CFrame.new(8784, -40, 3037)
+function DaycareReady()
+    local Saves = F_Lib.Save.Get()
+    assert(Saves)
+    local DCQueue
+	if require(game.ReplicatedStorage.Library).Shared.IsHardcore then
+		DCQueue = Saves.DaycareHardcoreQueue
+	else
+		DCQueue = Saves.DaycareQueue
+	end
+    for i, v in pairs(DCQueue) do 
+        if require(game.ReplicatedStorage.Library).Shared.DaycareComputeRemainingTime(Saves, v) == 0 then 
+            return true 
+        end
     end
-    if DitPSX["Auto Farm Fruit"].Enable then
-        local Apple, Orange = GetFruitAmount("Apple"), GetFruitAmount("Orange")
-        if Apple <= DitPSX["Auto Farm Fruit"]["Farm when under"] or Orange <= DitPSX["Auto Farm Fruit"]["Farm when under"] or FarmFruit then
-            V_World, V_Area, V_Pos = "Pixel", "Pixel Vault", CFrame.new(3553, -40, 2458)
-            if FarmFruit then
-                if Apple > 195 and Orange > 195 then
-                    getgenv().FarmFruit = false
-                    return
+end
+function CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot)
+    if not table.find(Enrolls, v.uid)
+    and not table.find(E_Pets, v.uid)
+    and not v.l
+    and getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetUsedSlots() + #Enrolls < DC_MaxSlot then
+        return true
+    end
+end
+function GetEnrollPet()
+    local Enrolls, I_Pets, DC_MaxSlot = {}, F_Lib.Save.Get().Pets, getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetMaxSlots()
+    local E_Pets = {}
+    for i, v in pairs(L_Client.PetCmds.GetEquipped()) do
+        table.insert(E_Pets, v.uid)
+    end
+    for i, v in pairs(I_Pets) do
+        if v.dm
+        and CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
+        end
+    end
+    for i, v in pairs(I_Pets) do
+        if v.r
+        and CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
+        end
+    end
+    for i, v in pairs(I_Pets) do
+        if v.g
+        and CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
+        end
+    end
+    for i, v in pairs(I_Pets) do
+        if CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
+        end
+    end
+    return Enrolls
+end
+function Ditting_PSX()
+    if DitPSX["Auto Daycare"] and (not LastCheckDaycare or tick() - LastCheckDaycare > 120) then
+        local Req1, Req2 = DaycareReady(), getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetUsedSlots() < getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetMaxSlots() and #GetEnrollPet() > 0
+        if Req1 or Req2 then
+            TeleportArea("Spawn")
+            wait(1)
+            local DaycarePath = game.workspace.__MAP.Interactive:FindFirstChild("Daycare")
+            if DaycarePath then 
+                plr.Character.HumanoidRootPart.CFrame = DaycarePath.Pad.CFrame 
+                wait(1)
+                if Req1 then
+                    L_Client.Network.Invoke("Daycare: Claim")
+                else
+                    L_Client.Network.Invoke("Daycare: Enroll", GetEnrollPet())
                 end
-            else
-                getgenv().FarmFruit = true
+                wait(5)
             end
         end
+        getgenv().LastCheckDaycare = tick()
     end
     if DitPSX["Auto Mailbox"].Enable and plr.Name ~= DitPSX["Auto Mailbox"]["Send to"] and plr.leaderstats.Diamonds.Value >= DitPSX["Auto Mailbox"]["Above amount"] then
         local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
@@ -576,6 +634,24 @@ function Ditting_PSX()
             end
         end
         getgenv().LastCheckMail = tick()
+    end
+    local V_World, V_Area, V_Pos = "Diamond Mine", "Mystic Mine", CFrame.new(9022, -40, 2507)
+    if TempFarmCyber then
+        V_Area, V_Pos = "Cyber Cavern", CFrame.new(8784, -40, 3037)
+    end
+    if DitPSX["Auto Farm Fruit"].Enable then
+        local Apple, Orange = GetFruitAmount("Apple"), GetFruitAmount("Orange")
+        if Apple <= DitPSX["Auto Farm Fruit"]["Farm when under"] or Orange <= DitPSX["Auto Farm Fruit"]["Farm when under"] or FarmFruit then
+            V_World, V_Area, V_Pos = "Pixel", "Pixel Vault", CFrame.new(3553, -40, 2458)
+            if FarmFruit then
+                if Apple > 195 and Orange > 195 then
+                    getgenv().FarmFruit = false
+                    return
+                end
+            else
+                getgenv().FarmFruit = true
+            end
+        end
     end
     if GetCurrentWorld() ~= V_World then
         return TeleportArea(V_Area)
@@ -653,8 +729,8 @@ function Ditting_PSX()
 end
 spawn(function()
     while wait() do
-        pcall(Ditting_PSX)
-        --Ditting_PSX()
+        --pcall(Ditting_PSX)
+        Ditting_PSX()
     end
 end)
 spawn(function()
