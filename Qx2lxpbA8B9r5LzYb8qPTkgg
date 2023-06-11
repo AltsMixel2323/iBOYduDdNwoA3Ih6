@@ -544,7 +544,7 @@ function FarmDiamond()
             wait(2)
         end
     end
-    if DitPSX["Auto Claim Mailbox"] and not LastCheckMail or tick() - LastCheckMail > 60 then
+    if DitPSX["Auto Claim Mailbox"] and (not LastCheckMail or tick() - LastCheckMail > 60) then
         local GiftsUUID = {}
         local DiamondCount = 0
         for i, v in pairs(F_Lib.Network.Invoke("Get Mail").Inbox) do
