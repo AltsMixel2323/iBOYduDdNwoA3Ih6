@@ -562,7 +562,8 @@ function GetEnrollPet()
 end
 function Ditting_PSX()
     if DitPSX["Auto Daycare"] and (not LastCheckDaycare or tick() - LastCheckDaycare > 120) then
-        local Req1, Req2 = DaycareReady(), getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetUsedSlots() < getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetMaxSlots() and #GetEnrollPet() > 0
+        local EnrollPets = #GetEnrollPet()
+        local Req1, Req2 = DaycareReady(), getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetUsedSlots() < getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetMaxSlots() and EnrollPets > 0
         if Req1 or Req2 then
             TeleportArea("Spawn")
             wait(1)
@@ -575,7 +576,7 @@ function Ditting_PSX()
                     wait(5)
                     return
                 else
-                    L_Client.Network.Invoke("Daycare: Enroll", GetEnrollPet())
+                    L_Client.Network.Invoke("Daycare: Enroll", EnrollPets)
                     wait(5)
                 end
             end
@@ -734,8 +735,8 @@ function Ditting_PSX()
 end
 spawn(function()
     while wait() do
-        pcall(Ditting_PSX)
-        --Ditting_PSX()
+        --pcall(Ditting_PSX)
+        Ditting_PSX()
     end
 end)
 spawn(function()
