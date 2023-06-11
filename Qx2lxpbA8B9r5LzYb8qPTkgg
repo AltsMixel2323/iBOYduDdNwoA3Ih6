@@ -11,8 +11,9 @@ if not script_key and not DitPSX then
         ["Auto Mailbox"] = { -- Auto send Diamonds to a person thru Mailbox when your Diamonds more than set diamond
             ["Enable"] = true,
             ["Send to"] = "egodwastaken",
-            ["Above amount"] = 100000000000
+            ["Above amount"] = 500000000000
         },
+        ["Auto Claim Mailbox"] = true, -- Claim Diamonds on the account received the Diamonds from Auto Mailbox
         ["Auto Leave"] = {
             ["Ping Froze"] = true,
             ["Got kicked"] = true,
@@ -33,7 +34,8 @@ if not script_key and not DitPSX then
         ["Discord Webhook"] = {
             ["Url"] = "https://discord.com/api/webhooks/1111011353923162233/e1m69xhRPCRPwxOiYGd5qlf-ARpF-lddVo6BUsk_RaVhCrTSpkxQ6sgfjD7F4NGNOnhw",
             ["Notify on Timer"] = 60*60, -- Will notify every set seconds
-            ["Notify on Hop Server"] = true
+            ["Notify on Hop Server"] = true,
+            ["Notify on Claim Gift"] = true,
         },
     }
 end
@@ -541,6 +543,31 @@ function FarmDiamond()
             getgenv().OldDiamond = OldDiamond + TotalDiamond
             wait(2)
         end
+    end
+    if DitPSX["Auto Claim Mailbox"] and not LastCheckMail or tick() - LastCheckMail > 60 then
+        local GiftsUUID = {}
+        local DiamondCount = 0
+        for i, v in pairs(F_Lib.Network.Invoke("Get Mail").Inbox) do
+            if v.Message == "Dit PSX" then
+                table.insert(GiftsUUID, v.uuid)
+                DiamondCount = DiamondCount + v.Diamonds
+            end
+        end
+        if #GiftsUUID ~= 0 then
+            local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
+            getgenv().noclip = false
+            plr.Character.HumanoidRootPart.CFrame = MailboxPad.CFrame
+            wait(1)
+            if plr:DistanceFromCharacter(MailboxPad.Position) < 8 then 
+                F_Lib.Network.Invoke("Claim Mail", GiftsUUID)
+                SendWebHook({
+                    ["name"] = "Claim Mailbox",
+                    ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)) .. "\nTotal Gem Claimed: " .. tostring(shortNumber(DiamondCount)),
+                    ["inline"] = false
+                })
+            end
+        end
+        getgenv().LastCheckMail = tick()
     end
     if GetCurrentWorld() ~= V_World then
         return TeleportArea(V_Area)
