@@ -101,39 +101,6 @@ spawn(function()
     end)
 end)
 
--- Disable UIs
-if game.CoreGui.RobloxGui:FindFirstChild("PerformanceStats") then 
-    UserSettings().GameSettings.PerformanceStatsVisible = false
-end
-if game.StarterGui:GetCoreGuiEnabled("PlayerList") then
-    game.StarterGui:SetCore('TopbarEnabled', false)
-end
-game.CoreGui:FindFirstChild("RobloxGui").Enabled = false
-game:GetService("VirtualInputManager"):SendKeyEvent(true, 27, false, game)
-game:GetService("VirtualInputManager"):SendKeyEvent(false, 27, false, game)
-plr.PlayerGui.Message.Enabled = false
-plr.PlayerGui.Message:GetPropertyChangedSignal("Enabled"):Connect(function()
-    plr.PlayerGui.Message.Enabled = false
-end)
-plr.PlayerGui.FreeGiftsTop.Enabled = false
-plr.PlayerGui.Main.Left.Visible = false
-plr.PlayerGui.Main.Right.Diamonds.Add.Visible = false
-plr.PlayerGui.Main.Right.Rank.Visible = false
-plr.PlayerGui.Main.Bottom.Visible = false
-for i, v in pairs(plr.PlayerGui.Main.Boosts:GetChildren()) do
-    if v:IsA("Frame")
-    and not string.find(v.Name, "Damage")
-    and v.Name ~= "Apple" and v.Name ~= "Orange" then
-        v.Visible = false
-    end
-end
-pcall(function()
-    spawn(function()
-        wait(10)
-        plr.PlayerGui.Main.SummerEvent.Visible = false
-    end)
-end)
-
 function SendWebHook(v, x)
     http_request({
         Url = x,
@@ -225,6 +192,39 @@ spawn(function()
             end
         end)
     end
+end)
+
+-- Disable UIs
+if game.CoreGui.RobloxGui:FindFirstChild("PerformanceStats") then 
+    UserSettings().GameSettings.PerformanceStatsVisible = false
+end
+if game.StarterGui:GetCoreGuiEnabled("PlayerList") then
+    game.StarterGui:SetCore('TopbarEnabled', false)
+end
+game.CoreGui:FindFirstChild("RobloxGui").Enabled = false
+game:GetService("VirtualInputManager"):SendKeyEvent(true, 27, false, game)
+game:GetService("VirtualInputManager"):SendKeyEvent(false, 27, false, game)
+plr.PlayerGui.Message.Enabled = false
+plr.PlayerGui.Message:GetPropertyChangedSignal("Enabled"):Connect(function()
+    plr.PlayerGui.Message.Enabled = false
+end)
+plr.PlayerGui.FreeGiftsTop.Enabled = false
+plr.PlayerGui.Main.Left.Visible = false
+plr.PlayerGui.Main.Right.Diamonds.Add.Visible = false
+plr.PlayerGui.Main.Right.Rank.Visible = false
+plr.PlayerGui.Main.Bottom.Visible = false
+for i, v in pairs(plr.PlayerGui.Main.Boosts:GetChildren()) do
+    if v:IsA("Frame")
+    and not string.find(v.Name, "Damage")
+    and v.Name ~= "Apple" and v.Name ~= "Orange" then
+        v.Visible = false
+    end
+end
+pcall(function()
+    spawn(function()
+        wait(10)
+        plr.PlayerGui.Main.SummerEvent.Visible = false
+    end)
 end)
 
 if DitPSX["Auto Leave"]["Ping Froze"] then 
@@ -735,8 +735,8 @@ function Ditting_PSX()
 end
 spawn(function()
     while wait() do
-        --pcall(Ditting_PSX)
-        Ditting_PSX()
+        pcall(Ditting_PSX)
+        --Ditting_PSX()
     end
 end)
 spawn(function()
