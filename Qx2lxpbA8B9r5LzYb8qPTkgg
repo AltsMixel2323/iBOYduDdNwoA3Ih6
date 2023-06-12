@@ -155,7 +155,7 @@ spawn(function()
     DiamondsGained.Icon.Rotation = 90
     DiamondsGained.Icon.Position = UDim2.new(0.954999983, 2, 0.5, 0)
     DiamondsGained.Add.Visible = false
-    if DiamondsGained:FindFirstChild("Amount_odometerGUIFX") then
+    if not DiamondsGained:FindFirstChild("Amount_odometerGUIFX") then
         getgenv().Mobile = true
     end
     if not Mobile then
