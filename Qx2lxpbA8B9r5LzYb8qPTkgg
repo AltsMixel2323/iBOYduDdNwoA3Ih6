@@ -49,6 +49,7 @@ getgenv().Executed = true
 repeat wait()
 until game:IsLoaded()
 and game.Players.LocalPlayer
+and game.Players.LocalPlayer:FindFirstChild("leaderstats")
 
 local plr = game.Players.LocalPlayer
 
@@ -744,15 +745,19 @@ end)
 spawn(function()
     while wait(5) do
         pcall(function()
-            if DitPSX["Auto Triple Damage Boost"].Boost and not F_Lib.Save.Get().Boosts["Triple Damage"] then
-                L_Client.Network.Fire("Activate Boost", "Triple Damage")
-                repeat wait(1)
-                until F_Lib.Save.Get().Boosts["Triple Damage"]
-            end
-            if DitPSX["Auto Triple Damage Boost"].Server and not F_Lib.ServerBoosts.GetActiveBoosts()["Triple Damage"] then
-                L_Client.Network.Fire("Activate Server Boost", "Triple Damage")
-                repeat wait(1)
-                until F_Lib.ServerBoosts.GetActiveBoosts()["Triple Damage"]
+            if not FarmFruit then
+                if DitPSX["Auto Triple Damage Boost"].Boost and not F_Lib.Save.Get().Boosts["Triple Damage"] then
+                    L_Client.Network.Fire("Activate Boost", "Triple Damage")
+                    local Timer = tick()
+                    repeat wait(1)
+                    until F_Lib.Save.Get().Boosts["Triple Damage"] or tick() - Timer > 5
+                end
+                if DitPSX["Auto Triple Damage Boost"].Server and not F_Lib.ServerBoosts.GetActiveBoosts()["Triple Damage"] then
+                    L_Client.Network.Fire("Activate Server Boost", "Triple Damage")
+                    local Timer = tick()
+                    repeat wait(1)
+                    until F_Lib.ServerBoosts.GetActiveBoosts()["Triple Damage"] or tick() - Timer > 5
+                end
             end
             for i, v in pairs(L_Directory.FreeGifts) do 
                 if not table.find(F_Lib.Save.Get().FreeGiftsRedeemed, i)
