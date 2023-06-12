@@ -57,12 +57,7 @@ function Kick(v)
     plr:Kick(v)
 end
 
-if not DitPSX then return Kick("Config not found") end
-if
-DitPSX["Auto Farm Fruit"].Enable and not DitPSX["Auto Farm Fruit"]["Farm when under"]
-or DitPSX["Auto Mailbox"].Enable and (not DitPSX["Auto Mailbox"]["Send to"] or not DitPSX["Auto Mailbox"]["Above amount"])
-then return Kick("Something went wrong with the config") end
-if not DitPSX["Farm Cooldown"] then DitPSX["Farm Cooldown"] = 0.2 end
+if not DitPSX then return Kick("Config not found\nPlease check out #script-config channel") end
 
 if true then
     local LoadingCount = tick()
