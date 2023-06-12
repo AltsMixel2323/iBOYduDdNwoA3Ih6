@@ -140,7 +140,9 @@ spawn(function()
 end)
 function SetText(v, x)
     v.Amount.Text = tostring(x)
-    v.Amount_odometerGUIFX.Text = tostring(x)
+    if not Mobile then
+        v.Amount_odometerGUIFX.Text = tostring(x)
+    end
 end
 spawn(function()
     DiamondsGained = plr.PlayerGui.Main.Right.Diamonds:Clone()
@@ -153,11 +155,16 @@ spawn(function()
     DiamondsGained.Icon.Rotation = 90
     DiamondsGained.Icon.Position = UDim2.new(0.954999983, 2, 0.5, 0)
     DiamondsGained.Add.Visible = false
-    DiamondsGained.Amount_odometerGUIFX["Diamonds Gradient"].Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.new(189/255, 207/255, 70/255)),
-        ColorSequenceKeypoint.new(0.432612, Color3.new(189/255, 207/255, 70/255)),
-        ColorSequenceKeypoint.new(1, Color3.new(53/255, 54/255, 49/255))
-    })
+    if DiamondsGained:FindFirstChild("Amount_odometerGUIFX") then
+        getgenv().Mobile = true
+    end
+    if not Mobile then
+        DiamondsGained.Amount_odometerGUIFX["Diamonds Gradient"].Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.new(189/255, 207/255, 70/255)),
+            ColorSequenceKeypoint.new(0.432612, Color3.new(189/255, 207/255, 70/255)),
+            ColorSequenceKeypoint.new(1, Color3.new(53/255, 54/255, 49/255))
+        })
+    end
     SetText(DiamondsGained, "Script by egoD\nLoading script...")
     getgenv().OldDiamond = plr.leaderstats.Diamonds.Value
     getgenv().SentDiamond = 0
@@ -178,7 +185,12 @@ spawn(function()
                     getgenv().SWH = true
                 end
             else
-                local olddg = DiamondsGained.Amount_odometerGUIFX.Text:split("\n")[1]
+                local olddg
+                if Mobile then
+                    olddg = DiamondsGained.Amount.Text:split("\n")[1]
+                else
+                    olddg = DiamondsGained.Amount_odometerGUIFX.Text:split("\n")[1]
+                end
                 local countdg = (plr.leaderstats.Diamonds.Value + SentDiamond) - OldDiamond
                 getgenv().dg = formatNumber(countdg)
                 SetText(DiamondsGained, dg .. "\n" .. S_Timer)
@@ -759,14 +771,13 @@ function Ditting_PSX()
             repeat wait()
             until B_Count >= #Breakables
             --or not wThings.Coins:FindFirstChild("HUD", true) or FarmFruit
-            
         end
     end
 end
 spawn(function()
     while wait() do
-        pcall(Ditting_PSX)
-        --Ditting_PSX()
+        --pcall(Ditting_PSX)
+        Ditting_PSX()
     end
 end)
 spawn(function()
