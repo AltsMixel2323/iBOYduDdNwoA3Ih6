@@ -1,1 +1,809 @@
+if not script_key and not DitPSX then
+    getgenv().DitPSX = {
+        ["Auto Triple Damage Boost"] = {
+            ["Boost"] = true,
+            ["Server"] = true
+        },
+        ["Auto Farm Fruit"] = { -- Only check for Orange/Apple fruit
+            ["Enable"] = true,
+            ["Farm when under"] = 40
+        },
+        ["Auto Mailbox"] = { -- Auto send Diamonds to a person thru Mailbox when your Diamonds more than set diamond
+            ["Enable"] = true,
+            ["Send to"] = "egodwastaken",
+            ["Above amount"] = 100000000000
+        },
+        ["Auto Claim Mailbox"] = true, -- Claim Diamonds on the account received the Diamonds from Auto Mailbox
+        ["Auto Daycare"] = true, -- Auto Claim Daycare and Enroll unequipped/unlocked Pets in your Inventory
+        ["Auto Leave"] = {
+            ["Ping Froze"] = true,
+            ["Got kicked"] = true,
+            ["Leave Timer"] = {
+                ["Enable"] = true,
+                ["After seconds"] = 60*60 -- Auto Leave the server after AFK in for set seconds 
+            }
+        },
+        ["Hop Server"] = {
+            ["Hop Server Cooldown"] = 180, -- Wait set second after Hop Server
+            ["Player nearby"] = true, -- Will hop to low player server if there's a player nearby Mystic Mine (2m cooldown)
+            ["Out of diamond"] = true, -- Will hop to low player server if there are no diamond left to farm
+        },
+        ["Farm Cooldown"] = 0.1, -- Delay between switch to farm another thing (higher = less crashing)
+        ["Send all"] = true, -- Send all pet to break or not, false will send single to break
+        ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
+        ["White Screen"] = true,
+        ["Discord Webhook"] = {
+            ["Stats Tracker"] = {
+                ["Url"] = "https://discord.com/api/webhooks/1117383456545050625/fAVOHZQVJjZiQSElfSYArxw9LuTlJrEhryG4bVmw3tPH4NFgyxlmLYF8WQRqTVhVLqDV",
+                ["Cooldown"] = 60*60, -- Will notify every set seconds
+            }, 
+            ["Hop Server"] = "https://discord.com/api/webhooks/1117383501352800387/FaHzAjgAKFiUpxM7J4iOV_BbwGHdKb9pUbBOFadOBIY5HqwqdkqLJUhGyMvlSTRDbBq4",
+            ["Mailbox"] = "https://discord.com/api/webhooks/1117383548098326649/dElhcBLhQhLRZBTGocxOwjRymFCyXPCiZz-nTfcvuOt64i6Jz9vjoiTMWd3AQ7i1zVGB",
+        },
+    }
+end
+    
+if Executed then return end
+getgenv().Executed = true
 
+repeat wait()
+until game:IsLoaded()
+and game.Players.LocalPlayer
+and game.Players.LocalPlayer:FindFirstChild("leaderstats")
+
+local plr = game.Players.LocalPlayer
+
+function Kick(v)
+    plr:Kick(v)
+end
+
+if not DitPSX then return Kick("Config not found\nPlease check out #script-config channel") end
+
+if true then
+    local LoadingCount = tick()
+    repeat wait(1)
+        pcall(function()
+            for i, v in pairs(getconnections(plr.PlayerGui["__INTRO"].Frame.Skip.MouseButton1Up)) do
+                v.Function()
+            end
+        end)
+        pcall(function()
+            if tick() - LoadingCount > 60 or plr.PlayerGui["__INTRO"].Frame.Notice.Visible then 
+                game:Shutdown()
+                wait(10)
+            end
+        end)
+    until not plr.PlayerGui:FindFirstChild("__INTRO")
+    repeat wait(1)
+    until plr.PlayerGui:FindFirstChild("Loading")
+    and not plr.PlayerGui:FindFirstChild("Loading").Enabled
+    and plr:FindFirstChild("__LOADED") and plr["__LOADED"].Value
+end
+
+-- FPS Boost
+local Lighting = game:GetService("Lighting")
+local Terrain = workspace:FindFirstChildOfClass("Terrain")
+sethiddenproperty(Terrain, "Decoration", false)
+sethiddenproperty(game.Lighting, "Technology", 0)
+settings().Rendering.QualityLevel = 1
+Lighting.Brightness = 0
+if DitPSX["White Screen"] then
+    game:GetService("RunService"):Set3dRenderingEnabled(false)
+end
+spawn(function()
+    local FPSboost 
+    FPSboost = hookfunction(getsenv(plr.PlayerScripts.Scripts.Game.Coins).CoinDamageAnimation, function(p10, p11)
+        return nil
+    end)
+end)
+
+function SendWebHook(v, x)
+    http_request({
+        Url = x,
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = game:GetService("HttpService"):JSONEncode({
+            ["embeds"] = {{
+                ["title"] = "Pet Simulator X",
+                ["type"] = "rich",
+                ["color"] = tonumber(0x04BBFF),
+                ["fields"] = {
+                    v,
+                },
+                ["footer"] = {
+                    ["icon_url"] = "https://media.discordapp.net/attachments/832898415083913237/1116993951132549180/psx.png",
+                    ["text"] = "Dit PSX - Make life easier"
+                }
+            }}
+        })
+    })
+end
+
+spawn(function()
+    while wait(.25) do
+        local TotalTime = game.workspace.DistributedGameTime
+        local Sec = math.round(TotalTime % 60)
+        local Min = math.floor(TotalTime / 60 % 60)
+        local Hour = math.floor(TotalTime / 3600)
+        if Sec == 60 then Sec = 0 Min = Min + 1 end
+        if Min == 60 then Min = 0 Hour = Hour + 1 end
+        local SecFormat = "" if string.len(Sec) == 1 then SecFormat = "0" end
+        local MinFormat = "" if string.len(Min) == 1 then MinFormat = "0" end
+        local HourFormat = "" if string.len(Hour) == 1 then HourFormat = "0" end
+        getgenv().S_Timer = string.format(MinFormat .. '%.0f:' .. SecFormat .. '%.0f', Min, Sec)
+        if Hour >= 1 then
+            getgenv().S_Timer = string.format(HourFormat .. '%.0f:', Hour) .. getgenv().S_Timer
+        end
+    end
+end)
+function SetText(v, x)
+    v.Amount.Text = tostring(x)
+    if not Mobile then
+        v.Amount_odometerGUIFX.Text = tostring(x)
+    end
+end
+spawn(function()
+    DiamondsGained = plr.PlayerGui.Main.Right.Diamonds:Clone()
+    DiamondsGained.Name = "Diamonds Gained"
+    DiamondsGained.LayoutOrder = 99998995 + 100
+    --DiamondsGained.UIScale.Scale = 0.9
+    DiamondsGained.Parent = plr.PlayerGui.Main.Right
+    DiamondsGained.Icon.Image = "rbxassetid://6248942117"
+    DiamondsGained.Icon.Size = UDim2.new(0.25, 4, 1.79999995, 4)
+    DiamondsGained.Icon.Rotation = 90
+    DiamondsGained.Icon.Position = UDim2.new(0.954999983, 2, 0.5, 0)
+    DiamondsGained.Add.Visible = false
+    if DiamondsGained:FindFirstChild("Amount_odometerGUIFX") then
+        getgenv().Mobile = true
+    end
+    if not Mobile then
+        DiamondsGained.Amount_odometerGUIFX["Diamonds Gradient"].Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.new(189/255, 207/255, 70/255)),
+            ColorSequenceKeypoint.new(0.432612, Color3.new(189/255, 207/255, 70/255)),
+            ColorSequenceKeypoint.new(1, Color3.new(53/255, 54/255, 49/255))
+        })
+    end
+    SetText(DiamondsGained, "Script by egoD\nLoading script...")
+    getgenv().OldDiamond = plr.leaderstats.Diamonds.Value
+    getgenv().SentDiamond = 0
+    wait(10)
+    while wait(.5) do
+        pcall(function()
+            if StartedHopServer then
+                SetText(DiamondsGained, "Hopping Server")
+                if DitPSX["Discord Webhook"]
+                and DitPSX["Discord Webhook"]["Hop Server"]
+                and string.find(DitPSX["Discord Webhook"]["Hop Server"], "discord")
+                and not SWH then
+                    SendWebHook({
+                        ["name"] = "Hop Server",
+                        ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)),
+                        ["inline"] = false
+                    }, DitPSX["Discord Webhook"]["Hop Server"])
+                    getgenv().SWH = true
+                end
+            else
+                local olddg
+                if Mobile then
+                    olddg = DiamondsGained.Amount.Text:split("\n")[1]
+                else
+                    olddg = DiamondsGained.Amount_odometerGUIFX.Text:split("\n")[1]
+                end
+                local countdg = (plr.leaderstats.Diamonds.Value + SentDiamond) - OldDiamond
+                getgenv().dg = formatNumber(countdg)
+                SetText(DiamondsGained, dg .. "\n" .. S_Timer)
+                if not string.find(olddg, dg) then
+                    getsenv(plr.PlayerScripts.Scripts.GUIs.Currency).BloatCurrencyFrame(DiamondsGained)
+                end
+            end
+        end)
+    end
+end)
+
+-- Disable UIs
+if game.CoreGui.RobloxGui:FindFirstChild("PerformanceStats") then 
+    UserSettings().GameSettings.PerformanceStatsVisible = false
+end
+--[[
+if game.StarterGui:GetCoreGuiEnabled("PlayerList") then
+    game.StarterGui:SetCore('TopbarEnabled', false)
+end
+game.CoreGui:FindFirstChild("RobloxGui").Enabled = false
+game:GetService("VirtualInputManager"):SendKeyEvent(true, 27, false, game)
+game:GetService("VirtualInputManager"):SendKeyEvent(false, 27, false, game)
+plr.PlayerGui.Message.Enabled = false
+plr.PlayerGui.Message:GetPropertyChangedSignal("Enabled"):Connect(function()
+    plr.PlayerGui.Message.Enabled = false
+end)
+]]
+plr.PlayerGui.FreeGiftsTop.Enabled = false
+plr.PlayerGui.Main.Left.Visible = false
+plr.PlayerGui.Main.Right.Diamonds.Add.Visible = false
+plr.PlayerGui.Main.Right.Rank.Visible = false
+plr.PlayerGui.Main.Bottom.Visible = false
+for i, v in pairs(plr.PlayerGui.Main.Boosts:GetChildren()) do
+    if v:IsA("Frame")
+    and not string.find(v.Name, "Damage")
+    and v.Name ~= "Apple" and v.Name ~= "Orange" then
+        v.Visible = false
+    end
+end
+pcall(function()
+    spawn(function()
+        wait(10)
+        plr.PlayerGui.Main.EventHud.Visible = false
+    end)
+end)
+
+if DitPSX["Auto Leave"]["Ping Froze"] then 
+    spawn(function()
+        function GetPing()
+            return game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
+        end
+        function AntiFrozePing()
+            local CurrentPing = GetPing()
+            if CurrentPing == 0 then return end
+            if NewPing and NewPing == GetPing() then
+                LastCheck = tick()
+            else
+                NewCheck = tick()
+            end
+            if LastCheck and NewCheck
+            and LastCheck - NewCheck > 20 then 
+                game:Shutdown()
+                wait(10)
+            end
+            NewPing = GetPing()
+        end
+        while wait(1) do
+            pcall(function()
+                AntiFrozePing()
+            end)
+        end
+    end)
+end
+if DitPSX["Auto Leave"]["Got kicked"] then 
+    spawn(function()
+        while wait(5) do
+            pcall(function()
+                if game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt")
+                and not string.find(game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt").MessageArea.ErrorFrame.ErrorMessage.Text, "Attempted to teleport to a place that is restricted") then
+                    game:Shutdown()
+                    wait(10)
+                end
+            end)
+        end
+    end)
+end
+if DitPSX["Auto Leave"]["Leave Timer"].Enable then 
+    spawn(function()
+        local TimerLeave = tick()
+        while wait(5) do
+            pcall(function()
+                if tick() - TimerLeave >= DitPSX["Auto Leave"]["Leave Timer"]["After seconds"] then
+                    game:Shutdown()
+                    wait(10)
+                end
+            end)
+        end
+    end)
+end
+
+local vu = game:GetService("VirtualUser")
+plr.Idled:connect(function()
+    vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+    wait(1)
+    vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+end)
+
+getgenv().F_Lib = require(game.ReplicatedStorage.Framework.Library)
+getgenv().L_Client = require(game.ReplicatedStorage.Library.Client)
+getgenv().L_Directory = require(game.ReplicatedStorage.Library.Directory)
+getgenv().wThings = workspace.__THINGS
+getgenv().formatNumber = F_Lib.Functions.Commas
+getgenv().shortNumber = F_Lib.Functions.NumberShorten
+
+local Library = require(game.ReplicatedStorage.Library)
+
+getrenv().require = getgenv().require -- mi thot tvk
+debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
+wait(3)
+debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
+wait(3)
+require(game.ReplicatedStorage.Framework.Library).WorldCmds.CanDoAction = function() return true end
+
+wait(4)
+
+if DitPSX["Discord Webhook"]
+and DitPSX["Discord Webhook"]["Stats Tracker"]
+and string.find(DitPSX["Discord Webhook"]["Stats Tracker"]["Url"], "discord") then
+    repeat wait()
+    until dg and S_Timer
+    spawn(function()
+        wait(10)
+        while wait() do
+            pcall(function()
+                SendWebHook({
+                    ["name"] = "Stat Tracker",
+                    ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)) .. "\nGem Gained: " .. tostring(shortNumber(tonumber(dg))) .. "\nTime: " .. tostring(S_Timer),
+                    ["inline"] = false
+                }, DitPSX["Discord Webhook"]["Stats Tracker"]["Url"])
+                local Timer = tick()
+                repeat wait(1)
+                until tick() - Timer >= DitPSX["Discord Webhook"]["Stats Tracker"]["Cooldown"]
+            end)
+        end
+    end)
+end
+
+if not Run1Time then
+    function CollectLoots()
+        for i, v in pairs(wThings.Orbs:GetChildren()) do 
+            getsenv(plr.PlayerScripts.Scripts.Game.Orbs).Collect(v)
+        end
+        for i, v in pairs(wThings.Lootbags:GetChildren()) do 
+            getsenv(plr.PlayerScripts.Scripts.Game.Lootbags).Collect(v)
+        end
+    end
+    spawn(function()
+        while wait() do
+            pcall(function()
+                CollectLoots()
+                if not StartedHopServer then wait(.5) end
+            end)
+        end
+    end)
+
+    -- shout out to rafa
+    local WorldCoins = F_Lib.Things:WaitForChild("Coins")
+    WorldCoins.ChildAdded:Connect(function(v)
+        v:SetAttribute("HasLanded", true)
+        v:SetAttribute("IsFalling", false)
+        local x = v:WaitForChild("Coin")
+        x:SetAttribute("InstantLand", true)
+    end)
+
+    local Original_HasPower = F_Lib.Shared.HasPower
+    F_Lib.Shared.HasPower = function(pet, powerName) 
+        if powerName == "Agility" then 
+            return true, 3
+        end
+        return Original_HasPower(pet, powerName)
+    end
+    
+    local Original_GetPowerDir = F_Lib.Shared.GetPowerDir
+    F_Lib.Shared.GetPowerDir = function(powerName, tier) 
+        if powerName == "Agility" then 
+            return  {
+                title = "Agility III", 
+                desc = "Pet moves 50% faster", 
+                value = 20
+            }
+        end
+        return Original_GetPowerDir(powerName, tier)
+    end
+
+    function Noclip()
+        for i, v in ipairs(plr.Character:GetDescendants()) do
+            if v:IsA("BasePart") and v.CanCollide == true then
+                v.CanCollide = false
+            end
+        end
+    end
+    game:GetService("RunService").Stepped:Connect(function()
+        if getgenv().noclip then
+            if plr.Character ~= nil then
+                local x = plr.Character:FindFirstChild("Humanoid")
+                if x then x:ChangeState(11) end
+                Noclip()
+            end
+        end
+    end)
+    spawn(function()
+        while wait(2) do
+            pcall(function()
+                if noclip and not plr.Character.HumanoidRootPart:FindFirstChild("coems") then
+                    local BV = Instance.new("BodyVelocity", plr.Character.HumanoidRootPart)
+                    BV.Name = "coems"
+                    BV.Velocity = Vector3.new(0, 0, 0)
+                    BV.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                end
+            end)
+        end
+    end)
+
+    getgenv().DisableFarmCyber = true
+    delay(20, function()
+        getgenv().DisableFarmCyber = false
+    end)
+
+    getgenv().Run1Time = true
+end
+
+function GetFruitAmount(x)
+    for i, v in pairs(F_Lib.FruitCmds.Directory) do
+        if i == x then
+            return math.round(F_Lib.FruitCmds.Get(F_Lib.LocalPlayer, v)) or 0
+        end
+    end
+end
+function CheckBreakable(i, v)
+    if wThings.Coins:FindFirstChild(i)
+    and ((wThings.Coins[i].POS:FindFirstChild("HUD") and wThings.Coins[i].POS.HUD.ProgressText.Text ~= "0") or not wThings.Coins[i]:FindFirstChild("HUD"))
+    and v.h > 0 then
+        return true
+    end
+end
+local PrioFruits = {
+    "Rainbow",
+    "Orange",
+    "Apple",
+}
+function GetBreakable(in_area)
+    local P_Breakable = {}
+    local Breakable = {}
+    for i, v in pairs(L_Client.Network.Invoke("Get Coins")) do
+        if v.a == in_area then
+            if CheckBreakable(i, v) then
+                if table.find(PrioFruits, v.n)
+                or v.n == "Mystic Mine Diamond Mine Giant Chest"
+                --or v.b / multipler coin
+                then
+                    table.insert(P_Breakable, i)
+                else
+                    table.insert(Breakable, i)
+                end
+            end
+        end 
+    end
+    if #P_Breakable ~= 0 then
+        return P_Breakable
+    else
+        return Breakable
+    end
+end
+function GetCurrentWorld()
+    return F_Lib.WorldCmds.Get()
+end
+function TeleportArea(area)
+    getsenv(plr.PlayerScripts.Scripts.GUIs.Teleport).Teleport(area, true)
+end
+local PlaceID = game.PlaceId
+local foundAnything = ""
+function TPReturner()
+    local Site;
+    if foundAnything == "" then
+        Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+    else
+        Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
+    end
+    local ID = ""
+    if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
+        foundAnything = Site.nextPageCursor
+    end
+    for i, v in pairs(Site.data) do
+        ID = tostring(v.id)
+        if tonumber(v.playing) <= 3 then
+            pcall(function()
+                wait()
+                game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, plr)
+            end)
+            wait(5)
+        end
+        wait(.1)
+    end
+end
+function HopServer()
+    getgenv().StartedHopServer = true
+    while wait() do
+        pcall(function()
+            TPReturner()
+        end)
+        wait(10)
+    end
+end
+function IsPlayerNearDiamondFarm()
+    for i, v in pairs(game.Players:GetChildren()) do
+        if v.Name ~= plr.Name and v:DistanceFromCharacter(Vector3.new(9022, -20, 2507)) < 250 then
+            return true
+        end
+    end
+end
+function DaycareReady()
+    local Saves = F_Lib.Save.Get()
+    assert(Saves)
+    local DCQueue
+	if Library.Shared.IsHardcore then
+		DCQueue = Saves.DaycareHardcoreQueue
+	else
+		DCQueue = Saves.DaycareQueue
+	end
+    for i, v in pairs(DCQueue) do 
+        if Library.Shared.DaycareComputeRemainingTime(Saves, v) == 0 then 
+            return true 
+        end
+    end
+end
+function CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot)
+    if not table.find(Enrolls, v.uid)
+    and not table.find(E_Pets, v.uid)
+    and not v.l
+    and getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetUsedSlots() + #Enrolls < DC_MaxSlot then
+        return true
+    end
+end
+function GetEnrollPet()
+    local Enrolls, I_Pets, DC_MaxSlot = {}, F_Lib.Save.Get().Pets, getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetMaxSlots()
+    local E_Pets = {}
+    for i, v in pairs(L_Client.PetCmds.GetEquipped()) do
+        table.insert(E_Pets, v.uid)
+    end
+    for i, v in pairs(I_Pets) do
+        if v.dm
+        and CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
+        end
+    end
+    for i, v in pairs(I_Pets) do
+        if v.r
+        and CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
+        end
+    end
+    for i, v in pairs(I_Pets) do
+        if v.g
+        and CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
+        end
+    end
+    for i, v in pairs(I_Pets) do
+        if CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
+        end
+    end
+    return Enrolls
+end
+--[[
+for i, v in pairs(getgc()) do 
+    if islclosure(v) and tostring(getfenv(v).script) == "Pets" then 
+        for _, x in pairs(debug.getconstants(v)) do 
+            if x == "Pets.Remove" then
+                getgenv().PetFunction = v
+                break
+            end
+        end
+        if getgenv().PetFunction then break end
+    end
+end
+]]
+if getgenv().PetFunction then 
+    getgenv().IsPetBusyValue = debug.getupvalues(getgenv().PetFunction)[1]
+    getgenv().IsPetBusy = function(uid) 
+        return getgenv().IsPetBusyValue[uid].farming
+    end
+end
+function GetEquippedPets()
+    local E_Pets = {}
+    for i, v in pairs(L_Client.PetCmds.GetEquipped()) do
+        ---if not IsPetBusy(v.uid) then
+        table.insert(E_Pets, v.uid)
+        --end
+    end
+    return E_Pets
+end
+function Ditting_PSX()
+    if DitPSX["Auto Daycare"] and (not LastCheckDaycare or tick() - LastCheckDaycare > 120) then
+        local EnrollPets = GetEnrollPet()
+        local Req1, Req2 = DaycareReady(), getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetUsedSlots() < getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetMaxSlots() and #EnrollPets > 0
+        if Req1 or Req2 then
+            TeleportArea("Spawn")
+            wait(1)
+            local DaycarePath = game.workspace.__MAP.Interactive:FindFirstChild("Daycare")
+            if DaycarePath then 
+                plr.Character.HumanoidRootPart.CFrame = DaycarePath.Pad.CFrame 
+                wait(1)
+                if Req1 then
+                    L_Client.Network.Invoke("Daycare: Claim")
+                    wait(5)
+                    return
+                else
+                    L_Client.Network.Invoke("Daycare: Enroll", EnrollPets)
+                    wait(5)
+                end
+            end
+        end
+        getgenv().LastCheckDaycare = tick()
+    end
+    if DitPSX["Auto Mailbox"].Enable and plr.Name ~= DitPSX["Auto Mailbox"]["Send to"] and plr.leaderstats.Diamonds.Value >= DitPSX["Auto Mailbox"]["Above amount"] then
+        local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
+        getgenv().noclip = false
+        plr.Character.HumanoidRootPart.CFrame = MailboxPad.CFrame
+        wait(1)
+        if plr:DistanceFromCharacter(MailboxPad.Position) < 8 then 
+            local TotalDiamond = plr.leaderstats.Diamonds.Value - 100000
+            L_Client.Network.Invoke("Send Mail", {
+                Recipient = DitPSX["Auto Mailbox"]["Send to"], 
+                Message = "Dit PSX", 
+                Pets = {}, 
+                Diamonds = TotalDiamond,
+            })
+            getgenv().SentDiamond = SentDiamond + TotalDiamond
+            if DitPSX["Discord Webhook"]
+            and DitPSX["Discord Webhook"]["Mailbox"]
+            and string.find(DitPSX["Discord Webhook"]["Mailbox"], "discord") then
+                SendWebHook({
+                    ["name"] = "Send Mailbox",
+                    ["value"] = "Account: ||" .. plr.Name .. "||\n\nGem Sent: " .. tostring(shortNumber(TotalDiamond)),
+                    ["inline"] = false
+                }, DitPSX["Discord Webhook"]["Mailbox"])
+            end
+            wait(2)
+        end
+    end
+    if DitPSX["Auto Claim Mailbox"] and (not LastCheckMail or tick() - LastCheckMail > 60) then
+        local GiftsUUID = {}
+        local DiamondCount = 0
+        local Mail = F_Lib.Network.Invoke("Get Mail")
+        pcall(function()
+            if Mail.Inbox then
+                for i, v in pairs(Mail.Inbox) do
+                    if v.Message == "Dit PSX" then
+                        table.insert(GiftsUUID, v.uuid)
+                        DiamondCount = DiamondCount + v.Diamonds
+                    end
+                end
+                if #GiftsUUID ~= 0 then
+                    local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
+                    getgenv().noclip = false
+                    plr.Character.HumanoidRootPart.CFrame = MailboxPad.CFrame
+                    wait(1)
+                    if plr:DistanceFromCharacter(MailboxPad.Position) < 8 then 
+                        F_Lib.Network.Invoke("Claim Mail", GiftsUUID)
+                        if DitPSX["Discord Webhook"]
+                        and DitPSX["Discord Webhook"]["Mailbox"]
+                        and string.find(DitPSX["Discord Webhook"]["Mailbox"], "discord") then
+                            SendWebHook({
+                                ["name"] = "Claim Mailbox",
+                                ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)) .. "\nTotal Gem Claimed: " .. tostring(shortNumber(DiamondCount)),
+                                ["inline"] = false
+                            }, DitPSX["Discord Webhook"]["Mailbox"])
+                        end
+                    end
+                end
+            end
+        end)
+        getgenv().LastCheckMail = tick()
+    end
+    local V_World, V_Area, V_Pos = "Diamond Mine", "Mystic Mine", CFrame.new(9022, -40, 2507)
+    if TempFarmCyber then
+        V_Area, V_Pos = "Cyber Cavern", CFrame.new(8784, -40, 3037)
+    end
+    if DitPSX["Auto Farm Fruit"].Enable and (not LastCheckFruit or tick() - LastCheckFruit > 60) then
+        local Apple, Orange = GetFruitAmount("Apple"), GetFruitAmount("Orange")
+        if Apple <= DitPSX["Auto Farm Fruit"]["Farm when under"] or Orange <= DitPSX["Auto Farm Fruit"]["Farm when under"] or FarmFruit then
+            V_World, V_Area, V_Pos = "Pixel", "Pixel Vault", CFrame.new(3553, -40, 2458)
+            if FarmFruit then
+                if Apple > 195 and Orange > 195 then
+                    getgenv().FarmFruit = false
+                    return
+                end
+            else
+                getgenv().FarmFruit = true
+            end
+        end
+        getgenv().LastCheckFruit = tick()
+    end
+    if GetCurrentWorld() ~= V_World then
+        return TeleportArea(V_Area)
+    elseif plr:DistanceFromCharacter(V_Pos.Position) > 20 then
+        getgenv().noclip = true
+        plr.Character.HumanoidRootPart.CFrame = V_Pos
+    end
+    local Breakables = GetBreakable(V_Area)
+    if Breakables then
+        if DitPSX["Swap to Cyber Cavern"]
+        and (#Breakables < 5 and V_Area == "Mystic Mine" and not TempFarmCyber and not DisableFarmCyber) then
+            V_Area, V_Pos = "Cyber Cavern", CFrame.new(8784, -40, 3037)
+            getgenv().TempFarmCyber = true
+            delay(30, function()
+                getgenv().TempFarmCyber = false
+                getgenv().DisableFarmCyber = true
+                delay(20, function()
+                    getgenv().DisableFarmCyber = false
+                end)
+            end)
+        end
+        if DitPSX["Hop Server"]["Out of diamond"] and not FarmFruit
+        and #Breakables == 0 and (not DitPSX["Swap to Cyber Cavern"] or DisableFarmCyber)
+        and (not LastHopTick or tick() - LastHopTick >= DitPSX["Hop Server"]["Hop Server Cooldown"]) then
+            queue_on_teleport("getgenv().LastHopTick = " .. tick())
+            HopServer()
+        end
+        if DitPSX["Hop Server"]["Player nearby"] and not FarmFruit
+        and #Breakables == 0 and (not DitPSX["Swap to Cyber Cavern"] or DisableFarmCyber)
+        and (not LastHopTick or tick() - LastHopTick >= DitPSX["Hop Server"]["Hop Server Cooldown"]) and IsPlayerNearDiamondFarm() then
+            queue_on_teleport("getgenv().LastHopTick = " .. tick())
+            HopServer()
+        end
+        if #Breakables ~= 0 then
+            local P_List = GetEquippedPets()
+            if #P_List == 0 then return end
+            local B_Count = 0
+            local P_Count = 1
+            spawn(function()
+                for i, v in pairs(Breakables) do
+                    B_Count = B_Count + 1
+                    if v and wThings.Coins:FindFirstChild(v) then
+                        pcall(function()
+                            if DitPSX["White Screen"] then return end
+                            local m = wThings.Coins[v].POS.Position
+                            game.workspace.Camera.CFrame = CFrame.new(m.X, m.Y + 40, m.Z, 0, -1, 0, 0, 0, 1, -1, 0, 0)
+                            game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
+                        end)
+                        if V_Area == "Mystic Mine" and #Breakables == 1
+                        or DitPSX["Send all"] and not FarmFruit then
+                            L_Client.Network.Invoke('Join Coin', v, P_List)
+                            for _, x in pairs(P_List) do
+                                L_Client.Network.Fire('Farm Coin', v, x)
+                            end
+                            repeat wait()
+                            until not wThings.Coins:FindFirstChild(v)
+                            or not wThings.Coins[v]:FindFirstChild("HUD", true)
+                            or wThings.Coins[v].POS.HUD.ProgressText.Text == "0"
+                        else
+                            P_Count = P_Count + 1
+                            if #P_List <= P_Count then
+                                P_Count = 1 
+                            end
+                            L_Client.Network.Invoke('Join Coin', v, {P_List[P_Count]})
+                            L_Client.Network.Fire('Farm Coin', v, P_List[P_Count])
+                        end
+                        if FarmFruit then
+                            task.wait()
+                        else
+                            task.wait(DitPSX["Farm Cooldown"])
+                        end
+                    end
+                end
+            end)
+            repeat wait()
+            until B_Count >= #Breakables
+            --or not wThings.Coins:FindFirstChild("HUD", true) or FarmFruit
+            
+        end
+    end
+end
+spawn(function()
+    while wait() do
+        --pcall(Ditting_PSX)
+        Ditting_PSX()
+    end
+end)
+spawn(function()
+    while wait(5) do
+        pcall(function()
+            if not FarmFruit then
+                if DitPSX["Auto Triple Damage Boost"].Boost and not F_Lib.Save.Get().Boosts["Triple Damage"] then
+                    L_Client.Network.Fire("Activate Boost", "Triple Damage")
+                    local Timer = tick()
+                    repeat wait(1)
+                    until F_Lib.Save.Get().Boosts["Triple Damage"] or tick() - Timer > 5
+                end
+                if DitPSX["Auto Triple Damage Boost"].Server and not F_Lib.ServerBoosts.GetActiveBoosts()["Triple Damage"] then
+                    L_Client.Network.Fire("Activate Server Boost", "Triple Damage")
+                    local Timer = tick()
+                    repeat wait(1)
+                    until F_Lib.ServerBoosts.GetActiveBoosts()["Triple Damage"] or tick() - Timer > 5
+                end
+            end
+            for i, v in pairs(L_Directory.FreeGifts) do 
+                if not table.find(F_Lib.Save.Get().FreeGiftsRedeemed, i)
+                and v.waitTime <= F_Lib.Save.Get().FreeGiftsTime then
+                    L_Client.Network.Invoke("Redeem Free Gift", i)
+                end
+            end
+        end)
+    end
+end)
