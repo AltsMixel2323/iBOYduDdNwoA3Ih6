@@ -199,16 +199,16 @@ end)
 if game.CoreGui.RobloxGui:FindFirstChild("PerformanceStats") then 
     UserSettings().GameSettings.PerformanceStatsVisible = false
 end
---[[if game.StarterGui:GetCoreGuiEnabled("PlayerList") then
+if game.StarterGui:GetCoreGuiEnabled("PlayerList") then
     game.StarterGui:SetCore('TopbarEnabled', false)
-end]]
---game.CoreGui:FindFirstChild("RobloxGui").Enabled = false
---game:GetService("VirtualInputManager"):SendKeyEvent(true, 27, false, game)
---game:GetService("VirtualInputManager"):SendKeyEvent(false, 27, false, game)
---plr.PlayerGui.Message.Enabled = false
---plr.PlayerGui.Message:GetPropertyChangedSignal("Enabled"):Connect(function()
---    plr.PlayerGui.Message.Enabled = false
---end)
+end
+game.CoreGui:FindFirstChild("RobloxGui").Enabled = false
+game:GetService("VirtualInputManager"):SendKeyEvent(true, 27, false, game)
+game:GetService("VirtualInputManager"):SendKeyEvent(false, 27, false, game)
+plr.PlayerGui.Message.Enabled = false
+plr.PlayerGui.Message:GetPropertyChangedSignal("Enabled"):Connect(function()
+    plr.PlayerGui.Message.Enabled = false
+end)
 plr.PlayerGui.FreeGiftsTop.Enabled = false
 plr.PlayerGui.Main.Left.Visible = false
 plr.PlayerGui.Main.Right.Diamonds.Add.Visible = false
