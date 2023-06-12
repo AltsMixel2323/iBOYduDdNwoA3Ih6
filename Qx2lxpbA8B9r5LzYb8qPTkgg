@@ -682,18 +682,15 @@ function Ditting_PSX()
     end
     if DitPSX["Auto Farm Fruit"].Enable and (not LastCheckFruit or tick() - LastCheckFruit > 60) then
         local Apple, Orange = GetFruitAmount("Apple"), GetFruitAmount("Orange")
-        if Apple <= DitPSX["Auto Farm Fruit"]["Farm when under"] or Orange <= DitPSX["Auto Farm Fruit"]["Farm when under"] or FarmFruit then
-            V_World, V_Area, V_Pos = "Pixel", "Pixel Vault", CFrame.new(3553, -40, 2458)
-            if FarmFruit then
-                if Apple > 195 and Orange > 195 then
-                    getgenv().FarmFruit = false
-                    return
-                end
-            else
-                getgenv().FarmFruit = true
-            end
+        if Apple > 195 and Orange > 195 then
+            getgenv().FarmFruit = false
+        elseif Apple <= DitPSX["Auto Farm Fruit"]["Farm when under"] or Orange <= DitPSX["Auto Farm Fruit"]["Farm when under"] then
+            getgenv().FarmFruit = true
         end
         getgenv().LastCheckFruit = tick()
+        return
+    elseif FarmFruit then
+        V_World, V_Area, V_Pos = "Pixel", "Pixel Vault", CFrame.new(3553, -40, 2458)
     end
     if GetCurrentWorld() ~= V_World then
         return TeleportArea(V_Area)
