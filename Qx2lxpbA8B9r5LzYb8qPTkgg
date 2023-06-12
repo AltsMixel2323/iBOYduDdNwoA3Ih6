@@ -206,7 +206,6 @@ end)
 if game.CoreGui.RobloxGui:FindFirstChild("PerformanceStats") then 
     UserSettings().GameSettings.PerformanceStatsVisible = false
 end
---[[
 if game.StarterGui:GetCoreGuiEnabled("PlayerList") then
     game.StarterGui:SetCore('TopbarEnabled', false)
 end
@@ -217,7 +216,6 @@ plr.PlayerGui.Message.Enabled = false
 plr.PlayerGui.Message:GetPropertyChangedSignal("Enabled"):Connect(function()
     plr.PlayerGui.Message.Enabled = false
 end)
-]]
 plr.PlayerGui.FreeGiftsTop.Enabled = false
 plr.PlayerGui.Main.Left.Visible = false
 plr.PlayerGui.Main.Right.Diamonds.Add.Visible = false
@@ -231,10 +229,7 @@ for i, v in pairs(plr.PlayerGui.Main.Boosts:GetChildren()) do
     end
 end
 pcall(function()
-    spawn(function()
-        wait(10)
-        plr.PlayerGui.Main.EventHud.Visible = false
-    end)
+    plr.PlayerGui.Main.EventHud.Visible = false
 end)
 
 if DitPSX["Auto Leave"]["Ping Froze"] then 
