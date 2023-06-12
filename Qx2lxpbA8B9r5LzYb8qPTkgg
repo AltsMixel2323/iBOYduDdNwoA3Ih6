@@ -28,7 +28,7 @@ if not script_key and not DitPSX then
             ["Player nearby"] = true, -- Will hop to low player server if there's a player nearby Mystic Mine (2m cooldown)
             ["Out of diamond"] = true, -- Will hop to low player server if there are no diamond left to farm
         },
-        ["Farm Cooldown"] = 0.2, -- Delay between switch to farm another thing (higher = less crashing)
+        ["Farm Cooldown"] = 0.1, -- Delay between switch to farm another thing (higher = less crashing)
         ["Send all"] = true, -- Send all pet to break or not, false will send single to break
         ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
         ["White Screen"] = true,
@@ -224,7 +224,7 @@ end
 pcall(function()
     spawn(function()
         wait(10)
-        plr.PlayerGui.Main.SummerEvent.Visible = false
+        plr.PlayerGui.Main.EventHud.Visible = false
     end)
 end)
 
@@ -296,6 +296,8 @@ getgenv().wThings = workspace.__THINGS
 getgenv().formatNumber = F_Lib.Functions.Commas
 getgenv().shortNumber = F_Lib.Functions.NumberShorten
 
+local Library = require(game.ReplicatedStorage.Library)
+
 getrenv().require = getgenv().require -- mi thot tvk
 debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
 wait(3)
@@ -310,8 +312,8 @@ and DitPSX["Discord Webhook"]["Stats Tracker"]
 and string.find(DitPSX["Discord Webhook"]["Stats Tracker"]["Url"], "discord") then
     repeat wait()
     until dg and S_Timer
-    wait(10)
     spawn(function()
+        wait(10)
         while wait() do
             pcall(function()
                 SendWebHook({
@@ -453,13 +455,6 @@ function GetBreakable(in_area)
         return Breakable
     end
 end
-function GetEquippedPets()
-    local E_Pets = {}
-    for i, v in pairs(L_Client.PetCmds.GetEquipped()) do
-        table.insert(E_Pets, v.uid)
-    end
-    return E_Pets
-end
 function GetCurrentWorld()
     return F_Lib.WorldCmds.Get()
 end
@@ -511,13 +506,13 @@ function DaycareReady()
     local Saves = F_Lib.Save.Get()
     assert(Saves)
     local DCQueue
-	if require(game.ReplicatedStorage.Library).Shared.IsHardcore then
+	if Library.Shared.IsHardcore then
 		DCQueue = Saves.DaycareHardcoreQueue
 	else
 		DCQueue = Saves.DaycareQueue
 	end
     for i, v in pairs(DCQueue) do 
-        if require(game.ReplicatedStorage.Library).Shared.DaycareComputeRemainingTime(Saves, v) == 0 then 
+        if Library.Shared.DaycareComputeRemainingTime(Saves, v) == 0 then 
             return true 
         end
     end
@@ -560,6 +555,34 @@ function GetEnrollPet()
         end
     end
     return Enrolls
+end
+--[[
+for i, v in pairs(getgc()) do 
+    if islclosure(v) and tostring(getfenv(v).script) == "Pets" then 
+        for _, x in pairs(debug.getconstants(v)) do 
+            if x == "Pets.Remove" then
+                getgenv().PetFunction = v
+                break
+            end
+        end
+        if getgenv().PetFunction then break end
+    end
+end
+]]
+if getgenv().PetFunction then 
+    getgenv().IsPetBusyValue = debug.getupvalues(getgenv().PetFunction)[1]
+    getgenv().IsPetBusy = function(uid) 
+        return getgenv().IsPetBusyValue[uid].farming
+    end
+end
+function GetEquippedPets()
+    local E_Pets = {}
+    for i, v in pairs(L_Client.PetCmds.GetEquipped()) do
+        ---if not IsPetBusy(v.uid) then
+        table.insert(E_Pets, v.uid)
+        --end
+    end
+    return E_Pets
 end
 function Ditting_PSX()
     if DitPSX["Auto Daycare"] and (not LastCheckDaycare or tick() - LastCheckDaycare > 120) then
@@ -648,7 +671,7 @@ function Ditting_PSX()
     if TempFarmCyber then
         V_Area, V_Pos = "Cyber Cavern", CFrame.new(8784, -40, 3037)
     end
-    if DitPSX["Auto Farm Fruit"].Enable then
+    if DitPSX["Auto Farm Fruit"].Enable and (not LastCheckFruit or tick() - LastCheckFruit > 60) then
         local Apple, Orange = GetFruitAmount("Apple"), GetFruitAmount("Orange")
         if Apple <= DitPSX["Auto Farm Fruit"]["Farm when under"] or Orange <= DitPSX["Auto Farm Fruit"]["Farm when under"] or FarmFruit then
             V_World, V_Area, V_Pos = "Pixel", "Pixel Vault", CFrame.new(3553, -40, 2458)
@@ -661,6 +684,7 @@ function Ditting_PSX()
                 getgenv().FarmFruit = true
             end
         end
+        getgenv().LastCheckFruit = tick()
     end
     if GetCurrentWorld() ~= V_World then
         return TeleportArea(V_Area)
@@ -696,43 +720,49 @@ function Ditting_PSX()
         end
         if #Breakables ~= 0 then
             local P_List = GetEquippedPets()
+            if #P_List == 0 then return end
             local B_Count = 0
             local P_Count = 1
             spawn(function()
                 for i, v in pairs(Breakables) do
-                    pcall(function()
-                        if DitPSX["White Screen"] then return end
-                        local m = wThings.Coins[v].POS.Position
-                        game.workspace.Camera.CFrame = CFrame.new(m.X, m.Y + 40, m.Z, 0, -1, 0, 0, 0, 1, -1, 0, 0)
-                        game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
-                    end)
-                    if V_Area == "Mystic Mine" and #Breakables == 1
-                    or DitPSX["Send all"] and not FarmFruit then
-                        L_Client.Network.Invoke('Join Coin', v, GetEquippedPets())
-                        for _, x in pairs(GetEquippedPets()) do
-                            L_Client.Network.Fire('Farm Coin', v, x)
-                        end
-                        repeat wait()
-                        until not wThings.Coins:FindFirstChild(v)
-                        or wThings.Coins:FindFirstChild(v).POS.HUD.ProgressText.Text == "0"
-                        return
-                    end
                     B_Count = B_Count + 1
-                    P_Count = P_Count + 1
-                    if #P_List <= P_Count then
-                        P_Count = 1 
-                    end
-                    L_Client.Network.Invoke('Join Coin', v, {P_List[P_Count]})
-                    L_Client.Network.Fire('Farm Coin', v, P_List[P_Count])
-                    if FarmFruit then
-                        task.wait()
-                    else
-                        task.wait(DitPSX["Farm Cooldown"])
+                    if v and wThings.Coins:FindFirstChild(v) then
+                        pcall(function()
+                            if DitPSX["White Screen"] then return end
+                            local m = wThings.Coins[v].POS.Position
+                            game.workspace.Camera.CFrame = CFrame.new(m.X, m.Y + 40, m.Z, 0, -1, 0, 0, 0, 1, -1, 0, 0)
+                            game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
+                        end)
+                        if V_Area == "Mystic Mine" and #Breakables == 1
+                        or DitPSX["Send all"] and not FarmFruit then
+                            L_Client.Network.Invoke('Join Coin', v, P_List)
+                            for _, x in pairs(P_List) do
+                                L_Client.Network.Fire('Farm Coin', v, x)
+                            end
+                            repeat wait()
+                            until not wThings.Coins:FindFirstChild(v)
+                            or not wThings.Coins[v]:FindFirstChild("HUD", true)
+                            or wThings.Coins[v].POS.HUD.ProgressText.Text == "0"
+                        else
+                            P_Count = P_Count + 1
+                            if #P_List <= P_Count then
+                                P_Count = 1 
+                            end
+                            L_Client.Network.Invoke('Join Coin', v, {P_List[P_Count]})
+                            L_Client.Network.Fire('Farm Coin', v, P_List[P_Count])
+                        end
+                        if FarmFruit then
+                            task.wait()
+                        else
+                            task.wait(DitPSX["Farm Cooldown"])
+                        end
                     end
                 end
             end)
-            repeat wait() until B_Count >= #Breakables
-            or not wThings.Coins:FindFirstChild("HUD", true) or FarmFruit
+            repeat wait()
+            until B_Count >= #Breakables
+            --or not wThings.Coins:FindFirstChild("HUD", true) or FarmFruit
+            
         end
     end
 end
