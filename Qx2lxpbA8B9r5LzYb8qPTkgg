@@ -31,7 +31,7 @@ if not script_key and not DitPSX then
         ["Farm Cooldown"] = 0.1, -- Delay between switch to farm another thing (higher = less crashing)
         ["Send all"] = true, -- Send all pet to break or not, false will send single to break
         ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
-        ["White Screen"] = false,
+        ["White Screen"] = true,
         ["Discord Webhook"] = {
             ["Stats Tracker"] = {
                 ["Url"] = "https://discord.com/api/webhooks/1117383456545050625/fAVOHZQVJjZiQSElfSYArxw9LuTlJrEhryG4bVmw3tPH4NFgyxlmLYF8WQRqTVhVLqDV",
