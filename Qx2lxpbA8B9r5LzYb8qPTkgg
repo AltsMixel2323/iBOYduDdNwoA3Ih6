@@ -353,7 +353,7 @@ if not Run1Time then
     end
     game:GetService("ReplicatedStorage").Assets.Billboards.Orb.Enabled = true
     game:GetService("ReplicatedStorage").Assets.Billboards.Reward.Enabled = true
-    game:GetService("ReplicatedStorage").Assets.Particles:Destroy()
+    --game:GetService("ReplicatedStorage").Assets.Particles:Destroy()
 
     function CollectLoots()
         for i, v in pairs(wThings.Orbs:GetChildren()) do 
