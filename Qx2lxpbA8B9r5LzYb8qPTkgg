@@ -108,7 +108,7 @@ if true then
         end)
         pcall(function()
             if tick() - LoadingCount > 60 or plr.PlayerGui["__INTRO"].Frame.Notice.Visible then 
-                --game:Shutdown()
+                game:Shutdown()
                 wait(10)
             end
         end)
@@ -288,7 +288,7 @@ if DitPSX["Auto Leave"]["Ping Froze"] then
             if LastCheck and NewCheck
             and LastCheck - NewCheck > 20 then 
                 pcall(UpdateDashboard)
-                --game:Shutdown()
+                game:Shutdown()
                 wait(10)
             end
             NewPing = GetPing()
@@ -307,7 +307,7 @@ if DitPSX["Auto Leave"]["Got kicked"] then
                 if game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt")
                 and not string.find(game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt").MessageArea.ErrorFrame.ErrorMessage.Text, "Attempted to teleport to a place that is restricted") then
                     pcall(UpdateDashboard)
-                    --game:Shutdown()
+                    game:Shutdown()
                     wait(10)
                 end
             end)
@@ -321,7 +321,7 @@ if DitPSX["Auto Leave"]["Leave Timer"].Enable then
             pcall(function()
                 if tick() - TimerLeave >= DitPSX["Auto Leave"]["Leave Timer"]["After seconds"] then
                     pcall(UpdateDashboard)
-                    --game:Shutdown()
+                    game:Shutdown()
                     wait(10)
                 end
             end)
