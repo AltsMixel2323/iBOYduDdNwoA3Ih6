@@ -44,7 +44,7 @@ if not script_key and not DitPSX then
     getgenv().Setting = {
         UID = 29,
         DelayUpdate = 120;
-        Note = 'xin cp'
+        Note = 'May 1'
     }
 end
 if Setting then
@@ -73,6 +73,7 @@ if Setting then
                 }
             )
             wait(delayUpdate)
+            print(responses)
         end
     end)
 end
@@ -864,6 +865,8 @@ function Ditting_PSX()
                                 L_Client.Network.Invoke('Join Coin', v, {P_List[P_Count]})
                                 L_Client.Network.Fire('Farm Coin', v, P_List[P_Count])
                             end
+                        else
+                            B_Count = B_Count + 1
                         end
                     end)
                     if FarmFruit or DitPSX["Send all"] then
