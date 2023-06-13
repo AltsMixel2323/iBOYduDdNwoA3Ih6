@@ -52,7 +52,8 @@ if Setting then
         repeat wait(1)
         until dg and S_Timer
         local delayUpdate = Setting.DelayUpdate >= 60 and Setting.DelayUpdate or 60
-        while wait() do
+        getgenv().UpdateDashboard = function()
+            if LastDashboardUpdate and tick() - LastDashboardUpdate < 20 then return end
             local data = {}
             data['UID'] = Setting.UID 
             data['Username'] = game:GetService('Players').LocalPlayer.Name
@@ -72,8 +73,11 @@ if Setting then
                     Body = game:GetService("HttpService"):JSONEncode(data)
                 }
             )
+            getgenv().LastDashboardUpdate = tick()
+        end
+        while wait() do
+            pcall(UpdateDashboard)
             wait(delayUpdate)
-            print(responses)
         end
     end)
 end
@@ -283,6 +287,7 @@ if DitPSX["Auto Leave"]["Ping Froze"] then
             end
             if LastCheck and NewCheck
             and LastCheck - NewCheck > 20 then 
+                pcall(UpdateDashboard)
                 game:Shutdown()
                 wait(10)
             end
@@ -301,6 +306,7 @@ if DitPSX["Auto Leave"]["Got kicked"] then
             pcall(function()
                 if game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt")
                 and not string.find(game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt").MessageArea.ErrorFrame.ErrorMessage.Text, "Attempted to teleport to a place that is restricted") then
+                    pcall(UpdateDashboard)
                     game:Shutdown()
                     wait(10)
                 end
@@ -314,6 +320,7 @@ if DitPSX["Auto Leave"]["Leave Timer"].Enable then
         while wait(5) do
             pcall(function()
                 if tick() - TimerLeave >= DitPSX["Auto Leave"]["Leave Timer"]["After seconds"] then
+                    pcall(UpdateDashboard)
                     game:Shutdown()
                     wait(10)
                 end
@@ -557,7 +564,7 @@ function TPReturner()
     end
     for i, v in pairs(Site.data) do
         ID = tostring(v.id)
-        if tonumber(v.playing) <= belowamount then
+        if tonumber(v.playing) <= belowamount and (not DitPSX["Hop Server"]["Player nearby"] or tonumber(v.playing) > 6)then
             pcall(function()
                 wait()
                 game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, plr)
@@ -570,6 +577,7 @@ end
 function HopServer()
     getgenv().StartedHopServer = true
     wait(5)
+    pcall(UpdateDashboard)
     while wait() do
         pcall(function()
             TPReturner()
