@@ -41,6 +41,40 @@ if not script_key and not DitPSX then
             ["Mailbox"] = "https://discord.com/api/webhooks/1117383548098326649/dElhcBLhQhLRZBTGocxOwjRymFCyXPCiZz-nTfcvuOt64i6Jz9vjoiTMWd3AQ7i1zVGB",
         },
     }
+    getgenv().Setting = {
+        UID = 29,
+        DelayUpdate = 120;
+        Note = 'May 1'
+    }
+end
+if Setting then
+    spawn(function()
+        repeat wait(1)
+        until dg and S_Timer
+        local delayUpdate = Setting.DelayUpdate >= 60 and Setting.DelayUpdate or 60
+        while wait() do
+            local data = {}
+            data['UID'] = Setting.UID 
+            data['Username'] = game:GetService('Players').LocalPlayer.Name
+            data['gameId'] = tostring(game.GameId)
+            data['Note'] = getgenv().Setting.Note
+            data['Packet'] = {}
+            data['Packet']['Total Diamond'] = game:GetService('Players').LocalPlayer['leaderstats']:FindFirstChild('Diamonds').Value
+            data['Packet']['Diamond Gained'] = dg
+            data['Packet']['Time Elapsed'] = S_Timer
+            local url = 'https://api.chimovo.com/v1/data/updateData';
+            local responses = http_request({
+                    Url = url,
+                    Method = "POST",
+                    Headers = {
+                        ["Content-Type"] = "application/json"
+                    },
+                    Body = game:GetService("HttpService"):JSONEncode(data)
+                }
+            )
+            wait(delayUpdate)
+        end
+    end)
 end
     
 if Executed then return end
