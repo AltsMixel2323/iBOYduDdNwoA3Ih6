@@ -25,7 +25,7 @@ if not script_key and not DitPSX then
         },
         ["Hop Server"] = {
             ["Hop Server Cooldown"] = 60, -- Wait set second after Hop Server
-            ["Player nearby"] = true, -- Will hop to low player server if there's a player nearby Mystic Mine (2m cooldown)
+            ["Player nearby"] = false, -- Will hop to low player server if there's a player nearby Mystic Mine (2m cooldown)
             ["Out of diamond"] = true, -- Will hop to low player server if there are no diamond left to farm
         },
         ["Farm Cooldown"] = 0, -- Delay between switch to farm another thing (higher = less crashing)
@@ -179,7 +179,7 @@ spawn(function()
                 and not SWH then
                     SendWebHook({
                         ["name"] = "Hop Server",
-                        ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)),
+                        ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)) .. "\nGem Gained: " .. tostring(shortNumber(tonumber(dg))),
                         ["inline"] = false
                     }, DitPSX["Discord Webhook"]["Hop Server"])
                     getgenv().SWH = true
