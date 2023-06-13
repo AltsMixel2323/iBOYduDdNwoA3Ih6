@@ -20,17 +20,17 @@ if not script_key and not DitPSX then
             ["Got kicked"] = true,
             ["Leave Timer"] = {
                 ["Enable"] = true,
-                ["After seconds"] = 60*60 -- Auto Leave the server after AFK in for set seconds 
+                ["After seconds"] = 30*60 -- Auto Leave the server after AFK in for set seconds 
             }
         },
         ["Hop Server"] = {
-            ["Hop Server Cooldown"] = 60, -- Wait set second after Hop Server
+            ["Hop Server Cooldown"] = 120, -- Wait set second after Hop Server
             ["Player nearby"] = false, -- Will hop to low player server if there's a player nearby Mystic Mine (2m cooldown)
             ["Out of diamond"] = true, -- Will hop to low player server if there are no diamond left to farm
         },
         ["Farm Cooldown"] = 0, -- Delay between switch to farm another thing (higher = less crashing)
-        ["Send all"] = false, -- Send all pet to break or not, false will send single to break
-        ["Swap to Cyber Cavern"] = false, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
+        ["Send all"] = true, -- Send all pet to break or not, false will send single to break
+        ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
         ["White Screen"] = true,
         ["Discord Webhook"] = {
             ["Stats Tracker"] = {
