@@ -303,13 +303,18 @@ getgenv().shortNumber = F_Lib.Functions.NumberShorten
 local Library = require(game.ReplicatedStorage.Library)
 
 getrenv().require = getgenv().require -- mi thot tvk
-debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
+hookfunction(debug.getupvalue(L_Client.Network.Invoke, 1), function(...) return true end)
 wait(3)
-debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
+hookfunction(debug.getupvalue(L_Client.Network.Fire, 1), function(...) return true end)
 wait(3)
 require(game.ReplicatedStorage.Framework.Library).WorldCmds.CanDoAction = function() return true end
-
-wait(4)
+wait(2)
+for i, v in pairs(F_Lib.Save.Get().Gamepasses) do
+    if v == 18674305 then
+        getgenv().VIPOwned = true
+    end
+end
+wait(2)
 
 if DitPSX["Discord Webhook"]
 and DitPSX["Discord Webhook"]["Stats Tracker"]
@@ -588,7 +593,40 @@ function GetEquippedPets()
     end
     return E_Pets
 end
+function IsRewardReady(R_Cooldown, R_Timer)
+    m = L_Client.Network.Invoke("Get OSTime") - R_Cooldown - R_Timer
+    if m > 0 then return true end
+end
 function Ditting_PSX()
+    if not LastRewardCheck or tick() - LastRewardCheck > 120 then
+        if VIPOwned and IsRewardReady(14400, F_Lib.Save.Get().VIPCooldown) then
+            TeleportArea("Spawn")
+            wait(1)
+            local VIPRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("VIP Rewards")
+            if VIPRewardPath then 
+                plr.Character.HumanoidRootPart.CFrame = DaycarePath.Pad.CFrame 
+                wait(1)
+                L_Client.Network.Invoke("Redeem VIP Rewards")
+            end
+        end
+        if IsRewardReady(L_Directory.Ranks[F_Lib.Save.Get().Rank].rewardCooldown, F_Lib.Save.Get().RankTimer) then
+            TeleportArea("Spawn")
+            wait(1)
+            local RankRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("Rank Rewards")
+            if RankRewardPath then 
+                plr.Character.HumanoidRootPart.CFrame = DaycarePath.Pad.CFrame 
+                wait(1)
+                L_Client.Network.Invoke("Redeem Rank Rewards")
+            end
+        end
+        for i, v in pairs(L_Directory.FreeGifts) do 
+            if not table.find(F_Lib.Save.Get().FreeGiftsRedeemed, i)
+            and v.waitTime <= F_Lib.Save.Get().FreeGiftsTime then
+                L_Client.Network.Invoke("Redeem Free Gift", i)
+            end
+        end
+        getgenv().LastRewardCheck = tick()
+    end
     if DitPSX["Auto Daycare"] and (not LastCheckDaycare or tick() - LastCheckDaycare > 120) then
         local EnrollPets = GetEnrollPet()
         local Req1, Req2 = DaycareReady(), getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetUsedSlots() < getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetMaxSlots() and #EnrollPets > 0
@@ -773,7 +811,7 @@ spawn(function()
     end
 end)
 spawn(function()
-    while wait(5) do
+    while wait(10) do
         pcall(function()
             if not FarmFruit then
                 if DitPSX["Auto Triple Damage Boost"].Boost and not F_Lib.Save.Get().Boosts["Triple Damage"] then
@@ -787,12 +825,6 @@ spawn(function()
                     local Timer = tick()
                     repeat wait(1)
                     until F_Lib.ServerBoosts.GetActiveBoosts()["Triple Damage"] or tick() - Timer > 5
-                end
-            end
-            for i, v in pairs(L_Directory.FreeGifts) do 
-                if not table.find(F_Lib.Save.Get().FreeGiftsRedeemed, i)
-                and v.waitTime <= F_Lib.Save.Get().FreeGiftsTime then
-                    L_Client.Network.Invoke("Redeem Free Gift", i)
                 end
             end
         end)
