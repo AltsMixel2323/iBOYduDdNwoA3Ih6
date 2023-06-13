@@ -576,6 +576,12 @@ function TPReturner()
 end
 function HopServer()
     getgenv().StartedHopServer = true
+    spawn(function()
+        wait(110)
+        while wait(10) do
+            game:GetService("TeleportService"):Teleport(game.PlaceId, plr)
+        end
+    end)
     wait(5)
     pcall(UpdateDashboard)
     while wait() do
