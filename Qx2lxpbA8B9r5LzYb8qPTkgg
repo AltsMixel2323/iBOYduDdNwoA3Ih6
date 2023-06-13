@@ -179,7 +179,7 @@ spawn(function()
                 and not SWH then
                     SendWebHook({
                         ["name"] = "Hop Server",
-                        ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)) .. "\nGem Gained: " .. tostring(shortNumber(tonumber(dg))),
+                        ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)) .. "\nGem Gained: " .. tostring(shortNumber(tonumber(dg))) .. "\nTime: " .. tostring(S_Timer),
                         ["inline"] = false
                     }, DitPSX["Discord Webhook"]["Hop Server"])
                     getgenv().SWH = true
@@ -513,6 +513,7 @@ function TPReturner()
 end
 function HopServer()
     getgenv().StartedHopServer = true
+    wait(5)
     while wait() do
         pcall(function()
             TPReturner()
