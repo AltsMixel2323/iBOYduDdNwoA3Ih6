@@ -853,14 +853,20 @@ function Ditting_PSX()
                 for i, v in ipairs(Breakables) do
                     pcall(function()
                         if v and wThings.Coins:FindFirstChild(v) then
+                            if game.workspace.Camera.CameraType == Enum.CameraType.Custom then
+                                game.workspace.Camera.CFrame = CFrame.new(0, 1000, 0, 0, -1, 0, 0, 0, -1, -1, 0, 0)
+                                game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
+                            end
                             if V_Area == "Mystic Mine" and #Breakables == 1
                             or DitPSX["Send all"] and not FarmFruit then
+                                --[[
                                 pcall(function()
                                     if DitPSX["White Screen"] then return end
                                     local m = wThings.Coins[v].POS.Position
                                     game.workspace.Camera.CFrame = CFrame.new(m.X, m.Y + 40, m.Z, 0, -1, 0, 0, 0, 1, -1, 0, 0)
                                     game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
                                 end)
+                                ]]
                                 L_Client.Network.Invoke('Join Coin', v, P_List)
                                 for _, x in pairs(P_List) do
                                     L_Client.Network.Fire('Farm Coin', v, x)
@@ -872,10 +878,12 @@ function Ditting_PSX()
                                 or wThings.Coins[v].POS.HUD.ProgressText.Text == "0"
                                 B_Count = B_Count + 1
                             else
+                                --[[
                                 if not DitPSX["White Screen"] and game.workspace.Camera.CameraType == Enum.CameraType.Scriptable then
                                     game.workspace.Camera.CFrame = CFrame.new(0, 0, 0, 0, -1, 0, 0, 0, -1, -1, 0, 0)
                                     game.workspace.Camera.CameraType = Enum.CameraType.Custom
                                 end
+                                ]]
                                 P_Count = P_Count + 1
                                 if #P_List <= P_Count then
                                     P_Count = 1 
