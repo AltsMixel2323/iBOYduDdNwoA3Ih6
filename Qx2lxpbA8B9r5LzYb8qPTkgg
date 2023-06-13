@@ -192,9 +192,10 @@ spawn(function()
                     olddg = DiamondsGained.Amount_odometerGUIFX.Text:split("\n")[1]
                 end
                 local countdg = (plr.leaderstats.Diamonds.Value + SentDiamond) - OldDiamond
-                getgenv().dg = formatNumber(countdg)
-                SetText(DiamondsGained, dg .. "\n" .. S_Timer)
-                if not string.find(olddg, dg) then
+                getgenv().dg = countdg
+                getgenv().dg2 = formatNumber(countdg)
+                SetText(DiamondsGained, dg2 .. "\n" .. S_Timer)
+                if not string.find(olddg, dg2) then
                     getsenv(plr.PlayerScripts.Scripts.GUIs.Currency).BloatCurrencyFrame(DiamondsGained)
                 end
             end
@@ -340,6 +341,7 @@ end
 
 if not Run1Time then
 
+    --[[
     for i, v in pairs(game:GetService("ReplicatedStorage").Assets.Models.Lootbags:GetDescendants()) do
         if v:IsA("Attachment") or v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("PointLight")  then 
             pcall(function()
@@ -354,11 +356,9 @@ if not Run1Time then
     game:GetService("ReplicatedStorage").Assets.Billboards.Orb.Enabled = true
     game:GetService("ReplicatedStorage").Assets.Billboards.Reward.Enabled = true
     --game:GetService("ReplicatedStorage").Assets.Particles:Destroy()
+    ]]
 
     function CollectLoots()
-        for i, v in pairs(wThings.Orbs:GetChildren()) do 
-            getsenv(plr.PlayerScripts.Scripts.Game.Orbs).Collect(v)
-        end
         for i, v in pairs(wThings.Lootbags:GetChildren()) do 
             getsenv(plr.PlayerScripts.Scripts.Game.Lootbags).Collect(v)
         end
@@ -370,6 +370,23 @@ if not Run1Time then
                 if not StartedHopServer then wait(1) end
             end)
         end
+    end)
+    
+    local huhu = getsenv(game.Players.LocalPlayer.PlayerScripts.Scripts.Game.Orbs)
+    local Collect = huhu.Collect
+    local list = {}
+    local getupval = debug.getupvalue
+    hookfunction(huhu.AddOrb,function(a,b) 
+        table.insert(list,a)
+    end)
+    getgenv().Collect = function()
+        table.foreach(list,function(k,v) 
+            table.insert(getupval(Collect,3),v)
+        end)
+        list = {}
+    end
+    spawn(function()
+        while wait(1) do getgenv().Collect() end
     end)
 
     -- shout out to rafa
@@ -783,24 +800,29 @@ function Ditting_PSX()
                 for i, v in ipairs(Breakables) do
                     pcall(function()
                         if v and wThings.Coins:FindFirstChild(v) then
-                            pcall(function()
-                                if DitPSX["White Screen"] then return end
-                                local m = wThings.Coins[v].POS.Position
-                                game.workspace.Camera.CFrame = CFrame.new(m.X, m.Y + 40, m.Z, 0, -1, 0, 0, 0, 1, -1, 0, 0)
-                                game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
-                            end)
                             if V_Area == "Mystic Mine" and #Breakables == 1
                             or DitPSX["Send all"] and not FarmFruit then
+                                pcall(function()
+                                    if DitPSX["White Screen"] then return end
+                                    local m = wThings.Coins[v].POS.Position
+                                    game.workspace.Camera.CFrame = CFrame.new(m.X, m.Y + 40, m.Z, 0, -1, 0, 0, 0, 1, -1, 0, 0)
+                                    game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
+                                end)
                                 L_Client.Network.Invoke('Join Coin', v, P_List)
                                 for _, x in pairs(P_List) do
                                     L_Client.Network.Fire('Farm Coin', v, x)
                                 end
                                 --Library.Signal.Fire("Select Coin", wThings.Coins:FindFirstChild(v))
-                                repeat wait(.1)
+                                repeat wait()
                                 until not wThings.Coins:FindFirstChild(v)
                                 or not wThings.Coins[v]:FindFirstChild("HUD", true)
                                 or wThings.Coins[v].POS.HUD.ProgressText.Text == "0"
+                                B_Count = B_Count + 1
                             else
+                                if not DitPSX["White Screen"] and game.workspace.Camera.CameraType == Enum.CameraType.Scriptable then
+                                    game.workspace.Camera.CFrame = CFrame.new(0, 0, 0, 0, -1, 0, 0, 0, -1, -1, 0, 0)
+                                    game.workspace.Camera.CameraType = Enum.CameraType.Custom
+                                end
                                 P_Count = P_Count + 1
                                 if #P_List <= P_Count then
                                     P_Count = 1 
@@ -810,16 +832,19 @@ function Ditting_PSX()
                             end
                         end
                     end)
-                    B_Count = B_Count + 1
-                    if FarmFruit then
+                    if FarmFruit or DitPSX["Send all"] then
                         task.wait()
                     else
                         task.wait(DitPSX["Farm Cooldown"])
                     end
                 end
             end)
-            repeat wait(.1)
-            until B_Count >= #Breakables
+            if DitPSX["Send all"] then
+                repeat wait()
+                until B_Count >= #Breakables
+            else
+                wait(DitPSX["Farm Cooldown"])
+            end
             --or not wThings.Coins:FindFirstChild("HUD", true) or FarmFruit
         end
     end
