@@ -34,7 +34,7 @@ if not script_key and not DitPSX then
         ["White Screen"] = true,
         ["Discord Webhook"] = {
             ["Stats Tracker"] = {
-                ["Url"] = "https://discord.com/api/webhooks/1117383456545050625/fAVOHZQVJjZiQSElfSYArxw9LuTlJrEhryG4bVmw3tPH4NFgyxlmLYF8WQRqTVhVLqDV",
+                ["Url"] = "",
                 ["Cooldown"] = 60*60, -- Will notify every set seconds
             }, 
             ["Hop Server"] = "https://discord.com/api/webhooks/1117383501352800387/FaHzAjgAKFiUpxM7J4iOV_BbwGHdKb9pUbBOFadOBIY5HqwqdkqLJUhGyMvlSTRDbBq4",
