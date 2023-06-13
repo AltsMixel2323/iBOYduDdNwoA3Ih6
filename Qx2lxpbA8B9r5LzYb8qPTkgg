@@ -540,6 +540,10 @@ function TeleportArea(area)
 end
 local PlaceID = game.PlaceId
 local foundAnything = ""
+local belowamount = 11
+if DitPSX["Hop Server"]["Player nearby"] then
+    belowamount = 3
+end
 function TPReturner()
     local Site;
     if foundAnything == "" then
@@ -553,7 +557,7 @@ function TPReturner()
     end
     for i, v in pairs(Site.data) do
         ID = tostring(v.id)
-        if tonumber(v.playing) <= 3 then
+        if tonumber(v.playing) <= belowamount then
             pcall(function()
                 wait()
                 game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, plr)
