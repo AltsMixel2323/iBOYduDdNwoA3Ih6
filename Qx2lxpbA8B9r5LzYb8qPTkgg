@@ -6,39 +6,39 @@ if not script_key and not DitPSX then
         },
         ["Auto Farm Fruit"] = { -- Only check for Orange/Apple fruit
             ["Enable"] = true,
-            ["Farm when under"] = 40
+            ["Farm when under"] = 120
         },
         ["Auto Mailbox"] = { -- Auto send Diamonds to a person thru Mailbox when your Diamonds more than set diamond
-            ["Enable"] = true,
-            ["Send to"] = "egodwastaken",
+            ["Enable"] = false,
+            ["Send to"] = "Roblox Username",
             ["Above amount"] = 100000000000
         },
         ["Auto Claim Mailbox"] = true, -- Claim Diamonds on the account received the Diamonds from Auto Mailbox
-        ["Auto Daycare"] = true, -- Auto Claim Daycare and Enroll unequipped/unlocked Pets in your Inventory
+        ["Auto Daycare"] = false, -- Auto Claim Daycare and Enroll unequipped/unlocked Pets in your Inventory
         ["Auto Leave"] = {
             ["Ping Froze"] = true,
             ["Got kicked"] = true,
             ["Leave Timer"] = {
-                ["Enable"] = true,
-                ["After seconds"] = 30*60 -- Auto Leave the server after AFK in for set seconds 
+                ["Enable"] = false,
+                ["After seconds"] = 6060 -- Auto Leave the server after AFK in for set seconds 
             }
         },
         ["Hop Server"] = {
-            ["Hop Server Cooldown"] = 300, -- Wait set second after Hop Server
-            ["Player nearby"] = false, -- Will hop to low player server if there's a player nearby Mystic Mine (2m cooldown)
+            ["Hop Server Cooldown"] = 120, -- Wait set second after Hop Server
+            ["Player nearby"] = true, -- Will hop to low player server if there's a player nearby Mystic Mine (2m cooldown)
             ["Out of diamond"] = true, -- Will hop to low player server if there are no diamond left to farm
         },
-        ["Farm Cooldown"] = 0, -- Delay between switch to farm another thing (higher = less crashing)
-        ["Send all"] = false, -- Send all pet to break or not, false will send single to break
+        ["Farm Cooldown"] = 0.1, -- Delay between switch to farm another thing (higher = less crashing but slower farm)
+        ["Send all"] = true, -- Send all pet to break or not, false will send single to break
         ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
-        ["White Screen"] = true,
-        ["Discord Webhook"] = {
+        ["White Screen"] = false,
+        ["Discord Webhook"] = { -- Leave default if you don't want to enable
             ["Stats Tracker"] = {
-                ["Url"] = "",
-                ["Cooldown"] = 60*60, -- Will notify every set seconds
+                ["Url"] = "Stat Tracker Webhook Url here",
+                ["Cooldown"] = 6060, -- Will notify every set seconds
             }, 
-            ["Hop Server"] = "https://discord.com/api/webhooks/1117383501352800387/FaHzAjgAKFiUpxM7J4iOV_BbwGHdKb9pUbBOFadOBIY5HqwqdkqLJUhGyMvlSTRDbBq4",
-            ["Mailbox"] = "https://discord.com/api/webhooks/1117383548098326649/dElhcBLhQhLRZBTGocxOwjRymFCyXPCiZz-nTfcvuOt64i6Jz9vjoiTMWd3AQ7i1zVGB",
+            ["Hop Server"] = "Hop Server Logs Webhook Url here",
+            ["Mailbox"] = "Claim/Send Gift Logs Webhook Url here",
         },
     }
     getgenv().Setting = {
@@ -894,7 +894,7 @@ function Ditting_PSX()
                     end
                 end
             end)
-            if DitPSX["Send all"] then
+            if DitPSX["Send all"] and not FarmFruit then
                 repeat wait()
                 until B_Count >= #Breakables
             else
