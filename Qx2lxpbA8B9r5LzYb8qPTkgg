@@ -1020,7 +1020,7 @@ function Ditting_PSX()
             local P_Count = 1
             spawn(function()
                 for i, v in ipairs(Breakables) do
-                    --pcall(function()
+                    pcall(function()
                         if v and wThings.Coins:FindFirstChild(v) then
                             if DitPSX["White Screen"] then
                                 if game.workspace.Camera.CameraType == Enum.CameraType.Custom then
@@ -1054,7 +1054,7 @@ function Ditting_PSX()
                         else
                             B_Count = B_Count + 1
                         end
-                    --end)
+                    end)
                     if FarmFruit or DitPSX["Send all"] then
                         task.wait()
                     else
@@ -1077,8 +1077,8 @@ end
 warpF2(function() 
     spawn(function()
         while wait() do
-            --pcall(Ditting_PSX)
-            Ditting_PSX()
+            pcall(Ditting_PSX)
+            --Ditting_PSX()
         end
     end)
 end)
