@@ -91,6 +91,84 @@ until game:IsLoaded()
 and game.Players.LocalPlayer
 and game.Players.LocalPlayer:FindFirstChild("leaderstats")
 
+local Blacklist = {"Daycare","Coins","Settings","Lootbags","Orbs","Currency","Teleport"}
+getgenv().Tvkne = function() 
+    pcall(function() 
+        workspace.__DEBRIS:Destroy()
+    end)
+    local huhu = {
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["World GUIs"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Achievement Progress"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Achievements,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Active Boosts"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Active Server Boosts"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["April Fools Console"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Auction Pet"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Auction Select"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Auto Settings"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Bank Client"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Bid Pet"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Bloomberg,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Boosts,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Booth Inventory"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Bottom Buttons"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Clipboard Popup"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Coin Rewards HUD"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["WIndow Visibility Handling"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Verify Twitter"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Upgrades,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Update Log"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Twiter Codes"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Trading Plaza Choice"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Trading History"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Trading,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Starter,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Server Boosts"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.SelectBooth,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Rename,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Release Pet"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Ranks,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Rainbow Machine"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Golden Machine"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Fuse Pets"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Free Gifts"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.FFlags,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Exclusive Shop"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Evolve Machine"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Enchant Pets"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Diamonds Rain Animation"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Auction Billboard"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Auto Hatch"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Barn Door"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game.Cannons,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game.Tutorial,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Traveling Merchant"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Trading Booths"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Shiny Relic"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Hoverboards,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Collection,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Core,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game.Misc,
+    }
+    for k,v in pairs(huhu) do v:Destroy() end
+    for k,v in pairs(game:GetService("ReplicatedStorage").Assets.Particles:GetDescendants()) do 
+        if v:IsA("ParticleEmitter") then 
+            v.Enabled = false
+            v.Texture = ""
+            v.Brightness = 0
+        end
+    end
+    while wait(10) do 
+        for k,v in pairs(game.Players:GetChildren()) do
+            if v.Name ~= plr.name then 
+                pcall(function() 
+                    v.Character:Destroy()    
+                end)    
+            end
+        end
+    end
+end
+
 local plr = game.Players.LocalPlayer
 
 function Kick(v)
@@ -679,6 +757,14 @@ function TPReturner()
 end
 function HopServer()
     spawn(function()
+        while wait() do
+            wait(2)
+            pcall(function()
+                TPReturner()
+            end)
+        end
+    end)
+    spawn(function()
         pcall(function()
             getgenv().StartedHopServer = true
             spawn(function()
@@ -691,15 +777,11 @@ function HopServer()
             pcall(UpdateDashboard)
         end)
     end)
-    spawn(function()
-        while wait() do
-            pcall(function()
-                TPReturner()
-            end)
-            wait(2)
-        end
-    end)
 end
+getgenv().hopserver = Instance.new("BindableEvent")
+getgenv().hopserver.Event:Connect(function() 
+    HopServer()
+end)
 function IsPlayerNearDiamondFarm()
     for i, v in pairs(game.Players:GetChildren()) do
         if v.Name ~= plr.Name and v:DistanceFromCharacter(Vector3.new(9022, -20, 2507)) < 250 then
@@ -956,14 +1038,14 @@ function Ditting_PSX()
             and not Breakable and (not DitPSX["Swap to Cyber Cavern"] or DisableFarmCyber)
             and (not LastHopTick or tick() - LastHopTick >= DitPSX["Hop Server"]["Hop Server Cooldown"]) then
                 queue_on_teleport("getgenv().LastHopTick = " .. tick())
-                HopServer()
+                getgenv().hopserver:Fire()
             end
             if not StartedHopServer
             and DitPSX["Hop Server"]["Player nearby"] and not FarmFruit
             and not Breakable and (not DitPSX["Swap to Cyber Cavern"] or DisableFarmCyber)
             and (not LastHopTick or tick() - LastHopTick >= DitPSX["Hop Server"]["Hop Server Cooldown"]) and IsPlayerNearDiamondFarm() then
                 queue_on_teleport("getgenv().LastHopTick = " .. tick())
-                HopServer()
+                getgenv().hopserver:Fire()
             end
             if DitPSX["White Screen"] then
                 if game.workspace.Camera.CameraType == Enum.CameraType.Custom then
@@ -1005,13 +1087,13 @@ function Ditting_PSX()
         and #Breakables == 0 and (not DitPSX["Swap to Cyber Cavern"] or DisableFarmCyber)
         and (not LastHopTick or tick() - LastHopTick >= DitPSX["Hop Server"]["Hop Server Cooldown"]) then
             queue_on_teleport("getgenv().LastHopTick = " .. tick())
-            HopServer()
+            getgenv().hopserver:Fire()
         end
         if DitPSX["Hop Server"]["Player nearby"] and not FarmFruit
         and #Breakables == 0 and (not DitPSX["Swap to Cyber Cavern"] or DisableFarmCyber)
         and (not LastHopTick or tick() - LastHopTick >= DitPSX["Hop Server"]["Hop Server Cooldown"]) and IsPlayerNearDiamondFarm() then
             queue_on_teleport("getgenv().LastHopTick = " .. tick())
-            HopServer()
+            getgenv().hopserver:Fire()
         end
         if #Breakables ~= 0 then
             local P_List = GetEquippedPets()
