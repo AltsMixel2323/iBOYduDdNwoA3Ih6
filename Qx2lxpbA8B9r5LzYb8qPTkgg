@@ -938,7 +938,7 @@ spawn(function()
     end
 end)
 spawn(function()
-    while wait(10) do
+    while wait(30) do
         pcall(function()
             if not FarmFruit then
                 if DitPSX["Auto Triple Damage Boost"].Boost and not F_Lib.Save.Get().Boosts["Triple Damage"] then
