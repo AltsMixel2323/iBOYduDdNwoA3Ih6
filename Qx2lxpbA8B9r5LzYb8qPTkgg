@@ -328,7 +328,56 @@ if DitPSX["Auto Leave"]["Leave Timer"].Enable then
         end
     end)
 end
+local connect
+local funcwrap
+local ret
+local ListFunc = {}
+local old
+local connect2
+old = hookmetamethod(game,"__index",function(...) 
+    if checkcaller() then return old(...) end
+    if not connect then 
+        connect=Instance.new("IntValue")
+        connect.Changed:Connect(function(val)
+            if val==100 then 
+                for k,v in pairs(ListFunc) do 
+                    if not v.Done then 
+                        spawn(function() 
+                            local s,e = pcall(function() 
+                                v.Res = k()
+                            end)
+                            if e then print(e) end
+                            v.tvk = true
+                            connect2.Value=100
+                            connect2.Value=0
+                        end)
+                        v.Done=true
+                    end
+                end
+            end 
+        end)
+    end
+    return old(...)
+end)
+repeat wait() until connect
+print("Connected")
+function warpF2(f) 
+    if not connect2 then 
+        connect2=Instance.new("IntValue")
+    end
+    ListFunc[f] = {}
 
+
+    connect.Value=100
+    connect.Value=0
+    
+    while not ListFunc[f].tvk do 
+        connect2.Changed:Wait()
+    end
+    local res = ListFunc[f].Res
+    ListFunc[f] = nil
+    return res
+end
 local vu = game:GetService("VirtualUser")
 plr.Idled:connect(function()
     vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
@@ -344,8 +393,6 @@ getgenv().formatNumber = F_Lib.Functions.Commas
 getgenv().shortNumber = F_Lib.Functions.NumberShorten
 
 local Library = require(game.ReplicatedStorage.Library)
-
-getrenv().require = getgenv().require -- mi thot tvk
 debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
 wait(1)
 debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
@@ -415,20 +462,20 @@ if not Run1Time then
     end)
     getgenv().noclip = true
     
-    for i, v in pairs(workspace.__THINGS.Coins:GetChildren()) do
-        local x = v:FindFirstChild("Coin", true)
-        if x then
-            x.MeshId = ""
-            x.TextureID = ""
-        end
-    end
-    for i, v in pairs(game.ReplicatedStorage.Assets.CoinAssets:GetChildren()) do
-        local x = v:FindFirstChildOfClass("MeshPart", true)
-        if x then
-            x.MeshId = ""
-            x.TextureID = ""
-        end
-    end
+    -- for i, v in pairs(workspace.__THINGS.Coins:GetChildren()) do
+    --     local x = v:FindFirstChild("Coin", true)
+    --     if x then
+    --         x.MeshId = ""
+    --         x.TextureID = ""
+    --     end
+    -- end
+    -- for i, v in pairs(game.ReplicatedStorage.Assets.CoinAssets:GetChildren()) do
+    --     local x = v:FindFirstChildOfClass("MeshPart", true)
+    --     if x then
+    --         x.MeshId = ""
+    --         x.TextureID = ""
+    --     end
+    -- end
 
     local LootbagCollect = getsenv(plr.PlayerScripts.Scripts.Game.Lootbags)
     function CollectLoots()
@@ -933,12 +980,15 @@ function Ditting_PSX()
         wait(5)
     end
 end
-spawn(function()
-    while wait() do
-        pcall(Ditting_PSX)
-        --Ditting_PSX()
-    end
+warpF2(function() 
+    spawn(function()
+        while wait() do
+            pcall(Ditting_PSX)
+            --Ditting_PSX()
+        end
+    end)
 end)
+
 spawn(function()
     while wait(30) do
         pcall(function()
