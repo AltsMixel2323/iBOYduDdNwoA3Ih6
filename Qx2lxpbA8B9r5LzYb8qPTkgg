@@ -234,9 +234,6 @@ spawn(function()
                 getgenv().dg = countdg
                 getgenv().dg2 = formatNumber(countdg)
                 SetText(DiamondsGained, dg2 .. "\n" .. S_Timer)
-                if not string.find(olddg, dg2) then
-                    getsenv(plr.PlayerScripts.Scripts.GUIs.Currency).BloatCurrencyFrame(DiamondsGained)
-                end
             end
         end)
     end
