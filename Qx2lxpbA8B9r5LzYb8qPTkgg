@@ -650,13 +650,13 @@ end
 function TeleportArea(area)
     getsenv(plr.PlayerScripts.Scripts.GUIs.Teleport).Teleport(area, true)
 end
-local PlaceID = game.PlaceId
-local foundAnything = ""
-local belowamount = 10
-if DitPSX["Hop Server"]["Player nearby"] then
-    belowamount = 3
-end
 function TPReturner()
+    local PlaceID = game.PlaceId
+    local foundAnything = ""
+    local belowamount = 10
+    if DitPSX["Hop Server"]["Player nearby"] then
+        belowamount = 3
+    end
     local Site;
     if foundAnything == "" then
         Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
@@ -679,22 +679,26 @@ function TPReturner()
 end
 function HopServer()
     spawn(function()
-        getgenv().StartedHopServer = true
-        spawn(function()
-            wait(110)
-            while wait(10) do
-                game:GetService("TeleportService"):Teleport(game.PlaceId, plr)
-            end
-        end)
-        wait(5)
-        pcall(UpdateDashboard)
-    end)
-    while wait() do
         pcall(function()
-            TPReturner()
+            getgenv().StartedHopServer = true
+            spawn(function()
+                wait(110)
+                while wait(10) do
+                    game:GetService("TeleportService"):Teleport(game.PlaceId, plr)
+                end
+            end)
+            wait(5)
+            pcall(UpdateDashboard)
         end)
-        wait(2)
-    end
+    end)
+    spawn(function()
+        while wait() do
+            pcall(function()
+                TPReturner()
+            end)
+            wait(2)
+        end
+    end)
 end
 function IsPlayerNearDiamondFarm()
     for i, v in pairs(game.Players:GetChildren()) do
