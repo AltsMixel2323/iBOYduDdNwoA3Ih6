@@ -430,9 +430,10 @@ if not Run1Time then
         end
     end
 
+    local collectloot = getsenv(plr.PlayerScripts.Scripts.Game.Lootbags)
     function CollectLoots()
         for i, v in pairs(wThings.Lootbags:GetChildren()) do 
-            getsenv(plr.PlayerScripts.Scripts.Game.Lootbags).Collect(v)
+            collectloot.Collect(v)
         end
     end
     spawn(function()
