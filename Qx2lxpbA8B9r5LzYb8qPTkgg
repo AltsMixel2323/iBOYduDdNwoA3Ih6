@@ -207,7 +207,7 @@ spawn(function()
     SetText(DiamondsGained, "Script by egoD\nLoading script...")
     getgenv().OldDiamond = plr.leaderstats.Diamonds.Value
     getgenv().SentDiamond = 0
-    wait(10)
+    wait(5)
     while wait(.5) do
         pcall(function()
             if StartedHopServer then
@@ -270,6 +270,9 @@ for i, v in pairs(plr.PlayerGui.Main.Boosts:GetChildren()) do
 end
 pcall(function()
     plr.PlayerGui.Main.EventHud.Visible = false
+    plr.PlayerGui.Main.EventHud:GetPropertyChangedSignal("Visible"):Connect(function()
+        plr.PlayerGui.Main.EventHud.Visible = false
+    end)
 end)
 
 if DitPSX["Auto Leave"]["Ping Froze"] then 
@@ -347,17 +350,16 @@ local Library = require(game.ReplicatedStorage.Library)
 
 getrenv().require = getgenv().require -- mi thot tvk
 hookfunction(debug.getupvalue(L_Client.Network.Invoke, 1), function(...) return true end)
-wait(3)
+wait(1)
 hookfunction(debug.getupvalue(L_Client.Network.Fire, 1), function(...) return true end)
-wait(3)
+wait(1)
 require(game.ReplicatedStorage.Framework.Library).WorldCmds.CanDoAction = function() return true end
-wait(2)
+wait(1)
 for i, v in pairs(F_Lib.Save.Get().Gamepasses) do
     if v == 18674305 then
         getgenv().VIPOwned = true
     end
 end
-wait(2)
 
 if DitPSX["Discord Webhook"]
 and DitPSX["Discord Webhook"]["Stats Tracker"]
@@ -365,7 +367,7 @@ and string.find(DitPSX["Discord Webhook"]["Stats Tracker"]["Url"], "discord") th
     repeat wait()
     until dg and S_Timer
     spawn(function()
-        wait(10)
+        wait(3)
         while wait() do
             pcall(function()
                 SendWebHook({
@@ -383,6 +385,13 @@ end
 
 if not Run1Time then
 
+    if DitPSX["Send all"] then
+        Library.Save.Get().Settings.PetsControl = 2
+    else
+        Library.Save.Get().Settings.PetsControl = 1
+    end
+    getsenv(plr.PlayerScripts.Scripts.GUIs.Settings).Update()
+
     --[[
     for i, v in pairs(game:GetService("ReplicatedStorage").Assets.Models.Lootbags:GetDescendants()) do
         if v:IsA("Attachment") or v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("PointLight")  then 
@@ -392,13 +401,37 @@ if not Run1Time then
             pcall(function()
                 v.Parent.MeshId = ""
             end)
-            v:Destroy()
         end
     end
+    ]]
     game:GetService("ReplicatedStorage").Assets.Billboards.Orb.Enabled = true
     game:GetService("ReplicatedStorage").Assets.Billboards.Reward.Enabled = true
     --game:GetService("ReplicatedStorage").Assets.Particles:Destroy()
-    ]]
+    spawn(function()
+        while wait() do
+            pcall(function()
+                local m = workspace.__MAP:FindFirstChild("Areas")
+                if m then m:Destroy() wait(10) end
+            end)
+            wait(5)
+        end
+    end)
+    getgenv().noclip = true
+    
+    for i, v in pairs(workspace.__THINGS.Coins:GetChildren()) do
+        local x = v:FindFirstChild("Coin", true)
+        if x then
+            x.MeshId = ""
+            x.TextureID = ""
+        end
+    end
+    for i, v in pairs(game.ReplicatedStorage.Assets.CoinAssets:GetChildren()) do
+        local x = v:FindFirstChildOfClass("MeshPart", true)
+        if x then
+            x.MeshId = ""
+            x.TextureID = ""
+        end
+    end
 
     function CollectLoots()
         for i, v in pairs(wThings.Lootbags:GetChildren()) do 
@@ -516,6 +549,7 @@ local PrioFruits = {
     "Orange",
     "Apple",
 }
+--[[
 function GetBreakable(in_area)
     local P_Breakable = {}
     local Breakable = {}
@@ -538,6 +572,31 @@ function GetBreakable(in_area)
     else
         return Breakable
     end
+end
+]]
+local Library = require(game.ReplicatedStorage.Library)
+function GetBreakable(in_area)
+    local Breakables = {}
+    for i, v in pairs(game.Workspace.__THINGS.Coins:GetChildren()) do 
+        if v:IsA("Folder")
+        and v:GetAttribute("Area") == in_area
+        and v:GetAttribute("Health") > 0 then
+        	table.insert(Breakables, v)
+        end
+    end
+    for i, v in pairs(Breakables) do
+    	if v:GetAttribute("Name") == "Haunted Island Haunted Chest" then
+    		return v
+		end
+    end
+    if not DitPSX["Send all"] then
+        for i, v in pairs(Breakables) do
+            if not v.POS:FindFirstChild("HUD") then
+                return v
+            end
+        end
+    end
+    return Breakables[1]
 end
 function GetCurrentWorld()
     return F_Lib.WorldCmds.Get()
@@ -569,9 +628,7 @@ function TPReturner()
                 wait()
                 game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, plr)
             end)
-            wait(5)
         end
-        wait(.1)
     end
 end
 function HopServer()
@@ -588,7 +645,7 @@ function HopServer()
         pcall(function()
             TPReturner()
         end)
-        wait(10)
+        wait(2)
     end
 end
 function IsPlayerNearDiamondFarm()
@@ -652,7 +709,6 @@ function GetEnrollPet()
     end
     return Enrolls
 end
---[[
 for i, v in pairs(getgc()) do 
     if islclosure(v) and tostring(getfenv(v).script) == "Pets" then 
         for _, x in pairs(debug.getconstants(v)) do 
@@ -664,7 +720,6 @@ for i, v in pairs(getgc()) do
         if getgenv().PetFunction then break end
     end
 end
-]]
 if getgenv().PetFunction then 
     getgenv().IsPetBusyValue = debug.getupvalues(getgenv().PetFunction)[1]
     getgenv().IsPetBusy = function(uid) 
@@ -674,11 +729,16 @@ end
 function GetEquippedPets()
     local E_Pets = {}
     for i, v in pairs(L_Client.PetCmds.GetEquipped()) do
-        ---if not IsPetBusy(v.uid) then
         table.insert(E_Pets, v.uid)
-        --end
     end
     return E_Pets
+end
+function IfAFreePet()
+    for i, v in pairs(GetEquippedPets()) do
+        if not IsPetBusy(v) then
+            return true
+        end
+    end
 end
 function IsRewardReady(R_Cooldown, R_Timer)
     m = L_Client.Network.Invoke("Get OSTime") - R_Cooldown - R_Timer
@@ -690,7 +750,8 @@ function Ditting_PSX()
             TeleportArea("Spawn")
             wait(1)
             local VIPRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("VIP Rewards")
-            if VIPRewardPath then 
+            if VIPRewardPath then
+                getgenv().noclip = true
                 plr.Character.HumanoidRootPart.CFrame = VIPRewardPath.Pad.CFrame 
                 wait(1)
                 L_Client.Network.Invoke("Redeem VIP Rewards")
@@ -700,7 +761,8 @@ function Ditting_PSX()
             TeleportArea("Spawn")
             wait(1)
             local RankRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("Rank Rewards")
-            if RankRewardPath then 
+            if RankRewardPath then
+                getgenv().noclip = true
                 plr.Character.HumanoidRootPart.CFrame = RankRewardPath.Pad.CFrame 
                 wait(1)
                 L_Client.Network.Invoke("Redeem Rank Rewards")
@@ -721,7 +783,8 @@ function Ditting_PSX()
             TeleportArea("Spawn")
             wait(1)
             local DaycarePath = game.workspace.__MAP.Interactive:FindFirstChild("Daycare")
-            if DaycarePath then 
+            if DaycarePath then
+                getgenv().noclip = true
                 plr.Character.HumanoidRootPart.CFrame = DaycarePath.Pad.CFrame 
                 wait(1)
                 if Req1 then
@@ -738,7 +801,7 @@ function Ditting_PSX()
     end
     if DitPSX["Auto Mailbox"].Enable and plr.Name ~= DitPSX["Auto Mailbox"]["Send to"] and plr.leaderstats.Diamonds.Value >= DitPSX["Auto Mailbox"]["Above amount"] then
         local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
-        getgenv().noclip = false
+        getgenv().noclip = true
         plr.Character.HumanoidRootPart.CFrame = MailboxPad.CFrame
         wait(1)
         if plr:DistanceFromCharacter(MailboxPad.Position) < 8 then 
@@ -776,7 +839,7 @@ function Ditting_PSX()
                 end
                 if #GiftsUUID ~= 0 then
                     local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
-                    getgenv().noclip = false
+                    getgenv().noclip = true
                     plr.Character.HumanoidRootPart.CFrame = MailboxPad.CFrame
                     wait(1)
                     if plr:DistanceFromCharacter(MailboxPad.Position) < 8 then 
@@ -818,10 +881,11 @@ function Ditting_PSX()
         getgenv().noclip = true
         plr.Character.HumanoidRootPart.CFrame = V_Pos
     end
-    local Breakables = GetBreakable(V_Area)
-    if Breakables then
+    --if not DitPSX["Send all"] and not IfAFreePet() then print'0' return wait() end
+    local Breakable = GetBreakable(V_Area)
+    if Breakable then
         if DitPSX["Swap to Cyber Cavern"]
-        and (#Breakables < 5 and V_Area == "Mystic Mine" and not TempFarmCyber and not DisableFarmCyber) then
+        and (not Breakable and V_Area == "Mystic Mine" and not TempFarmCyber and not DisableFarmCyber) then
             V_Area, V_Pos = "Cyber Cavern", CFrame.new(8784, -40, 3037)
             getgenv().TempFarmCyber = true
             delay(30, function()
@@ -832,84 +896,38 @@ function Ditting_PSX()
                 end)
             end)
         end
-        if DitPSX["Hop Server"]["Out of diamond"] and not FarmFruit
-        and #Breakables == 0 and (not DitPSX["Swap to Cyber Cavern"] or DisableFarmCyber)
+        if not StartedHopServer
+        and DitPSX["Hop Server"]["Out of diamond"] and not FarmFruit
+        and not Breakable and (not DitPSX["Swap to Cyber Cavern"] or DisableFarmCyber)
         and (not LastHopTick or tick() - LastHopTick >= DitPSX["Hop Server"]["Hop Server Cooldown"]) then
             queue_on_teleport("getgenv().LastHopTick = " .. tick())
             HopServer()
         end
-        if DitPSX["Hop Server"]["Player nearby"] and not FarmFruit
-        and #Breakables == 0 and (not DitPSX["Swap to Cyber Cavern"] or DisableFarmCyber)
+        if not StartedHopServer
+        and DitPSX["Hop Server"]["Player nearby"] and not FarmFruit
+        and not Breakable and (not DitPSX["Swap to Cyber Cavern"] or DisableFarmCyber)
         and (not LastHopTick or tick() - LastHopTick >= DitPSX["Hop Server"]["Hop Server Cooldown"]) and IsPlayerNearDiamondFarm() then
             queue_on_teleport("getgenv().LastHopTick = " .. tick())
             HopServer()
         end
-        if #Breakables ~= 0 then
-            local P_List = GetEquippedPets()
-            if #P_List == 0 then return end
-            local B_Count = 0
-            local P_Count = 1
-            spawn(function()
-                for i, v in ipairs(Breakables) do
-                    pcall(function()
-                        if v and wThings.Coins:FindFirstChild(v) then
-                            if game.workspace.Camera.CameraType == Enum.CameraType.Custom then
-                                game.workspace.Camera.CFrame = CFrame.new(0, 1000, 0, 0, -1, 0, 0, 0, -1, -1, 0, 0)
-                                game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
-                            end
-                            if V_Area == "Mystic Mine" and #Breakables == 1
-                            or DitPSX["Send all"] and not FarmFruit then
-                                --[[
-                                pcall(function()
-                                    if DitPSX["White Screen"] then return end
-                                    local m = wThings.Coins[v].POS.Position
-                                    game.workspace.Camera.CFrame = CFrame.new(m.X, m.Y + 40, m.Z, 0, -1, 0, 0, 0, 1, -1, 0, 0)
-                                    game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
-                                end)
-                                ]]
-                                L_Client.Network.Invoke('Join Coin', v, P_List)
-                                for _, x in pairs(P_List) do
-                                    L_Client.Network.Fire('Farm Coin', v, x)
-                                end
-                                --Library.Signal.Fire("Select Coin", wThings.Coins:FindFirstChild(v))
-                                repeat wait()
-                                until not wThings.Coins:FindFirstChild(v)
-                                or not wThings.Coins[v]:FindFirstChild("HUD", true)
-                                or wThings.Coins[v].POS.HUD.ProgressText.Text == "0"
-                                B_Count = B_Count + 1
-                            else
-                                --[[
-                                if not DitPSX["White Screen"] and game.workspace.Camera.CameraType == Enum.CameraType.Scriptable then
-                                    game.workspace.Camera.CFrame = CFrame.new(0, 0, 0, 0, -1, 0, 0, 0, -1, -1, 0, 0)
-                                    game.workspace.Camera.CameraType = Enum.CameraType.Custom
-                                end
-                                ]]
-                                P_Count = P_Count + 1
-                                if #P_List <= P_Count then
-                                    P_Count = 1 
-                                end
-                                L_Client.Network.Invoke('Join Coin', v, {P_List[P_Count]})
-                                L_Client.Network.Fire('Farm Coin', v, P_List[P_Count])
-                            end
-                        else
-                            B_Count = B_Count + 1
-                        end
-                    end)
-                    if FarmFruit or DitPSX["Send all"] then
-                        task.wait()
-                    else
-                        task.wait(DitPSX["Farm Cooldown"])
-                    end
-                end
-            end)
-            if DitPSX["Send all"] and not FarmFruit then
-                repeat wait()
-                until B_Count >= #Breakables
-            else
-                wait(DitPSX["Farm Cooldown"])
+        if DitPSX["White Screen"] then
+            if game.workspace.Camera.CameraType == Enum.CameraType.Custom then
+                game.workspace.Camera.CFrame = CFrame.new(0, 1000, 0, 0, -1, 0, 0, 0, -1, -1, 0, 0)
+                game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
             end
-            --or not wThings.Coins:FindFirstChild("HUD", true) or FarmFruit
+        else
+            local m = Breakable.POS.Position
+            game.workspace.Camera.CFrame = CFrame.new(m.X, m.Y + 40, m.Z, 0, -1, 0, 0, 0, 1, -1, 0, 0)
+            game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
         end
+        Library.Signal.Fire("Select Coin", Breakable)
+        if DitPSX["Send all"] then
+            repeat wait()
+            until not Breakable or not Breakable.Parent
+            or not Breakable:FindFirstChild("HUD", true)
+            or Breakable.POS.HUD.ProgressText.Text == "0"
+        end
+        wait(DitPSX["Farm Cooldown"])
     end
 end
 spawn(function()
