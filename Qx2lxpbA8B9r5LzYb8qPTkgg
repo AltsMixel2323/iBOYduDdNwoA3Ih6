@@ -430,10 +430,10 @@ if not Run1Time then
         end
     end
 
-    local collectloot = getsenv(plr.PlayerScripts.Scripts.Game.Lootbags)
+    local LootbagCollect = getsenv(plr.PlayerScripts.Scripts.Game.Lootbags)
     function CollectLoots()
         for i, v in pairs(wThings.Lootbags:GetChildren()) do 
-            collectloot.Collect(v)
+            LootbagCollect.Collect(v)
         end
     end
     spawn(function()
@@ -668,16 +668,17 @@ function DaycareReady()
         end
     end
 end
+local DaycareGUI = getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare)
 function CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot)
     if not table.find(Enrolls, v.uid)
     and not table.find(E_Pets, v.uid)
     and not v.l
-    and getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetUsedSlots() + #Enrolls < DC_MaxSlot then
+    and DaycareGUI.GetUsedSlots() + #Enrolls < DC_MaxSlot then
         return true
     end
 end
 function GetEnrollPet()
-    local Enrolls, I_Pets, DC_MaxSlot = {}, F_Lib.Save.Get().Pets, getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetMaxSlots()
+    local Enrolls, I_Pets, DC_MaxSlot = {}, F_Lib.Save.Get().Pets, DaycareGUI.GetMaxSlots()
     local E_Pets = {}
     for i, v in pairs(L_Client.PetCmds.GetEquipped()) do
         table.insert(E_Pets, v.uid)
@@ -776,7 +777,7 @@ function Ditting_PSX()
     end
     if DitPSX["Auto Daycare"] and (not LastCheckDaycare or tick() - LastCheckDaycare > 120) then
         local EnrollPets = GetEnrollPet()
-        local Req1, Req2 = DaycareReady(), getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetUsedSlots() < getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare).GetMaxSlots() and #EnrollPets > 0
+        local Req1, Req2 = DaycareReady(), DaycareGUI.GetUsedSlots() < DaycareGUI.GetMaxSlots() and #EnrollPets > 0
         if Req1 or Req2 then
             TeleportArea("Spawn")
             wait(1)
