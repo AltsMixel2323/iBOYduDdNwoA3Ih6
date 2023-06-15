@@ -44,8 +44,8 @@ if not script_key and not DitPSX then
     }
     getgenv().Setting = {
         UID = 29,
-        DelayUpdate = 120;
-        Note = 'May 1'
+        DelayUpdate = 60;
+        Note = 'them chit gai alim'
     }
 end
 if Setting then
