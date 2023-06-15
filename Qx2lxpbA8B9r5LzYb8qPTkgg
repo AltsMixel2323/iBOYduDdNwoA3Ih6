@@ -24,7 +24,7 @@ if not script_key and not DitPSX then
             }
         },
         ["Hop Server"] = {
-            ["Hop Server Cooldown"] = 5*60, -- Wait set second after Hop Server
+            ["Hop Server Cooldown"] = 15*60, -- Wait set second after Hop Server
             ["Player nearby"] = true, -- Will hop to low player server if there's a player nearby Mystic Mine (2m cooldown)
             ["Out of diamond"] = false, -- Will hop to low player server if there are no diamond left to farm
         },
