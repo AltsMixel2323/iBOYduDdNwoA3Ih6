@@ -24,9 +24,9 @@ if not script_key and not DitPSX then
             }
         },
         ["Hop Server"] = {
-            ["Hop Server Cooldown"] = 15*60, -- Wait set second after Hop Server
-            ["Player nearby"] = false, -- Will hop to low player server if there's a player nearby Mystic Mine (2m cooldown)
-            ["Out of diamond"] = true, -- Will hop to low player server if there are no diamond left to farm
+            ["Hop Server Cooldown"] = 5*60, -- Wait set second after Hop Server
+            ["Player nearby"] = true, -- Will hop to low player server if there's a player nearby Mystic Mine (2m cooldown)
+            ["Out of diamond"] = false, -- Will hop to low player server if there are no diamond left to farm
         },
         ["Farm Cooldown"] = 0, -- Delay between switch to farm another thing (higher = less crashing)
         ["Send all"] = false, -- Send all pet to break or not, false will send single to break
