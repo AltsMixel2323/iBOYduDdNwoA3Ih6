@@ -458,16 +458,16 @@ plr.Idled:connect(function()
     vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
 end)
 
+if not Mobile then
+    getrenv().require = getgenv().require -- method tvk hihi (iu tvk vcl)
+end
+
 getgenv().F_Lib = require(game.ReplicatedStorage.Framework.Library)
 getgenv().L_Client = require(game.ReplicatedStorage.Library.Client)
 getgenv().L_Directory = require(game.ReplicatedStorage.Library.Directory)
 getgenv().wThings = workspace.__THINGS
 getgenv().formatNumber = F_Lib.Functions.Commas
 getgenv().shortNumber = F_Lib.Functions.NumberShorten
-
-if not Mobile then
-    getrenv().require = getgenv().require -- method tvk hihi (iu tvk vcl)
-end
 
 local Library = require(game.ReplicatedStorage.Library)
 debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
