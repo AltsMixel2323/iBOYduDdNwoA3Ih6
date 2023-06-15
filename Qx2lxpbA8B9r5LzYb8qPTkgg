@@ -257,9 +257,12 @@ spawn(function()
         end
     end
 end)
+if game:GetService("UserInputService").TouchEnabled and game:GetService("UserInputService").KeyboardEnabled == false and Exploit == "Fluxus" then
+    getgenv().Mobile = true
+end
 function SetText(v, x)
     v.Amount.Text = tostring(x)
-    if not Mobile then
+    if v:FindFirstChild("Amount_odometerGUIFX") then
         v.Amount_odometerGUIFX.Text = tostring(x)
     end
 end
@@ -274,10 +277,7 @@ spawn(function()
     DiamondsGained.Icon.Rotation = 90
     DiamondsGained.Icon.Position = UDim2.new(0.954999983, 2, 0.5, 0)
     DiamondsGained.Add.Visible = false
-    if not DiamondsGained:FindFirstChild("Amount_odometerGUIFX") then
-        getgenv().Mobile = true
-    end
-    if not Mobile then
+    if DiamondsGained:FindFirstChild("Amount_odometerGUIFX") then
         DiamondsGained.Amount_odometerGUIFX["Diamonds Gradient"].Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Color3.new(189/255, 207/255, 70/255)),
             ColorSequenceKeypoint.new(0.432612, Color3.new(189/255, 207/255, 70/255)),
@@ -464,6 +464,10 @@ getgenv().L_Directory = require(game.ReplicatedStorage.Library.Directory)
 getgenv().wThings = workspace.__THINGS
 getgenv().formatNumber = F_Lib.Functions.Commas
 getgenv().shortNumber = F_Lib.Functions.NumberShorten
+
+if not Mobile then
+    getrenv().require = getgenv().require -- method tvk hihi (iu tvk vcl)
+end
 
 local Library = require(game.ReplicatedStorage.Library)
 debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
@@ -1172,14 +1176,23 @@ function Ditting_PSX()
         end
     end
 end
-warpF2(function() 
+if Mobile then
+    warpF2(function() 
+        spawn(function()
+            while wait() do
+                pcall(Ditting_PSX)
+                --Ditting_PSX()
+            end
+        end)
+    end)
+else
     spawn(function()
         while wait() do
             pcall(Ditting_PSX)
             --Ditting_PSX()
         end
     end)
-end)
+end
 
 spawn(function()
     while wait(30) do
