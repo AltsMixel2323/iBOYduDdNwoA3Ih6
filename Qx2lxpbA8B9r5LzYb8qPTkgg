@@ -91,85 +91,6 @@ until game:IsLoaded()
 and game.Players.LocalPlayer
 and game.Players.LocalPlayer:FindFirstChild("leaderstats")
 
-local Blacklist = {"Daycare","Coins","Settings","Lootbags","Orbs","Currency","Teleport"}
-getgenv().Tvkne = function() 
-    pcall(function() 
-        workspace.__DEBRIS:Destroy()
-    end)
-    local huhu = {
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["World GUIs"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Achievement Progress"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Achievements,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Active Boosts"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Active Server Boosts"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["April Fools Console"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Auction Pet"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Auction Select"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Auto Settings"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Bank Client"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Bid Pet"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Bloomberg,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Boosts,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Booth Inventory"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Bottom Buttons"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Clipboard Popup"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Coin Rewards HUD"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["WIndow Visibility Handling"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Verify Twitter"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Upgrades,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Update Log"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Twiter Codes"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Trading Plaza Choice"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Trading History"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Trading,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Starter,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Server Boosts"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.SelectBooth,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Rename,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Release Pet"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Ranks,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Rainbow Machine"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Golden Machine"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Fuse Pets"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Free Gifts"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.FFlags,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Exclusive Shop"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Evolve Machine"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Enchant Pets"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Diamonds Rain Animation"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Auction Billboard"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Auto Hatch"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Barn Door"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game.Cannons,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game.Tutorial,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Traveling Merchant"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Trading Booths"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Shiny Relic"],
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Hoverboards,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Collection,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Core,
-        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game.Misc,
-    }
-    for k,v in pairs(huhu) do v:Destroy() end
-    for k,v in pairs(game:GetService("ReplicatedStorage").Assets.Particles:GetChildren()) do 
-        local x = v:FindFirstChildOfClass("ParticleEmitter", true)
-        if x then 
-            x.Enabled = false
-            x.Texture = ""
-            x.Brightness = 0
-        end
-    end
-    while wait(10) do 
-        for k,v in pairs(game.Players:GetChildren()) do
-            if v.Name ~= plr.name then 
-                pcall(function() 
-                    v.Character:Destroy()    
-                end)    
-            end
-        end
-    end
-end
-
 local plr = game.Players.LocalPlayer
 
 function Kick(v)
@@ -210,10 +131,11 @@ if DitPSX["White Screen"] then
     game:GetService("RunService"):Set3dRenderingEnabled(false)
 end
 spawn(function()
-    local FPSboost 
-    FPSboost = hookfunction(getsenv(plr.PlayerScripts.Scripts.Game.Coins).CoinDamageAnimation, function(p10, p11)
-        return nil
-    end)
+    -- local FPSboost 
+    -- FPSboost = hookfunction(getsenv(plr.PlayerScripts.Scripts.Game.Coins).CoinDamageAnimation, function(p10, p11)
+    --     return nil
+    -- end)
+    getsenv(plr.PlayerScripts.Scripts.Game.Coins).CoinDamageAnimation = function() end
 end)
 
 function SendWebHook(v, x)
@@ -402,54 +324,56 @@ if DitPSX["Auto Leave"]["Leave Timer"].Enable then
         end
     end)
 end
-local connect
-local funcwrap
-local ret
-local ListFunc = {}
-local old
-local connect2
-old = hookmetamethod(game,"__index",function(...) 
-    if checkcaller() then return old(...) end
-    if not connect then 
-        connect=Instance.new("IntValue")
-        connect.Changed:Connect(function(val)
-            if val==100 then 
-                for k,v in pairs(ListFunc) do 
-                    if not v.Done then 
-                        spawn(function() 
-                            local s,e = pcall(function() 
-                                v.Res = k()
+if Mobile then 
+    local connect
+    local funcwrap
+    local ret
+    local ListFunc = {}
+    local old
+    local connect2
+    old = hookmetamethod(game,"__index",function(...) 
+        if checkcaller() then return old(...) end
+        if not connect then 
+            connect=Instance.new("IntValue")
+            connect.Changed:Connect(function(val)
+                if val==100 then 
+                    for k,v in pairs(ListFunc) do 
+                        if not v.Done then 
+                            spawn(function() 
+                                local s,e = pcall(function() 
+                                    v.Res = k()
+                                end)
+                                if e then print(e) end
+                                v.tvk = true
+                                connect2.Value=100
+                                connect2.Value=0
                             end)
-                            if e then print(e) end
-                            v.tvk = true
-                            connect2.Value=100
-                            connect2.Value=0
-                        end)
-                        v.Done=true
+                            v.Done=true
+                        end
                     end
-                end
-            end 
-        end)
-    end
-    return old(...)
-end)
-repeat wait() until connect
-function warpF2(f) 
-    if not connect2 then 
-        connect2=Instance.new("IntValue")
-    end
-    ListFunc[f] = {}
-
-
-    connect.Value=100
-    connect.Value=0
+                end 
+            end)
+        end
+        return old(...)
+    end)
+    repeat wait() until connect
+    function warpF2(f) 
+        if not connect2 then 
+            connect2=Instance.new("IntValue")
+        end
+        ListFunc[f] = {}
     
-    while not ListFunc[f].tvk do 
-        connect2.Changed:Wait()
+    
+        connect.Value=100
+        connect.Value=0
+        
+        while not ListFunc[f].tvk do 
+            connect2.Changed:Wait()
+        end
+        local res = ListFunc[f].Res
+        ListFunc[f] = nil
+        return res
     end
-    local res = ListFunc[f].Res
-    ListFunc[f] = nil
-    return res
 end
 local vu = game:GetService("VirtualUser")
 plr.Idled:connect(function()
@@ -461,7 +385,10 @@ end)
 if not Mobile then
     getrenv().require = getgenv().require -- method tvk hihi (iu tvk vcl)
 end
-
+if setfflag then 
+    setfflag("HumanoidParallelRemoveNoPhysics", "False")
+    setfflag("HumanoidParallelRemoveNoPhysicsNoSimulate2", "False")
+end
 getgenv().F_Lib = require(game.ReplicatedStorage.Framework.Library)
 getgenv().L_Client = require(game.ReplicatedStorage.Library.Client)
 getgenv().L_Directory = require(game.ReplicatedStorage.Library.Directory)
@@ -504,30 +431,12 @@ and string.find(DitPSX["Discord Webhook"]["Stats Tracker"]["Url"], "discord") th
     end)
 end
 
-if not Run1Time then
+function Optimize()
+    workspace.__DEBRIS:Destroy()
 
-    if DitPSX["Send all"] then
-        Library.Save.Get().Settings.PetsControl = 2
-    else
-        Library.Save.Get().Settings.PetsControl = 1
-    end
-    getsenv(plr.PlayerScripts.Scripts.GUIs.Settings).Update()
-
-    --[[
-    for i, v in pairs(game:GetService("ReplicatedStorage").Assets.Models.Lootbags:GetDescendants()) do
-        if v:IsA("Attachment") or v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("PointLight")  then 
-            pcall(function()
-                v.Parent.Transparency = 1
-            end)
-            pcall(function()
-                v.Parent.MeshId = ""
-            end)
-        end
-    end
-    ]]
     game:GetService("ReplicatedStorage").Assets.Billboards.Orb.Enabled = true
     game:GetService("ReplicatedStorage").Assets.Billboards.Reward.Enabled = true
-    --game:GetService("ReplicatedStorage").Assets.Particles:Destroy()
+
     spawn(function()
         while wait() do
             pcall(function()
@@ -537,23 +446,126 @@ if not Run1Time then
             wait(5)
         end
     end)
-    workspace.__DEBRIS:Destroy()
-    getgenv().noclip = true
     
-    -- for i, v in pairs(workspace.__THINGS.Coins:GetChildren()) do
-    --     local x = v:FindFirstChild("Coin", true)
-    --     if x then
-    --         x.MeshId = ""
-    --         x.TextureID = ""
-    --     end
-    -- end
-    -- for i, v in pairs(game.ReplicatedStorage.Assets.CoinAssets:GetChildren()) do
-    --     local x = v:FindFirstChildOfClass("MeshPart", true)
-    --     if x then
-    --         x.MeshId = ""
-    --         x.TextureID = ""
-    --     end
-    -- end
+    for i, v in pairs(workspace.__THINGS.Coins:GetChildren()) do
+        if v:FindFirstChild("Coin") then
+            pcall(function()
+                v.Coin.MeshId = ""
+            end)
+            pcall(function()
+                v.Coin.TextureID = ""
+            end)
+        end
+    end
+    for i, v in pairs(game.ReplicatedStorage.Assets.CoinAssets:GetDescendants()) do
+        if v:IsA("MeshPart") then
+            pcall(function()
+                v.MeshId = ""
+            end)
+            pcall(function()
+                v.TextureID = ""
+            end)
+        end
+    end
+    for i, v in pairs(game.ReplicatedStorage.Assets.Models.Lootbags:GetDescendants()) do
+        if v:IsA("MeshPart") then
+            pcall(function()
+                v.MeshId = ""
+            end)
+            pcall(function()
+                v.TextureID = ""
+            end)
+        end
+    end
+    local huhu = {
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["World GUIs"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Achievement Progress"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Achievements,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Active Boosts"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Active Server Boosts"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["April Fools Console"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Auction Pet"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Auction Select"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Auto Settings"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Bank Client"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Bid Pet"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Bloomberg,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Boosts,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Booth Inventory"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Bottom Buttons"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Clipboard Popup"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Coin Rewards HUD"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["WIndow Visibility Handling"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Verify Twitter"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Upgrades,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Update Log"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Twiter Codes"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Trading Plaza Choice"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Trading History"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Trading,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Starter,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Server Boosts"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.SelectBooth,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Rename,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Release Pet"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Ranks,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Rainbow Machine"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Golden Machine"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Fuse Pets"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Free Gifts"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.FFlags,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Exclusive Shop"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Evolve Machine"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Enchant Pets"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs["Diamonds Rain Animation"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Auction Billboard"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Auto Hatch"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Barn Door"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game.Cannons,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game.Tutorial,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Traveling Merchant"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Trading Booths"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game["Shiny Relic"],
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Hoverboards,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.GUIs.Collection,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Core,
+        game:GetService("Players").LocalPlayer.PlayerScripts.Scripts.Game.Misc,
+    }
+    for k, v in pairs(huhu) do v:Destroy() end
+
+    for k, v in pairs(game:GetService("ReplicatedStorage").Assets.Particles:GetDescendants()) do 
+        if v:IsA("ParticleEmitter") then 
+            v.Enabled = false
+            v.Texture = ""
+            v.Brightness = 0
+        end
+    end
+
+    spawn(function()
+        while wait(10) do 
+            for k,v in pairs(game.Players:GetChildren()) do
+                if v.Name ~= plr.name then 
+                    pcall(function() 
+                        v.Character:Destroy()    
+                    end)    
+                end
+            end
+        end
+    end)
+end
+
+if not Run1Time then
+
+    if DitPSX["Send all"] then
+        Library.Save.Get().Settings.PetsControl = 2
+    else
+        Library.Save.Get().Settings.PetsControl = 1
+    end
+    getsenv(plr.PlayerScripts.Scripts.GUIs.Settings).Update()
+
+    getgenv().noclip = true
+
+    pcall(Optimize)
 
     local LootbagCollect = getsenv(plr.PlayerScripts.Scripts.Game.Lootbags)
     function CollectLoots()
@@ -562,7 +574,7 @@ if not Run1Time then
         end
     end
     spawn(function()
-        while wait() do
+        while wait(.2) do
             pcall(function()
                 CollectLoots()
                 if not StartedHopServer then wait(1) end
@@ -574,12 +586,14 @@ if not Run1Time then
     local Collect = huhu.Collect
     local list = {}
     local getupval = debug.getupvalue
-    hookfunction(huhu.AddOrb,function(a,b) 
+    huhu.AddOrb = function(a,b) 
         table.insert(list,a)
-    end)
+    end
     getgenv().Collect = function()
+        if #list == 0 then return end
+        local upval = getupval(Collect,3)
         table.foreach(list,function(k,v) 
-            table.insert(getupval(Collect,3),v)
+            table.insert(upval,v)
         end)
         list = {}
     end
@@ -626,26 +640,31 @@ if not Run1Time then
     game:GetService("RunService").Stepped:Connect(function()
         if getgenv().noclip then
             if plr.Character ~= nil then
-                local x = plr.Character:FindFirstChild("Humanoid")
-                if x then x:ChangeState(11) end
-                Noclip()
+                if setfflag then 
+                    local x = plr.Character:FindFirstChild("Humanoid")
+                    if x then x:ChangeState(11) end
+                else
+                    Noclip()
+                end
             end
         end
     end)
-    spawn(function()
-        while wait() do
-            pcall(function()
-                if noclip and not plr.Character.HumanoidRootPart:FindFirstChild("coems") then
-                    local BV = Instance.new("BodyVelocity", plr.Character.HumanoidRootPart)
-                    BV.Name = "coems"
-                    BV.Velocity = Vector3.new(0, 0, 0)
-                    BV.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                end
-                repeat wait()
-                until not plr.Character.HumanoidRootPart:FindFirstChild("coems")
-            end)
-        end
-    end)
+    if not setfflag then 
+        spawn(function()
+            while wait() do
+                pcall(function()
+                    if noclip and not plr.Character.HumanoidRootPart:FindFirstChild("coems") then
+                        local BV = Instance.new("BodyVelocity", plr.Character.HumanoidRootPart)
+                        BV.Name = "coems"
+                        BV.Velocity = Vector3.new(0, 0, 0)
+                        BV.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                    end
+                    repeat wait()
+                    until not plr.Character.HumanoidRootPart:FindFirstChild("coems")
+                end)
+            end
+        end)
+    end
 
     getgenv().DisableFarmCyber = true
     delay(20, function()
@@ -679,19 +698,21 @@ function GetBreakable(in_area, x)
     if x then
         local P_Breakable = {}
         local Breakable = {}
+        local P_BreakAdded = false
         for i, v in pairs(L_Client.Network.Invoke("Get Coins")) do
             if v.a == in_area then
                 if CheckBreakable(i, v) then
                     if table.find(PrioFruits, v.n)
                     or not DitPSX["Ignore Giant Chest"] and v.n == "Mystic Mine Diamond Mine Giant Chest" then
                         table.insert(P_Breakable, i)
-                    else
+                        P_BreakAdded = true
+                    elseif not P_BreakAdded then
                         table.insert(Breakable, i)
                     end
                 end
             end 
         end
-        if #P_Breakable ~= 0 then
+        if P_BreakAdded then
             return P_Breakable
         else
             return Breakable
@@ -703,12 +724,10 @@ function GetBreakable(in_area, x)
             and v:GetAttribute("Area") == in_area
             and v:GetAttribute("Health") > 0 then
                 table.insert(Breakables, v)
-            end
-        end
-        for i, v in pairs(Breakables) do
-            if table.find(PrioFruits, v:GetAttribute("Name"))
-            or not DitPSX["Ignore Giant Chest"] and v:GetAttribute("Name") == "Mystic Mine Diamond Mine Giant Chest" then
-                return v
+                if table.find(PrioFruits, v:GetAttribute("Name"))
+                or not DitPSX["Ignore Giant Chest"] and v:GetAttribute("Name") == "Mystic Mine Diamond Mine Giant Chest" then
+                    return v
+                end
             end
         end
         if not DitPSX["Send all"] then
@@ -754,7 +773,6 @@ function TPReturner()
         end
     end
 end
---[[
 local Http = game:GetService("HttpService")
 local TPS = game:GetService("TeleportService")
 local Api = "https://games.roblox.com/v1/games/"
@@ -766,14 +784,6 @@ function ListServers(cursor)
    return Http:JSONDecode(Raw)
 end
 
-local Server, Next; repeat
-   local Servers = ListServers(Next)
-   Server = Servers.data[1]
-   Next = Servers.nextPageCursor
-until Server
-
-TPS:TeleportToPlaceInstance(_place,Server.id,game.Players.LocalPlayer)
-]]
 function HopServer()
     getgenv().StartedHopServer = true
     if Mobile and not script_key then return end
@@ -790,7 +800,12 @@ function HopServer()
             spawn(function()
                 wait(110)
                 while wait(10) do
-                    game:GetService("TeleportService"):Teleport(game.PlaceId, plr)
+                    local Server, Next; repeat
+                        local Servers = ListServers(Next)
+                        Server = Servers.data[1]
+                        Next = Servers.nextPageCursor
+                    until Server
+                    TPS:TeleportToPlaceInstance(_place, Server.id, game.Players.LocalPlayer)
                 end
             end)
             wait(5)
@@ -898,6 +913,30 @@ end
 function IsRewardReady(R_Cooldown, R_Timer)
     m = L_Client.Network.Invoke("Get OSTime") - R_Cooldown - R_Timer
     if m > 0 then return true end
+end
+function HMS_To_Number(v)
+	local sec = 0
+	v = v:split(":")
+	local h, m, s = v[1], v[2], v[3]
+	h, m, s = tonumber(h), tonumber(m), tonumber(s)
+	if h > 0 then
+		for i = 1, h do
+			sec = sec + 3600
+		end
+	end
+	if m > 0 then
+		for i = 1, m do
+			sec = sec + 60
+		end
+	end
+	sec = sec + s
+	return sec
+end
+function IsMineCollapsed()
+    if workspace.__MAP.Interactive:FindFirstChild("Diamond Mine Collapsed Sign")
+    and workspace.__MAP.Interactive["Diamond Mine Collapsed Sign"].Main.SurfaceGui.Enabled then
+        return true
+    end
 end
 function Ditting_PSX()
     if not LastRewardCheck or tick() - LastRewardCheck > 120 then
@@ -1018,15 +1057,26 @@ function Ditting_PSX()
     if TempFarmCyber then
         V_Area, V_Pos = "Cyber Cavern", CFrame.new(8784, -40, 3037)
     end
-    if DitPSX["Auto Farm Fruit"].Enable and (not LastCheckFruit or tick() - LastCheckFruit > 60) then
-        local Apple, Orange = GetFruitAmount("Apple"), GetFruitAmount("Orange")
-        if Apple > 195 and Orange > 195 then
-            getgenv().FarmFruit = false
-        elseif Apple <= DitPSX["Auto Farm Fruit"]["Farm when under"] or Orange <= DitPSX["Auto Farm Fruit"]["Farm when under"] then
+    if not TempDisableCheckFruit
+    and (DitPSX["Auto Farm Fruit"].Enable and (not LastCheckFruit or tick() - LastCheckFruit > 60) or IsMineCollapsed()) then
+        if IsMineCollapsed() then
+            local TimeLeft = HMS_To_Number(workspace.__MAP.Interactive["Diamond Mine Collapsed Sign"].Main.SurfaceGui.Timer.Text:split("in:")[2])
             getgenv().FarmFruit = true
+            getgenv().TempDisableCheckFruit = true
+            delay(TimeLeft + 5, function()
+                getgenv().FarmFruit = false
+                getgenv().TempDisableCheckFruit = false
+            end)
+        else
+            local Apple, Orange = GetFruitAmount("Apple"), GetFruitAmount("Orange")
+            if Apple > 195 and Orange > 195 then
+                getgenv().FarmFruit = false
+            elseif Apple <= DitPSX["Auto Farm Fruit"]["Farm when under"] or Orange <= DitPSX["Auto Farm Fruit"]["Farm when under"] then
+                getgenv().FarmFruit = true
+            end
+            getgenv().LastCheckFruit = tick()
+            return
         end
-        getgenv().LastCheckFruit = tick()
-        return
     elseif FarmFruit then
         V_World, V_Area, V_Pos = "Pixel", "Pixel Vault", CFrame.new(3553, -40, 2458)
     end
@@ -1088,6 +1138,8 @@ function Ditting_PSX()
         elseif GetCurrentWorld() ~= V_World then
             TeleportArea(V_Area)
             wait(5)
+        else
+            game.workspace.Camera.CameraType = Enum.CameraType.Custom
         end
     else
         local Breakables = GetBreakable(V_Area, true)
@@ -1173,6 +1225,8 @@ function Ditting_PSX()
         elseif GetCurrentWorld() ~= V_World then
             TeleportArea(V_Area)
             wait(5)
+        else
+            game.workspace.Camera.CameraType = Enum.CameraType.Custom
         end
     end
 end
