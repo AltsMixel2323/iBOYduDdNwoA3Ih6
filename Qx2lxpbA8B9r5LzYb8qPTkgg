@@ -32,7 +32,7 @@ if not script_key and not DitPSX then
         ["Send all"] = false, -- Send all pet to break or not, false will send single to break
         ["Performance Mode"] = false, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
         ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
-        ["White Screen"] = false,
+        ["White Screen"] = true,
         ["Discord Webhook"] = {
             ["Stats Tracker"] = {
                 ["Url"] = "",
@@ -277,7 +277,6 @@ spawn(function()
 end)
 
 --Disable UIs
---[[
 if game.CoreGui.RobloxGui:FindFirstChild("PerformanceStats") then 
     UserSettings().GameSettings.PerformanceStatsVisible = false
 end
@@ -291,7 +290,6 @@ plr.PlayerGui.Message.Enabled = false
 plr.PlayerGui.Message:GetPropertyChangedSignal("Enabled"):Connect(function()
     plr.PlayerGui.Message.Enabled = false
 end)
-]]
 plr.PlayerGui.FreeGiftsTop.Enabled = false
 plr.PlayerGui.Main.Left.Visible = false
 plr.PlayerGui.Main.Right.Diamonds.Add.Visible = false
@@ -730,7 +728,6 @@ function SetTempFarmFruit()
     delay(TimeLeft + 5, function()
         getgenv().FarmFruit = false
         getgenv().TempDisableCheckFruit = false
-        print'0'
         TeleportArea("Spawn")
     end)
 end
@@ -846,7 +843,6 @@ end
 function Ditting_PSX()
     if not LastRewardCheck or tick() - LastRewardCheck > 120 then
         if VIPOwned and IsRewardReady(14400, F_Lib.Save.Get().VIPCooldown) then
-            print'1'
             TeleportArea("Spawn")
             local VIPRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("VIP Rewards")
             if VIPRewardPath then
@@ -857,7 +853,6 @@ function Ditting_PSX()
             end
         end
         if IsRewardReady(L_Directory.Ranks[F_Lib.Save.Get().Rank].rewardCooldown, F_Lib.Save.Get().RankTimer) then
-            print'2'
             TeleportArea("Spawn")
             local RankRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("Rank Rewards")
             if RankRewardPath then
@@ -881,7 +876,6 @@ function Ditting_PSX()
         if #EnrollPets == 0 then return end
         local Req1, Req2 = DaycareReady(), DaycareGUI.GetUsedSlots() < DaycareGUI.GetMaxSlots() and #EnrollPets > 0
         if Req1 or Req2 then
-            print'3'
             TeleportArea("Spawn")
             local DaycarePath = game.workspace.__MAP.Interactive:FindFirstChild("Daycare")
             if DaycarePath then
@@ -964,16 +958,15 @@ function Ditting_PSX()
         V_Area, V_Pos = "Cyber Cavern", CFrame.new(8784, -40, 3037)
     end
     if not TempDisableCheckFruit and DitPSX["Auto Farm Fruit"].Enable and (not LastCheckFruit or tick() - LastCheckFruit > 60) then
+        getgenv().LastCheckFruit = tick()
         local Apple, Orange = GetFruitAmount("Apple"), GetFruitAmount("Orange")
         if Apple > 195 and Orange > 195 then
             getgenv().FarmFruit = false
-            print'4'
             TeleportArea("Spawn")
             return
         elseif Apple <= DitPSX["Auto Farm Fruit"]["Farm when under"] or Orange <= DitPSX["Auto Farm Fruit"]["Farm when under"] then
             getgenv().FarmFruit = true
         end
-        getgenv().LastCheckFruit = tick()
         return
     elseif FarmFruit then
         V_World, V_Area, V_Pos = "Pixel", "Pixel Vault", CFrame.new(3553, -40, 2458)
