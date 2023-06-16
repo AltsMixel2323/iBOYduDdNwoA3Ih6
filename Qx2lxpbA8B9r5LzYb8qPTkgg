@@ -30,7 +30,7 @@ if not script_key and not DitPSX then
         },
         ["Farm Cooldown"] = 0, -- Delay between switch to farm another thing (higher = less crashing)
         ["Send all"] = false, -- Send all pet to break or not, false will send single to break
-        ["Performance Mode"] = true, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
+        ["Performance Mode"] = false, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
         ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
         ["White Screen"] = false,
         ["Discord Webhook"] = {
@@ -325,6 +325,20 @@ if DitPSX["Auto Leave"]["Leave Timer"].Enable then
         end
     end)
 end
+spawn(function()
+    while wait(2) do
+        if plr.PlayerGui.Loading.Enabled then
+            local TimerLoading = tick()
+            while plr.PlayerGui.Loading.Enabled do wait()
+                if tick() - TimerLoading > 10 then
+                    pcall(UpdateDashboard)
+                    game:Shutdown()
+                    wait(10)
+                end
+            end
+        end
+    end
+end)
 if Mobile then 
     local connect
     local funcwrap
@@ -641,6 +655,7 @@ local PrioFruits = {
 }
 local Library = require(game.ReplicatedStorage.Library)
 getgenv().GetBreakable = function(in_area, x)
+    print'1'
     if x then
         local P_Breakable = {}
         local Breakable = {}
@@ -695,48 +710,29 @@ end
 local TeleportENV = getsenv(plr.PlayerScripts.Scripts.GUIs.Teleport)
 function TeleportArea(area)
     TeleportENV.Teleport(area, true)
+    wait(3)
 end
-function TPReturner()
-    local PlaceID = game.PlaceId
-    local foundAnything = ""
-    local belowamount = 10
-    if DitPSX["Hop Server"]["Player nearby"] then
-        belowamount = 3
-    end
-    local Site;
-    if foundAnything == "" then
-        Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
-    else
-        Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
-    end
-    local ID = ""
-    if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
-        foundAnything = Site.nextPageCursor
-    end
-    for i, v in ipairs(Site.data) do
-        ID = tostring(v.id)
-        if tonumber(v.playing) <= belowamount and (not DitPSX["Hop Server"]["Player nearby"] or tonumber(v.playing) > 6)then
-            pcall(function()
-                wait()
-                game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, plr)
-            end)
-        end
-    end
-end
+
 local Http = game:GetService("HttpService")
 local TPS = game:GetService("TeleportService")
 local Api = "https://games.roblox.com/v1/games/"
-
 local _place = game.PlaceId
 local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=100"
 function ListServers(cursor)
    local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
    return Http:JSONDecode(Raw)
 end
+function TPReturner()
+    local Server, Next; repeat
+        local Servers = ListServers(Next)
+        Server = Servers.data[1]
+        Next = Servers.nextPageCursor
+    until Server
+    TPS:TeleportToPlaceInstance(_place, Server.id, game.Players.LocalPlayer)
+end
 
 function HopServer()
     getgenv().StartedHopServer = true
-    if Mobile and not script_key then return end
     spawn(function()
         while wait() do
             wait(2)
@@ -744,23 +740,6 @@ function HopServer()
                 TPReturner()
             end)
         end
-    end)
-    spawn(function()
-        pcall(function()
-            spawn(function()
-                wait(110)
-                while wait(10) do
-                    local Server, Next; repeat
-                        local Servers = ListServers(Next)
-                        Server = Servers.data[1]
-                        Next = Servers.nextPageCursor
-                    until Server
-                    TPS:TeleportToPlaceInstance(_place, Server.id, game.Players.LocalPlayer)
-                end
-            end)
-            wait(5)
-            pcall(UpdateDashboard)
-        end)
     end)
 end
 getgenv().hopserver = Instance.new("BindableEvent")
@@ -888,7 +867,6 @@ function Ditting_PSX()
     if not LastRewardCheck or tick() - LastRewardCheck > 120 then
         if VIPOwned and IsRewardReady(14400, F_Lib.Save.Get().VIPCooldown) then
             TeleportArea("Spawn")
-            wait(1)
             local VIPRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("VIP Rewards")
             if VIPRewardPath then
                 getgenv().noclip = true
@@ -899,7 +877,6 @@ function Ditting_PSX()
         end
         if IsRewardReady(L_Directory.Ranks[F_Lib.Save.Get().Rank].rewardCooldown, F_Lib.Save.Get().RankTimer) then
             TeleportArea("Spawn")
-            wait(1)
             local RankRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("Rank Rewards")
             if RankRewardPath then
                 getgenv().noclip = true
@@ -918,11 +895,9 @@ function Ditting_PSX()
     end
     if DitPSX["Auto Daycare"] and (not LastCheckDaycare or tick() - LastCheckDaycare > 120) then
         local EnrollPets = GetEnrollPet()
-        table.foreach(EnrollPets, print)
         local Req1, Req2 = DaycareReady(), DaycareGUI.GetUsedSlots() < DaycareGUI.GetMaxSlots() and #EnrollPets > 0
         if Req1 or Req2 then
             TeleportArea("Spawn")
-            wait(1)
             local DaycarePath = game.workspace.__MAP.Interactive:FindFirstChild("Daycare")
             if DaycarePath then
                 getgenv().noclip = true
@@ -1005,8 +980,8 @@ function Ditting_PSX()
         V_Area, V_Pos = "Cyber Cavern", CFrame.new(8784, -40, 3037)
     end
     if not TempDisableCheckFruit
-    and (DitPSX["Auto Farm Fruit"].Enable and (not LastCheckFruit or tick() - LastCheckFruit > 60) or IsMineCollapsed()) then
-        if IsMineCollapsed() then
+    and (DitPSX["Auto Farm Fruit"].Enable and (not LastCheckFruit or tick() - LastCheckFruit > 60) or not FarmFruit and IsMineCollapsed()) then
+        if not FarmFruit and IsMineCollapsed() then
             local TimeLeft = HMS_To_Number(workspace.__MAP.Interactive["Diamond Mine Collapsed Sign"].Main.SurfaceGui.Timer.Text:split("in:")[2])
             getgenv().FarmFruit = true
             getgenv().TempDisableCheckFruit = true
@@ -1014,7 +989,6 @@ function Ditting_PSX()
                 getgenv().FarmFruit = false
                 getgenv().TempDisableCheckFruit = false
                 TeleportArea("Spawn")
-                wait(3)
                 return
             end)
         else
@@ -1022,7 +996,6 @@ function Ditting_PSX()
             if Apple > 195 and Orange > 195 then
                 getgenv().FarmFruit = false
                 TeleportArea("Spawn")
-                wait(3)
                 return
             elseif Apple <= DitPSX["Auto Farm Fruit"]["Farm when under"] or Orange <= DitPSX["Auto Farm Fruit"]["Farm when under"] then
                 getgenv().FarmFruit = true
@@ -1098,7 +1071,6 @@ function Ditting_PSX()
             wait(DitPSX["Farm Cooldown"])
         elseif GetCurrentWorld() ~= V_World then
             TeleportArea(V_Area)
-            wait(5)
         else
             game.workspace.Camera.CameraType = Enum.CameraType.Custom
         end
@@ -1188,7 +1160,6 @@ function Ditting_PSX()
             end
         elseif GetCurrentWorld() ~= V_World then
             TeleportArea(V_Area)
-            wait(5)
         else
             game.workspace.Camera.CameraType = Enum.CameraType.Custom
         end
