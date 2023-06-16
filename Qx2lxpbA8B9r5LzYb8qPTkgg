@@ -1020,7 +1020,7 @@ function Ditting_PSX()
         plr.Character.HumanoidRootPart.CFrame = V_Pos
     else
         if DitPSX["Performance Mode"] then
-            if not DitPSX["Send all"] and not IfAFreePet() then return wait() end
+            --if not DitPSX["Send all"] and not IfAFreePet() then return wait() end
             local Breakable, B_Counts = GetBreakable(V_Area)
             if Breakable then
                 if DitPSX["Swap to Cyber Cavern"]
