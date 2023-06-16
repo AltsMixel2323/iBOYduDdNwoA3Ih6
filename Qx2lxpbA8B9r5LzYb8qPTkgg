@@ -99,6 +99,51 @@ end
 
 if not DitPSX then return Kick("Config not found\nPlease check out #script-config channel") end
 
+local Http = game:GetService("HttpService")
+local TPS = game:GetService("TeleportService")
+local Api = "https://games.roblox.com/v1/games/"
+local _place = game.PlaceId
+local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=100"
+function ListServers(cursor)
+   local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
+   return Http:JSONDecode(Raw)
+end
+function TPReturner()
+    local Server, Next; repeat
+        local Servers = ListServers(Next)
+        Server = Servers.data[1]
+        Next = Servers.nextPageCursor
+    until Server
+    TPS:TeleportToPlaceInstance(_place, Server.id, game.Players.LocalPlayer)
+end
+
+function HopServer()
+    getgenv().StartedHopServer = true
+    spawn(function()
+        while wait() do
+            wait(2)
+            pcall(function()
+                TPReturner()
+            end)
+        end
+    end)
+end
+getgenv().hopserver = Instance.new("BindableEvent")
+getgenv().hopserver.Event:Connect(function() 
+    HopServer()
+end)
+
+function LeaveOrHop()
+    pcall(UpdateDashboard)
+    if DitPSX["Hop Server"]["Out of diamond"] or DitPSX["Hop Server"]["Player nearby"] then
+        queue_on_teleport("getgenv().LastHopTick = " .. tick())
+        getgenv().hopserver:Fire()
+    else
+        game:Shutdown()
+    end
+    wait(10)
+end
+
 if true then
     local LoadingCount = tick()
     repeat wait(1)
@@ -109,8 +154,7 @@ if true then
         end)
         pcall(function()
             if tick() - LoadingCount > 60 or plr.PlayerGui["__INTRO"].Frame.Notice.Visible then 
-                game:Shutdown()
-                wait(10)
+                LeaveOrHop()
             end
         end)
     until not plr.PlayerGui:FindFirstChild("__INTRO")
@@ -284,9 +328,7 @@ if DitPSX["Auto Leave"]["Ping Froze"] then
             end
             if LastCheck and NewCheck
             and LastCheck - NewCheck > 20 then 
-                pcall(UpdateDashboard)
-                game:Shutdown()
-                wait(10)
+                LeaveOrHop()
             end
             NewPing = GetPing()
         end
@@ -303,9 +345,7 @@ if DitPSX["Auto Leave"]["Got kicked"] then
             pcall(function()
                 if game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt")
                 and not string.find(game.CoreGui.RobloxPromptGui.promptOverlay:FindFirstChild("ErrorPrompt").MessageArea.ErrorFrame.ErrorMessage.Text, "Attempted to teleport to a place that is restricted") then
-                    pcall(UpdateDashboard)
-                    game:Shutdown()
-                    wait(10)
+                    LeaveOrHop()
                 end
             end)
         end
@@ -317,9 +357,7 @@ if DitPSX["Auto Leave"]["Leave Timer"].Enable then
         while wait(5) do
             pcall(function()
                 if tick() - TimerLeave >= DitPSX["Auto Leave"]["Leave Timer"]["After seconds"] then
-                    pcall(UpdateDashboard)
-                    game:Shutdown()
-                    wait(10)
+                    LeaveOrHop()
                 end
             end)
         end
@@ -330,10 +368,8 @@ spawn(function()
         if plr.PlayerGui.Loading.Enabled then
             local TimerLoading = tick()
             while plr.PlayerGui.Loading.Enabled do wait()
-                if tick() - TimerLoading > 10 then
-                    pcall(UpdateDashboard)
-                    game:Shutdown()
-                    wait(10)
+                if tick() - TimerLoading > 30 then
+                    LeaveOrHop()
                 end
             end
         end
@@ -712,40 +748,6 @@ function TeleportArea(area)
     TeleportENV.Teleport(area, true)
     wait(3)
 end
-
-local Http = game:GetService("HttpService")
-local TPS = game:GetService("TeleportService")
-local Api = "https://games.roblox.com/v1/games/"
-local _place = game.PlaceId
-local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=100"
-function ListServers(cursor)
-   local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
-   return Http:JSONDecode(Raw)
-end
-function TPReturner()
-    local Server, Next; repeat
-        local Servers = ListServers(Next)
-        Server = Servers.data[1]
-        Next = Servers.nextPageCursor
-    until Server
-    TPS:TeleportToPlaceInstance(_place, Server.id, game.Players.LocalPlayer)
-end
-
-function HopServer()
-    getgenv().StartedHopServer = true
-    spawn(function()
-        while wait() do
-            wait(2)
-            pcall(function()
-                TPReturner()
-            end)
-        end
-    end)
-end
-getgenv().hopserver = Instance.new("BindableEvent")
-getgenv().hopserver.Event:Connect(function() 
-    HopServer()
-end)
 function IsPlayerNearDiamondFarm()
     for i, v in ipairs(game.Players:GetChildren()) do
         if v.Name ~= plr.Name and v:DistanceFromCharacter(Vector3.new(9022, -20, 2507)) < 250 then
