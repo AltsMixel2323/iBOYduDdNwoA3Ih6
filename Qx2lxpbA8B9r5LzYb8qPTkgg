@@ -775,7 +775,8 @@ function SetTempFarmFruit()
 end
 function TeleportArea(area)
     if area == "Mystic Mine" and GetCurrentWorld() == "Spawn" and IsMineCollapsed() then
-        return SetTempFarmFruit()
+        SetTempFarmFruit()
+        return
     end
     TeleportENV.Teleport(area, true)
     wait(3)
