@@ -790,58 +790,44 @@ function DaycareReady()
     end
 end
 local DaycareGUI = getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare)
-function CheckPetEnrollable(v, CurrentEnrollsLenght, E_Pets, DC_MaxSlot)
-    if --not table.find(Enrolls, v.uid) and
-    not table.find(E_Pets, v.uid)
-    --and not v.l
-    and DaycareGUI.GetUsedSlots() + CurrentEnrollsLenght < DC_MaxSlot then
+function CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot)
+    if not table.find(Enrolls, v.uid)
+    and not table.find(E_Pets, v.uid)
+    and not v.l
+    and DaycareGUI.GetUsedSlots() + #Enrolls < DC_MaxSlot then
         return true
     end
 end
-function Convert2DTableTo1d(Table) 
-    local Relsut = {}
-    for k,v in ipairs(Table) do 
-        for k,v in ipairs(v) do 
-            table.insert(Relsut,v)
-        end
-    end
-    return Relsut
-end
 function GetEnrollPet()
-    local Enrolls, I_Pets, DC_MaxSlot = {
-        {},
-        {},
-        {},
-        {}
-    }, F_Lib.Save.Get().Pets, DaycareGUI.GetMaxSlots()
+    local Enrolls, I_Pets, DC_MaxSlot = {}, F_Lib.Save.Get().Pets, DaycareGUI.GetMaxSlots()
     local E_Pets = {}
-    for i, v in ipairs(L_Client.PetCmds.GetEquipped()) do
+    for i, v in pairs(L_Client.PetCmds.GetEquipped()) do
         table.insert(E_Pets, v.uid)
     end
-    for i, v in ipairs(I_Pets) do
-        if not v.l and not table.find(E_Pets, v.uid) then 
-            if v.dm then 
-                table.insert(Enrolls[1], v.uid)
-            elseif v.r then 
-                table.insert(Enrolls[2], v.uid)
-            elseif v.g then
-                table.insert(Enrolls[3], v.uid)
-            else
-                table.insert(Enrolls[4], v.uid)
-            end
+    for i, v in pairs(I_Pets) do
+        if v.dm
+        and CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
         end
     end
-    local EnrollRelsut = {}
-    local EnrollLenght = 0
-    for k,v in ipairs(Enroll) do 
-        for k,v in pairs(v) do 
-            if DaycareGUI.GetUsedSlots() + EnrollLenght < DC_MaxSlot then 
-                table.insert(EnrollRelsut,v)
-                EnrollLenght = EnrollLenght + 1
-            end
+    for i, v in pairs(I_Pets) do
+        if v.r
+        and CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
         end
     end
-    return EnrollRelsut
+    for i, v in pairs(I_Pets) do
+        if v.g
+        and CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
+        end
+    end
+    for i, v in pairs(I_Pets) do
+        if CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
+        end
+    end
+    return Enrolls
 end
 for i, v in ipairs(getgc()) do 
     if islclosure(v) and tostring(getfenv(v).script) == "Pets" then 
