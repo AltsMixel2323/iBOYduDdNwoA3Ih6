@@ -1059,7 +1059,7 @@ function Ditting_PSX()
                 game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
             end
             spawn(function()
-                if B_Counts == 1 then
+                if B_Counts <= 5 then
                     Library.Signal.Fire("Group Select Coin", Breakable)
                 else
                     Library.Signal.Fire("Select Coin", Breakable)
