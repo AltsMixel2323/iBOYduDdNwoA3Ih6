@@ -1029,6 +1029,7 @@ function Ditting_PSX()
                 getgenv().TempDisableCheckFruit = false
                 TeleportArea("Spawn")
                 wait(3)
+                return
             end)
         else
             local Apple, Orange = GetFruitAmount("Apple"), GetFruitAmount("Orange")
@@ -1036,6 +1037,7 @@ function Ditting_PSX()
                 getgenv().FarmFruit = false
                 TeleportArea("Spawn")
                 wait(3)
+                return
             elseif Apple <= DitPSX["Auto Farm Fruit"]["Farm when under"] or Orange <= DitPSX["Auto Farm Fruit"]["Farm when under"] then
                 getgenv().FarmFruit = true
             end
