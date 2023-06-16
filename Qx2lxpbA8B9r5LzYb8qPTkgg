@@ -858,8 +858,9 @@ for i, v in ipairs(getgc()) do
 end
 if getgenv().PetFunction then 
     getgenv().IsPetBusyValue = debug.getupvalues(getgenv().PetFunction)[1]
-    getgenv().IsPetBusy = function(uid) 
-        return getgenv().IsPetBusyValue[uid].farming
+    getgenv().IsPetBusy = function(uid)
+        local PetPath = getgenv().IsPetBusyValue[uid]
+        return PetPath.farming or false
     end
 end
 local EquippedPets = L_Client.PetCmds.GetEquipped()
@@ -1179,8 +1180,8 @@ if Mobile then
 else
     spawn(function()
         while wait() do
-            Ditting_PSX()
-            --pcall(Ditting_PSX)
+            --Ditting_PSX()
+            pcall(Ditting_PSX)
         end
     end)
 end
