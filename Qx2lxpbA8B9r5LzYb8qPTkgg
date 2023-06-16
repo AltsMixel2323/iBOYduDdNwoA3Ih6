@@ -32,7 +32,7 @@ if not script_key and not DitPSX then
         ["Send all"] = false, -- Send all pet to break or not, false will send single to break
         ["Performance Mode"] = false, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
         ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
-        ["White Screen"] = true,
+        ["White Screen"] = false,
         ["Discord Webhook"] = {
             ["Stats Tracker"] = {
                 ["Url"] = "",
