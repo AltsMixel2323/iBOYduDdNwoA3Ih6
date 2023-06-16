@@ -30,9 +30,9 @@ if not script_key and not DitPSX then
         },
         ["Farm Cooldown"] = 0, -- Delay between switch to farm another thing (higher = less crashing)
         ["Send all"] = false, -- Send all pet to break or not, false will send single to break
-        ["Performance Mode"] = false, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
+        ["Performance Mode"] = true, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
         ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
-        ["White Screen"] = true,
+        ["White Screen"] = false,
         ["Discord Webhook"] = {
             ["Stats Tracker"] = {
                 ["Url"] = "",
@@ -666,14 +666,16 @@ getgenv().GetBreakable = function(in_area, x)
     else
         local NotSendAllPart
         local FoundPart
+        local count = 0
         for i, v in ipairs(game.Workspace.__THINGS.Coins:GetChildren()) do 
             if v:IsA("Folder")
             and v:GetAttribute("Area") == in_area
             and v:GetAttribute("Health") > 0 then
+                count = count + 1 
                 local name = v:GetAttribute("Name")
                 if PrioFruits[name]
                 or not DitPSX["Ignore Giant Chest"] and name == "Mystic Mine Diamond Mine Giant Chest" then
-                    return v
+                    return v, count
                 end
                 if not DitPSX["Send all"] then
                     if not v.POS:FindFirstChild("HUD") then
@@ -683,8 +685,8 @@ getgenv().GetBreakable = function(in_area, x)
                 if not FoundPart then FoundPart = v end
             end
         end
-        if NotSendAllPart then return NotSendAllPart end
-        return FoundPart
+        if NotSendAllPart then return NotSendAllPart, count end
+        return FoundPart, count
     end
 end
 function GetCurrentWorld()
@@ -816,24 +818,30 @@ function GetEnrollPet()
     for i, v in ipairs(L_Client.PetCmds.GetEquipped()) do
         table.insert(E_Pets, v.uid)
     end
-    local EnrollLenght = 0
     for i, v in ipairs(I_Pets) do
-        if not v.l then 
-            if CheckPetEnrollable(v, EnrollLenght, E_Pets, DC_MaxSlot) then 
-                if v.dm then 
-                    table.insert(Enrolls[1], v.uid)
-                elseif v.r then 
-                    table.insert(Enrolls[2], v.uid)
-                elseif v.g then
-                    table.insert(Enrolls[3], v.uid)
-                else
-                    table.insert(Enrolls[4], v.uid)
-                end
+        if not v.l and not table.find(E_Pets, v.uid) then 
+            if v.dm then 
+                table.insert(Enrolls[1], v.uid)
+            elseif v.r then 
+                table.insert(Enrolls[2], v.uid)
+            elseif v.g then
+                table.insert(Enrolls[3], v.uid)
+            else
+                table.insert(Enrolls[4], v.uid)
+            end
+        end
+    end
+    local EnrollRelsut = {}
+    local EnrollLenght = 0
+    for k,v in ipairs(Enroll) do 
+        for k,v in pairs(v) do 
+            if DaycareGUI.GetUsedSlots() + EnrollLenght < DC_MaxSlot then 
+                table.insert(EnrollRelsut,v)
                 EnrollLenght = EnrollLenght + 1
             end
         end
     end
-    return Convert2DTableTo1d(Enrolls)
+    return EnrollRelsut
 end
 for i, v in ipairs(getgc()) do 
     if islclosure(v) and tostring(getfenv(v).script) == "Pets" then 
@@ -924,6 +932,7 @@ function Ditting_PSX()
     end
     if DitPSX["Auto Daycare"] and (not LastCheckDaycare or tick() - LastCheckDaycare > 120) then
         local EnrollPets = GetEnrollPet()
+        table.foreach(EnrollPets, print)
         local Req1, Req2 = DaycareReady(), DaycareGUI.GetUsedSlots() < DaycareGUI.GetMaxSlots() and #EnrollPets > 0
         if Req1 or Req2 then
             TeleportArea("Spawn")
@@ -1045,7 +1054,7 @@ function Ditting_PSX()
     end
     if DitPSX["Performance Mode"] then
         if not DitPSX["Send all"] and not IfAFreePet() then return wait() end
-        local Breakable = GetBreakable(V_Area)
+        local Breakable, B_Counts = GetBreakable(V_Area)
         if Breakable then
             if DitPSX["Swap to Cyber Cavern"]
             and (not Breakable and V_Area == "Mystic Mine" and not TempFarmCyber and not DisableFarmCyber) then
@@ -1085,8 +1094,14 @@ function Ditting_PSX()
                 game.workspace.Camera.CFrame = CFrame.new(m.X, m.Y + 40, m.Z, 0, -1, 0, 0, 0, 1, -1, 0, 0)
                 game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
             end
-            Library.Signal.Fire("Select Coin", Breakable)
-            if DitPSX["Send all"] then
+            spawn(function()
+                if B_Counts == 1 then
+                    Library.Signal.Fire("Group Select Coin", Breakable)
+                else
+                    Library.Signal.Fire("Select Coin", Breakable)
+                end
+            end)
+            if DitPSX["Send all"] or B_Counts == 1 then
                 repeat wait()
                 until not Breakable or not Breakable.Parent
                 or not Breakable:FindFirstChild("HUD", true)
@@ -1205,8 +1220,8 @@ if Mobile then
 else
     spawn(function()
         while wait() do
-            --Ditting_PSX()
-            pcall(Ditting_PSX)
+            Ditting_PSX()
+            --pcall(Ditting_PSX)
         end
     end)
 end
