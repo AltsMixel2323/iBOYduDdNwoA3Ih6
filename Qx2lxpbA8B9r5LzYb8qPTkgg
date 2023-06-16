@@ -763,21 +763,24 @@ function IsMineCollapsed()
         return true
     end
 end
+function SetTempFarmFruit()
+    local TimeLeft = HMS_To_Number(workspace.__MAP.Interactive["Diamond Mine Collapsed Sign"].Main.SurfaceGui.Timer.Text:split("in:")[2])
+    getgenv().FarmFruit = true
+    getgenv().TempDisableCheckFruit = true
+    delay(TimeLeft + 5, function()
+        getgenv().FarmFruit = false
+        getgenv().TempDisableCheckFruit = false
+        TeleportArea("Spawn")
+    end)
+end
 function TeleportArea(area)
-    print(area)
+    if area == "Mystic Mine" and GetCurrentWorld() == "Spawn" and IsMineCollapsed() then
+        return SetTempFarmFruit()
+    end
     TeleportENV.Teleport(area, true)
     wait(3)
     if area == "Mystic Mine" and GetCurrentWorld() ~= area and IsMineCollapsed() then
-        print'1'
-        local TimeLeft = HMS_To_Number(workspace.__MAP.Interactive["Diamond Mine Collapsed Sign"].Main.SurfaceGui.Timer.Text:split("in:")[2])
-        getgenv().FarmFruit = true
-        getgenv().TempDisableCheckFruit = true
-        delay(TimeLeft + 5, function()
-            getgenv().FarmFruit = false
-            getgenv().TempDisableCheckFruit = false
-            TeleportArea("Spawn")
-        end)
-        wait(1)
+        SetTempFarmFruit()
     end
 end
 function IsPlayerNearDiamondFarm()
