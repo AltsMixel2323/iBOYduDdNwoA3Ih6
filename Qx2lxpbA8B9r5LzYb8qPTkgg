@@ -960,7 +960,7 @@ function Ditting_PSX()
     if not TempDisableCheckFruit and DitPSX["Auto Farm Fruit"].Enable and (not LastCheckFruit or tick() - LastCheckFruit > 60) then
         getgenv().LastCheckFruit = tick()
         local Apple, Orange = GetFruitAmount("Apple"), GetFruitAmount("Orange")
-        if Apple > 195 and Orange > 195 then
+        if FarmFruit and Apple > 195 and Orange > 195 then
             getgenv().FarmFruit = false
             TeleportArea("Spawn")
             return
