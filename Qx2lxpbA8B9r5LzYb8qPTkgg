@@ -32,7 +32,7 @@ if not script_key and not DitPSX then
         ["Send all"] = false, -- Send all pet to break or not, false will send single to break
         ["Performance Mode"] = false, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
         ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
-        ["White Screen"] = true,
+        ["White Screen"] = true, -- Enable for disable game's rendering for less CPU/GPU usage
         ["Discord Webhook"] = {
             ["Stats Tracker"] = {
                 ["Url"] = "",
@@ -175,10 +175,6 @@ if DitPSX["White Screen"] then
     game:GetService("RunService"):Set3dRenderingEnabled(false)
 end
 spawn(function()
-    -- local FPSboost 
-    -- FPSboost = hookfunction(getsenv(plr.PlayerScripts.Scripts.Game.Coins).CoinDamageAnimation, function(p10, p11)
-    --     return nil
-    -- end)
     getsenv(plr.PlayerScripts.Scripts.Game.Coins).CoinDamageAnimation = function() end
 end)
 
@@ -277,7 +273,6 @@ spawn(function()
 end)
 
 --Disable UIs
---[[
 if game.CoreGui.RobloxGui:FindFirstChild("PerformanceStats") then 
     UserSettings().GameSettings.PerformanceStatsVisible = false
 end
@@ -291,7 +286,6 @@ plr.PlayerGui.Message.Enabled = false
 plr.PlayerGui.Message:GetPropertyChangedSignal("Enabled"):Connect(function()
     plr.PlayerGui.Message.Enabled = false
 end)
-]]
 plr.PlayerGui.FreeGiftsTop.Enabled = false
 plr.PlayerGui.Main.Left.Visible = false
 plr.PlayerGui.Main.Right.Diamonds.Add.Visible = false
@@ -480,7 +474,7 @@ and string.find(DitPSX["Discord Webhook"]["Stats Tracker"]["Url"], "discord") th
 end
 
 function Optimize()
-    --workspace.__DEBRIS:Destroy()
+    workspace.__DEBRIS:Destroy()
 
     game:GetService("ReplicatedStorage").Assets.Billboards.Orb.Enabled = true
     game:GetService("ReplicatedStorage").Assets.Billboards.Reward.Enabled = true
@@ -1185,7 +1179,6 @@ warpF2(function()
         end
     end)
 end)
--- haaa 
 spawn(function()
     while wait(30) do
         pcall(function()
