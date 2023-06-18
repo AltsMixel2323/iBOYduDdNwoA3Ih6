@@ -11,7 +11,7 @@ if not script_key and not DitPSX then
         ["Auto Mailbox"] = { -- Auto send Diamonds to a person thru Mailbox when your Diamonds more than set diamond
             ["Enable"] = true,
             ["Send to"] = "egodwastaken",
-            ["Above amount"] = 10000000000
+            ["Above amount"] = 100000000000
         },
         ["Auto Claim Mailbox"] = true, -- Claim Diamonds on the account received the Diamonds from Auto Mailbox
         ["Auto Daycare"] = true, -- Auto Claim Daycare and Enroll unequipped/unlocked Pets in your Inventory
@@ -277,6 +277,7 @@ spawn(function()
 end)
 
 --Disable UIs
+--[[
 if game.CoreGui.RobloxGui:FindFirstChild("PerformanceStats") then 
     UserSettings().GameSettings.PerformanceStatsVisible = false
 end
@@ -290,6 +291,7 @@ plr.PlayerGui.Message.Enabled = false
 plr.PlayerGui.Message:GetPropertyChangedSignal("Enabled"):Connect(function()
     plr.PlayerGui.Message.Enabled = false
 end)
+]]
 plr.PlayerGui.FreeGiftsTop.Enabled = false
 plr.PlayerGui.Main.Left.Visible = false
 plr.PlayerGui.Main.Right.Diamonds.Add.Visible = false
@@ -843,6 +845,7 @@ end
 function Ditting_PSX()
     if not LastRewardCheck or tick() - LastRewardCheck > 120 then
         if VIPOwned and IsRewardReady(14400, F_Lib.Save.Get().VIPCooldown) then
+            print'1'
             TeleportArea("Spawn")
             local VIPRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("VIP Rewards")
             if VIPRewardPath then
@@ -853,6 +856,7 @@ function Ditting_PSX()
             end
         end
         if IsRewardReady(L_Directory.Ranks[F_Lib.Save.Get().Rank].rewardCooldown, F_Lib.Save.Get().RankTimer) then
+            print'2'
             TeleportArea("Spawn")
             local RankRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("Rank Rewards")
             if RankRewardPath then
@@ -876,6 +880,7 @@ function Ditting_PSX()
         if #EnrollPets == 0 then return end
         local Req1, Req2 = DaycareReady(), DaycareGUI.GetUsedSlots() < DaycareGUI.GetMaxSlots() and #EnrollPets > 0
         if Req1 or Req2 then
+            print'3'
             TeleportArea("Spawn")
             local DaycarePath = game.workspace.__MAP.Interactive:FindFirstChild("Daycare")
             if DaycarePath then
@@ -962,6 +967,7 @@ function Ditting_PSX()
         local Apple, Orange = GetFruitAmount("Apple"), GetFruitAmount("Orange")
         if FarmFruit and Apple > 195 and Orange > 195 then
             getgenv().FarmFruit = false
+            print'4'
             TeleportArea("Spawn")
             return
         elseif Apple <= DitPSX["Auto Farm Fruit"]["Farm when under"] or Orange <= DitPSX["Auto Farm Fruit"]["Farm when under"] then
