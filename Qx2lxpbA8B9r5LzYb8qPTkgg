@@ -1142,7 +1142,7 @@ warpF2(function()
         while wait() do
             --Ditting_PSX()
             local _, e = pcall(function()
-                Ditting_PSX
+                Ditting_PSX()
             end)
             if e then print(e) end
         end
