@@ -389,6 +389,27 @@ spawn(function()
         end
     end
 end)
+function FireButton(x)
+    for i, v in pairs(getconnections(x.MouseButton1Click)) do 
+        v:Fire()
+        v:Function()
+    end
+    for i, v in pairs(getconnections(x.MouseButton1Down)) do 
+        v:Fire()
+    end
+    for i, v in pairs(getconnections(x.Activated)) do 
+        v:Fire()
+    end
+end
+spawn(function()
+    while wait(2) do
+        pcall(function()
+            if plr.PlayerGui.Message.Enabled and plr.PlayerGui.Message.Frame.Visible and plr.PlayerGui.Message.Frame.No.Visible then
+                FireButton(plr.PlayerGui.Message.Frame.No)
+            end
+        end)
+    end
+end)
 local connect
 local old
 old = hookmetamethod(game,"__index",function(...) 
