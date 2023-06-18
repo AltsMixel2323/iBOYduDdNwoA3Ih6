@@ -891,7 +891,6 @@ function Ditting_PSX()
     if DitPSX["Auto Daycare"] and (not LastCheckDaycare or tick() - LastCheckDaycare > 120) then
         getgenv().LastCheckDaycare = tick()
         local EnrollPets = GetEnrollPet()
-        if #EnrollPets == 0 then return end
         local Req1, Req2 = DaycareReady(), DaycareGUI.GetUsedSlots() < DaycareGUI.GetMaxSlots() and #EnrollPets > 0
         if Req1 or Req2 then
             TeleportArea("Spawn")
