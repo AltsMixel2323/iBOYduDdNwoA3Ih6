@@ -459,7 +459,7 @@ and string.find(DitPSX["Discord Webhook"]["Stats Tracker"]["Url"], "discord") th
 end
 
 function Optimize()
-    workspace.__DEBRIS:Destroy()
+    --workspace.__DEBRIS:Destroy()
 
     game:GetService("ReplicatedStorage").Assets.Billboards.Orb.Enabled = true
     game:GetService("ReplicatedStorage").Assets.Billboards.Reward.Enabled = true
