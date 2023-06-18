@@ -760,6 +760,16 @@ function IsMineCollapsed()
         return true
     end
 end
+function TeleportArea(area)
+    if area == "Mystic Mine" and IsMineCollapsed() then
+        return SetTempFarmFruit()
+    end
+    TeleportENV.Teleport(area, true)
+    wait(3)
+    if area == "Mystic Mine" and IsMineCollapsed() then
+        SetTempFarmFruit()
+    end
+end
 function SetTempFarmFruit()
     local TimeLeft = HMS_To_Number(workspace.__MAP.Interactive["Diamond Mine Collapsed Sign"].Main.SurfaceGui.Timer.Text:split("in:")[2])
     getgenv().FarmFruit = true
@@ -769,16 +779,6 @@ function SetTempFarmFruit()
         getgenv().TempDisableCheckFruit = false
         TeleportArea("Spawn")
     end)
-end
-function TeleportArea(area)
-    if area == "Mystic Mine" and GetCurrentWorld() == "Spawn" and IsMineCollapsed() then
-        return SetTempFarmFruit()
-    end
-    TeleportENV.Teleport(area, true)
-    wait(3)
-    if area == "Mystic Mine" and GetCurrentWorld() ~= area and IsMineCollapsed() then
-        SetTempFarmFruit()
-    end
 end
 function IsPlayerNearDiamondFarm()
     for i, v in ipairs(game.Players:GetChildren()) do
@@ -1016,6 +1016,12 @@ function Ditting_PSX()
         getgenv().noclip = true
         plr.Character.HumanoidRootPart.CFrame = V_Pos
     else
+        if not LastWorldCheck or tick() - LastWorldCheck > 60 then
+            if GetCurrentWorld() ~= V_World then
+                TeleportArea(V_Area)
+            end
+            getgenv().LastWorldCheck = tick()
+        end
         if DitPSX["Performance Mode"] then
             if not DitPSX["Send all"] and not IfAFreePet() then return wait() end
             local Breakable, B_Counts = GetBreakable(V_Area)
@@ -1169,7 +1175,6 @@ function Ditting_PSX()
 end
 
 warpF2(function() 
-    print(getfenv(debug.info(2,"f")).script)
     spawn(function()
         while wait() do
             --Ditting_PSX()
