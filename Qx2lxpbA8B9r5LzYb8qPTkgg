@@ -373,6 +373,23 @@ spawn(function()
         end
     end
 end)
+spawn(function()
+    repeat wait()
+    until dg
+    while wait(2) do
+        if dg == 0 then
+            local TimerZero = tick()
+            while wait() do
+                if tick() - TimerZero > 30 and dg == 0 then
+                    LeaveOrHop()
+                end
+            end
+        else
+            break
+        end
+    end
+end)
+
 local connect
 local old
 old = hookmetamethod(game,"__index",function(...) 
