@@ -730,6 +730,7 @@ function SetTempFarmFruit()
     delay(TimeLeft + 5, function()
         getgenv().FarmFruit = false
         getgenv().TempDisableCheckFruit = false
+        print'0'
         TeleportArea("Spawn")
     end)
 end
@@ -1140,7 +1141,10 @@ warpF2(function()
     spawn(function()
         while wait() do
             --Ditting_PSX()
-            pcall(Ditting_PSX)
+            local _, e = pcall(function()
+                Ditting_PSX
+            end)
+            if e then print(e) end
         end
     end)
 end)
