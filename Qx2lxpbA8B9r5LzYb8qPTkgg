@@ -554,10 +554,12 @@ if not Run1Time then
 
     pcall(Optimize)
 
-    local LootbagCollect = getsenv(plr.PlayerScripts.Scripts.Game.Lootbags)
     function CollectLoots()
-        for i, v in ipairs(wThings.Lootbags:GetChildren()) do 
-            LootbagCollect.Collect(v)
+        for _, lootbag in pairs(Library.Things:FindFirstChild("Lootbags"):GetChildren()) do
+            if lootbag and not lootbag:GetAttribute("Collected") then
+                Library.Network.Fire("Collect Lootbag", lootbag.Name, plr.Character.HumanoidRootPart.Position + Vector3.new(math.random(-0.05, 0.05), math.random(-0.05, 0.05), math.random(-0.05, 0.05)))
+                wait(0.03)
+            end
         end
     end
     spawn(function()
