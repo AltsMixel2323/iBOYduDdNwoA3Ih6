@@ -687,6 +687,11 @@ function CheckBreakable(i, v)
         return true
     end
 end
+local PrioFruits = {
+    Rainbow = true,
+    Orange = true,
+    Apple = true,
+}
 getgenv().GetBreakable = function(in_area, x)
     if x then
         local P_Breakable = {}
