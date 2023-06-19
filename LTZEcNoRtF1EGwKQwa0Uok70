@@ -681,9 +681,11 @@ function AutoOverlord()
     end
 end
 function CheckBreakable(i, v)
-    if wThings.Coins:FindFirstChild(i)
-    and ((wThings.Coins[i].POS:FindFirstChild("HUD") and wThings.Coins[i].POS.HUD.ProgressText.Text ~= "0") or not wThings.Coins[i]:FindFirstChild("HUD"))
-    and v.h > 0 then
+    local m = wThings.Coins:FindFirstChild(i)
+    if m
+    and ((m.POS:FindFirstChild("HUD") and m.POS.HUD.ProgressText.Text ~= "0") or not m:FindFirstChild("HUD"))
+    and v.h > 0
+    and plr:DistanceFromCharacter(v.POS.Position) < 295 then
         return true
     end
 end
@@ -722,7 +724,8 @@ getgenv().GetBreakable = function(in_area, x)
         for i, v in ipairs(game.Workspace.__THINGS.Coins:GetChildren()) do 
             if v:IsA("Folder")
             and v:GetAttribute("Area") == in_area
-            and v:GetAttribute("Health") > 0 then
+            and v:GetAttribute("Health") > 0
+            and plr:DistanceFromCharacter(v.POS.Position) < 295 then
                 count = count + 1 
                 local name = v:GetAttribute("Name")
                 if PrioFruits[name]
@@ -768,6 +771,7 @@ function FarmBreakables()
                 until not Breakable or not Breakable.Parent
                 or not Breakable:FindFirstChild("HUD", true)
                 or Breakable.POS.HUD.ProgressText.Text == "0"
+                or plr:DistanceFromCharacter(Breakable.POS.Position) > 295
             end
             wait(DitPSX["Farm Cooldown"])
         else
@@ -785,14 +789,16 @@ function FarmBreakables()
                     pcall(function()
                         if v and wThings.Coins:FindFirstChild(v) then
                             if DitPSX["Send all"] then
+                                local m = wThings.Coins:FindFirstChild(v)
                                 L_Client.Network.Invoke('Join Coin', v, P_List)
                                 for _, x in ipairs(P_List) do
                                     L_Client.Network.Fire('Farm Coin', v, x)
                                 end
                                 repeat wait()
-                                until not wThings.Coins:FindFirstChild(v)
-                                or not wThings.Coins[v]:FindFirstChild("HUD", true)
-                                or wThings.Coins[v].POS.HUD.ProgressText.Text == "0"
+                                until not m
+                                or not m:FindFirstChild("HUD", true)
+                                or m.POS.HUD.ProgressText.Text == "0"
+                                or plr:DistanceFromCharacter(m.POS.Position) > 295
                                 B_Count = B_Count + 1
                             else
                                 P_Count = P_Count + 1
