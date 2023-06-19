@@ -4,7 +4,7 @@ if not script_key and not DitPSX then
         ["Farm Cooldown"] = 0, -- Delay between switch to farm another thing (higher = less crashing)
         ["Send all"] = true, -- Send all pet to break or not, false will send single to break
         ["Performance Mode"] = false, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
-        ["White Screen"] = true, -- Enable for disable game's rendering for less CPU/GPU usage
+        ["White Screen"] = false, -- Enable for disable game's rendering for less CPU/GPU usage
     }
 end
 
@@ -451,7 +451,7 @@ function GetNearestArea()
     local Dist = math.huge
     local NearestArea
     for i, v in ipairs(workspace.__MAP.Boxes:GetChildren()) do
-        if v.Name ~= "Doodle Shop" then
+        if v.Name ~= "Doodle Shop" and v.Name ~= "Pixel Kyoto" then
             local Mag = plr:DistanceFromCharacter(v.Position)
             if Mag < Dist then
                 Dist = Mag
