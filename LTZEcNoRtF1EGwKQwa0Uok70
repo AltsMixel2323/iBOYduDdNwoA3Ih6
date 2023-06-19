@@ -685,7 +685,7 @@ function CheckBreakable(i, v)
     if m
     and ((m.POS:FindFirstChild("HUD") and m.POS.HUD.ProgressText.Text ~= "0") or not m:FindFirstChild("HUD"))
     and v.h > 0
-    and plr:DistanceFromCharacter(v.POS.Position) < 295 then
+    and plr:DistanceFromCharacter(m.POS.Position) < 295 then
         return true
     end
 end
