@@ -130,6 +130,40 @@ for i, v in ipairs(F_Lib.Save.Get().Gamepasses) do
     end
 end
 
+--Disable UIs
+if game.CoreGui.RobloxGui:FindFirstChild("PerformanceStats") then 
+    UserSettings().GameSettings.PerformanceStatsVisible = false
+end
+if game.StarterGui:GetCoreGuiEnabled("PlayerList") then
+    game.StarterGui:SetCore('TopbarEnabled', false)
+end
+game.CoreGui:FindFirstChild("RobloxGui").Enabled = false
+game:GetService("VirtualInputManager"):SendKeyEvent(true, 27, false, game)
+game:GetService("VirtualInputManager"):SendKeyEvent(false, 27, false, game)
+plr.PlayerGui.Message.Enabled = false
+plr.PlayerGui.Message:GetPropertyChangedSignal("Enabled"):Connect(function()
+    plr.PlayerGui.Message.Enabled = false
+end)
+plr.PlayerGui.FreeGiftsTop.Enabled = false
+plr.PlayerGui.Main.Left.Visible = false
+plr.PlayerGui.Main.Right.Diamonds.Add.Visible = false
+plr.PlayerGui.Main.Bottom.Visible = false
+--[[
+for i, v in ipairs(plr.PlayerGui.Main.Boosts:GetChildren()) do
+    if v:IsA("Frame")
+    and not string.find(v.Name, "Damage")
+    and v.Name ~= "Apple" and v.Name ~= "Orange" then
+        v.Visible = false
+    end
+end
+]]
+pcall(function()
+    plr.PlayerGui.Main.EventHud.Visible = false
+    plr.PlayerGui.Main.EventHud:GetPropertyChangedSignal("Visible"):Connect(function()
+        plr.PlayerGui.Main.EventHud.Visible = false
+    end)
+end)
+
 local connect
 local old
 old = hookmetamethod(game,"__index",function(...) 
@@ -496,12 +530,11 @@ function AutoOverlord()
     end
 
     if not LastWorldCheck or tick() - LastWorldCheck > 30 then
-        if Library.WorldCmds.HasArea("Kawaii Temple") then
+        getgenv().LastWorldCheck = tick()
+        if plr:DistanceFromCharacter(Vector3.new(5335.78174, -16.4735279, 1833.3938)) > 20 and Library.WorldCmds.HasArea("Kawaii Temple") then
             AreaTeleport("Kawaii Temple")
             getgenv().UnlockedKawaiiTemple = true
-            return
         end
-        getgenv().LastWorldCheck = tick()
     end
 
     if UnlockedKawaiiTemple then return end
@@ -662,7 +695,8 @@ getgenv().GetBreakable = function(in_area, x)
         for i, v in pairs(L_Client.Network.Invoke("Get Coins")) do
             if v.a == in_area then
                 if CheckBreakable(i, v) then
-                    if string.find(v.n, "Giant Chest") then
+                    if PrioFruits[v.n]
+                    or v.n == "Giant Kawaii Chest" then
                         table.insert(P_Breakable, i)
                         P_BreakAdded = true
                     elseif not P_BreakAdded then
@@ -686,7 +720,8 @@ getgenv().GetBreakable = function(in_area, x)
             and v:GetAttribute("Health") > 0 then
                 count = count + 1 
                 local name = v:GetAttribute("Name")
-                if string.find(name, "Giant Chest") then
+                if PrioFruits[name]
+                or name == "Giant Kawaii Chest" then
                     return v, count
                 end
                 if not DitPSX["Send all"] then
@@ -703,7 +738,11 @@ getgenv().GetBreakable = function(in_area, x)
 end
 spawn(function()
     while wait(1) do
-        getgenv().NearestArea = GetNearestArea()
+        if not UnlockedKawaiiTemple then
+            getgenv().NearestArea = GetNearestArea()
+        else
+            getgenv().NearestArea = "Kawaii Temple"
+        end
     end 
 end)
 function FarmBreakables()
