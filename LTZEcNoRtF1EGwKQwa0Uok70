@@ -1,1 +1,802 @@
+if not script_key and not DitPSX then
+    getgenv().DitPSX = {
+        ["Auto Daycare"] = false, -- Auto Claim Daycare and Enroll unequipped/unlocked Pets in your Inventory
+        ["Farm Cooldown"] = 0, -- Delay between switch to farm another thing (higher = less crashing)
+        ["Send all"] = true, -- Send all pet to break or not, false will send single to break
+        ["Performance Mode"] = false, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
+        ["White Screen"] = true, -- Enable for disable game's rendering for less CPU/GPU usage
+    }
+end
 
+if Executed then return end
+getgenv().Executed = true
+
+repeat wait()
+until game:IsLoaded()
+and game.Players.LocalPlayer
+and game.Players.LocalPlayer:FindFirstChild("leaderstats")
+
+local plr = game.Players.LocalPlayer
+
+function Kick(v)
+    plr:Kick(v)
+end
+
+if not DitPSX then return Kick("Config not found\nPlease check out #script-config channel") end
+
+local Http = game:GetService("HttpService")
+local TPS = game:GetService("TeleportService")
+local Api = "https://games.roblox.com/v1/games/"
+local _place = game.PlaceId 
+local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=100"
+function ListServers(cursor)
+   local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
+   return Http:JSONDecode(Raw)
+end
+function TPReturner()
+    local Server, Next; repeat
+        local Servers = ListServers(Next)
+        Server = Servers.data[1]
+        Next = Servers.nextPageCursor
+    until Server
+    TPS:TeleportToPlaceInstance(_place, Server.id, game.Players.LocalPlayer)
+end
+
+function HopServer()
+    getgenv().StartedHopServer = true
+    spawn(function()
+        while wait() do
+            wait(2)
+            pcall(function()
+                TPReturner()
+            end)
+        end
+    end)
+end
+getgenv().hopserver = Instance.new("BindableEvent")
+getgenv().hopserver.Event:Connect(function() 
+    HopServer()
+end)
+
+function LeaveOrHop()
+    pcall(UpdateDashboard)
+    if DitPSX["Hop Server"]["Out of diamond"] or DitPSX["Hop Server"]["Player nearby"] then
+        queue_on_teleport("getgenv().LastHopTick = " .. tick())
+        getgenv().hopserver:Fire()
+    else
+        game:Shutdown()
+    end
+    wait(10)
+end
+
+if true then
+    local LoadingCount = tick()
+    repeat wait(1)
+        pcall(function()
+            for i, v in ipairs(getconnections(plr.PlayerGui["__INTRO"].Frame.Skip.MouseButton1Up)) do
+                v.Function()
+            end
+        end)
+        pcall(function()
+            if tick() - LoadingCount > 60 or plr.PlayerGui["__INTRO"].Frame.Notice.Visible then 
+                LeaveOrHop()
+            end
+        end)
+    until not plr.PlayerGui:FindFirstChild("__INTRO")
+    repeat wait(1)
+    until plr.PlayerGui:FindFirstChild("Loading")
+    and not plr.PlayerGui:FindFirstChild("Loading").Enabled
+    and plr:FindFirstChild("__LOADED") and plr["__LOADED"].Value
+end
+
+-- FPS Boost
+local Lighting = game:GetService("Lighting")
+local Terrain = workspace:FindFirstChildOfClass("Terrain")
+sethiddenproperty(Terrain, "Decoration", false)
+sethiddenproperty(game.Lighting, "Technology", 0)
+settings().Rendering.QualityLevel = 1
+Lighting.Brightness = 0
+if DitPSX["White Screen"] then
+    game:GetService("RunService"):Set3dRenderingEnabled(false)
+end
+spawn(function()
+    getsenv(plr.PlayerScripts.Scripts.Game.Coins).CoinDamageAnimation = function() end
+end)
+
+local vu = game:GetService("VirtualUser")
+plr.Idled:connect(function()
+    vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+    wait(1)
+    vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+end)
+
+getgenv().F_Lib = require(game.ReplicatedStorage.Framework.Library)
+getgenv().L_Client = require(game.ReplicatedStorage.Library.Client)
+getgenv().L_Directory = require(game.ReplicatedStorage.Library.Directory)
+getgenv().wThings = workspace.__THINGS
+getgenv().formatNumber = F_Lib.Functions.Commas
+getgenv().shortNumber = F_Lib.Functions.NumberShorten
+
+local Library = require(game.ReplicatedStorage.Library)
+debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
+wait(1)
+debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
+wait(1)
+require(game.ReplicatedStorage.Framework.Library).WorldCmds.CanDoAction = function() return true end
+wait(1)
+for i, v in ipairs(F_Lib.Save.Get().Gamepasses) do
+    if v == 18674305 then
+        getgenv().VIPOwned = true
+    end
+end
+
+local connect
+local old
+old = hookmetamethod(game,"__index",function(...) 
+    if checkcaller() then return old(...) end
+    if not connect then 
+        connect = Instance.new("BindableFunction")
+        connect.OnInvoke = function(f) 
+            return f()
+        end
+    end
+    return old(...)
+end)
+repeat wait() until connect
+function warpF2(f) 
+    return connect:Invoke(f)
+end
+
+for i, v in ipairs(getgc()) do 
+    if islclosure(v) and tostring(getfenv(v).script) == "Pets" then 
+        for _, x in ipairs(debug.getconstants(v)) do 
+            if x == "Pets.Remove" then
+                getgenv().PetFunction = v
+                break
+            end
+        end
+        if getgenv().PetFunction then break end
+    end
+end
+if getgenv().PetFunction then 
+    getgenv().IsPetBusyValue = debug.getupvalues(getgenv().PetFunction)[1]
+    getgenv().IsPetBusy = function(uid)
+        local PetPath = getgenv().IsPetBusyValue[uid]
+        return PetPath.farming or false
+    end
+end
+local EquippedPets = L_Client.PetCmds.GetEquipped()
+function GetEquippedPets()
+    local E_Pets = {}
+    for i, v in ipairs(EquippedPets) do
+        table.insert(E_Pets, v.uid)
+    end
+    return E_Pets
+end
+function IfAFreePet()
+    for i, v in ipairs(EquippedPets) do
+        if not IsPetBusy(v.uid) then
+            return true
+        end
+    end
+end
+
+if DitPSX["Send all"] then
+    Library.Save.Get().Settings.PetsControl = 2
+else
+    Library.Save.Get().Settings.PetsControl = 1
+end
+getsenv(plr.PlayerScripts.Scripts.GUIs.Settings).Update()
+
+function CollectLoots()			
+    for _, lootbag in pairs(Library.Things:FindFirstChild("Lootbags"):GetChildren()) do
+        if lootbag and not lootbag:GetAttribute("Collected") then
+            Library.Network.Fire("Collect Lootbag", lootbag.Name, plr.Character.HumanoidRootPart.Position + Vector3.new(math.random(-0.05, 0.05), math.random(-0.05, 0.05), math.random(-0.05, 0.05)))
+            wait(0.03)
+        end
+    end
+end
+spawn(function()
+    while wait() do
+        pcall(function()
+            CollectLoots()
+            wait(1)
+        end)
+    end
+end)
+
+local huhu = getsenv(game.Players.LocalPlayer.PlayerScripts.Scripts.Game.Orbs)
+local Collect = huhu.Collect
+local list = {}
+local getupval = debug.getupvalue
+huhu.AddOrb = function(a,b) 
+    table.insert(list,a)
+end
+getgenv().Collect = function()
+    if #list == 0 then return end
+    local upval = getupval(Collect,3)
+    for k,v in ipairs(list) do 
+        table.insert(upval,v)
+    end
+    table.clear(list)
+end
+spawn(function()
+    while wait(1) do getgenv().Collect() end
+end)
+
+-- shout out to rafa
+local WorldCoins = F_Lib.Things:WaitForChild("Coins")
+WorldCoins.ChildAdded:Connect(function(v)
+    v:SetAttribute("HasLanded", true)
+    v:SetAttribute("IsFalling", false)
+    local x = v:WaitForChild("Coin")
+    x:SetAttribute("InstantLand", true)
+end)
+
+local Original_HasPower = F_Lib.Shared.HasPower
+F_Lib.Shared.HasPower = function(pet, powerName) 
+    if powerName == "Agility" then 
+        return true, 3
+    end
+    return Original_HasPower(pet, powerName)
+end
+
+local Original_GetPowerDir = F_Lib.Shared.GetPowerDir
+F_Lib.Shared.GetPowerDir = function(powerName, tier) 
+    if powerName == "Agility" then 
+        return  {
+            title = "Agility III", 
+            desc = "Pet moves 50% faster", 
+            value = 20
+        }
+    end
+    return Original_GetPowerDir(powerName, tier)
+end
+
+-- Love you rafa
+local AllGameAreas = {}
+for name, area in pairs(Library.Directory.Areas) do
+    local world = Library.Directory.Worlds[area.world]
+    if world and world.worldOrder and world.worldOrder > 0 then
+        if not area.hidden and not area.isVIP then
+            local containsArea = false
+            if world.spawns then
+                for i,v in pairs(world.spawns) do
+                    if v.settings and v.settings.area and v.settings.area == name then 
+                        containsArea = true 
+                        break 
+                    end
+                end
+            end
+            if area.gate or containsArea then
+                table.insert(AllGameAreas, name)
+            end
+        end
+    end
+end
+table.sort(AllGameAreas, function(a, b)
+    local areaA = Library.Directory.Areas[a]
+    local areaB = Library.Directory.Areas[b]
+    local worldA = Library.Directory.Worlds[areaA.world]
+    if a == "Ice Tech" then 
+        worldA = Library.Directory.Worlds["Fantasy"]
+    end
+    local worldB = Library.Directory.Worlds[areaB.world]
+    if b == "Ice Tech" then 
+        worldB = Library.Directory.Worlds["Fantasy"]
+    end
+    if worldA.worldOrder ~= worldB.worldOrder then
+        return worldA.worldOrder < worldB.worldOrder
+    end
+    local currencyA = Library.Directory.Currency[worldA.mainCurrency]
+    local currencyB = Library.Directory.Currency[worldB.mainCurrency]
+    if currencyA.order ~= currencyB.order then
+        return currencyA.order < currencyB.order
+    end
+    if not areaA.gate or not areaB.gate then
+        return areaA.id < areaB.id
+    end
+    return areaA.gate.cost < areaB.gate.cost
+end)
+function GetCurrentAndNextArea(ignoreicetech)
+    local cArea, nArea = "", ""    
+    for i, v in ipairs(AllGameAreas) do 
+        if not ignoreicetech or v ~= "Ice Tech" and v ~= "Cave" then
+            if cArea == "" and Library.WorldCmds.HasArea(v) then
+                local nxtArea = AllGameAreas[i + 1]
+                if nxtArea and not Library.WorldCmds.HasArea(nxtArea) then 
+                    cArea = v
+                    nArea = nxtArea
+                    break
+                elseif not nxtArea then
+                    cArea = v
+                    nArea = "COMPLETED"
+                end
+            end
+        end
+    end
+    return cArea, nArea
+end
+function CheckIfCanAffordArea(areaName)
+    local saveData = Library.Save.Get()
+    local area = Library.Directory.Areas[areaName]
+    if not saveData then 
+        return false 
+    end
+    if not area then return false end
+    if not area.gate then 
+        return true 
+    end
+    local gateCurrency = area.gate.currency
+    local currency = saveData[gateCurrency]
+    if IsHardcore then
+        if gateCurrency ~= "Diamonds" then
+            currency = saveData.HardcoreCurrency[gateCurrency]
+        end
+    end
+    if currency and currency >= area.gate.cost then
+        return true
+    end
+    return false
+end
+function IsRewardReady(R_Cooldown, R_Timer)
+    m = L_Client.Network.Invoke("Get OSTime") - R_Cooldown - R_Timer
+    if m > 0 then return true end
+end
+function DaycareReady()
+    local Saves = F_Lib.Save.Get()
+    assert(Saves)
+    local DCQueue
+	if Library.Shared.IsHardcore then
+		DCQueue = Saves.DaycareHardcoreQueue
+	else
+		DCQueue = Saves.DaycareQueue
+	end
+    for i, v in ipairs(DCQueue) do 
+        if Library.Shared.DaycareComputeRemainingTime(Saves, v) == 0 then 
+            return true 
+        end
+    end
+end
+local DaycareGUI = getsenv(plr.PlayerScripts.Scripts.GUIs.Daycare)
+function CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot)
+    if not table.find(Enrolls, v.uid)
+    and not table.find(E_Pets, v.uid)
+    and not v.l
+    and DaycareGUI.GetUsedSlots() + #Enrolls < DC_MaxSlot then
+        return true
+    end
+end
+function GetEnrollPet()
+    local Enrolls, I_Pets, DC_MaxSlot = {}, F_Lib.Save.Get().Pets, DaycareGUI.GetMaxSlots()
+    local E_Pets = {}
+    for i, v in pairs(L_Client.PetCmds.GetEquipped()) do
+        table.insert(E_Pets, v.uid)
+    end
+    for i, v in pairs(I_Pets) do
+        if v.dm
+        and CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
+        end
+    end
+    for i, v in pairs(I_Pets) do
+        if v.r
+        and CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
+        end
+    end
+    for i, v in pairs(I_Pets) do
+        if v.g
+        and CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
+        end
+    end
+    for i, v in pairs(I_Pets) do
+        if CheckPetEnrollable(v, Enrolls, E_Pets, DC_MaxSlot) then
+            table.insert(Enrolls, v.uid)
+        end
+    end
+    return Enrolls
+end
+local TeleportENV = getsenv(plr.PlayerScripts.Scripts.GUIs.Teleport)
+function TeleportArea(area)
+    TeleportENV.Teleport(area, true)
+    wait(3)
+end
+function AreaTeleport(v)
+    local areaTeleport = Library.WorldCmds.GetMap().Teleports:FindFirstChild(v);
+    if areaTeleport then
+        Library.Signal.Fire("Teleporting")
+        task.wait(0.25)
+        plr.Character:PivotTo(areaTeleport.CFrame + areaTeleport.CFrame.UpVector * (plr.Character.Humanoid.HipHeight + plr.Character.HumanoidRootPart.Size.Y / 2))
+        Library.Network.Fire("Performed Teleport", v)
+        task.wait(0.25)
+    end
+end
+function GetNearestArea()
+    local Dist = math.huge
+    local NearestArea
+    for i, v in ipairs(workspace.__MAP.Boxes:GetChildren()) do
+        if v.Name ~= "Doodle Shop" then
+            local Mag = plr:DistanceFromCharacter(v.Position)
+            if Mag < Dist then
+                Dist = Mag
+                NearestArea = v
+            end
+        end
+    end
+    return NearestArea.Name
+end
+
+function AutoOverlord()
+    if not LastRewardCheck or tick() - LastRewardCheck > 120 then
+        local CurrentArea, CurrentWorld = GetNearestArea(), Library.WorldCmds.Get() 
+        if VIPOwned and IsRewardReady(14400, F_Lib.Save.Get().VIPCooldown) then
+            TeleportArea("Spawn")
+            local VIPRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("VIP Rewards")
+            if VIPRewardPath then
+                plr.Character.HumanoidRootPart.CFrame = VIPRewardPath.Pad.CFrame 
+                wait(1)
+                L_Client.Network.Invoke("Redeem VIP Rewards")
+            end
+        end
+        if IsRewardReady(L_Directory.Ranks[F_Lib.Save.Get().Rank].rewardCooldown, F_Lib.Save.Get().RankTimer) then
+            TeleportArea("Spawn")
+            local RankRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("Rank Rewards")
+            if RankRewardPath then
+                plr.Character.HumanoidRootPart.CFrame = RankRewardPath.Pad.CFrame 
+                wait(1)
+                L_Client.Network.Invoke("Redeem Rank Rewards")
+            end
+        end
+        if Library.WorldCmds.Get() ~= CurrentWorld then
+            Library.WorldCmds.Load(CurrentWorld)
+            wait(2)
+        end
+        if GetNearestArea() ~= CurrentArea then
+            AreaTeleport(CurrentArea)
+        end
+        for i, v in ipairs(L_Directory.FreeGifts) do 
+            if not table.find(F_Lib.Save.Get().FreeGiftsRedeemed, i)
+            and v.waitTime <= F_Lib.Save.Get().FreeGiftsTime then
+                L_Client.Network.Invoke("Redeem Free Gift", i)
+            end
+        end
+        getgenv().LastRewardCheck = tick()
+    end
+    if DitPSX["Auto Daycare"] and (not LastCheckDaycare or tick() - LastCheckDaycare > 120) then
+        local CurrentArea, CurrentWorld = GetNearestArea(), Library.WorldCmds.Get() 
+        getgenv().LastCheckDaycare = tick()
+        local EnrollPets = GetEnrollPet()
+        local Req1, Req2 = DaycareReady(), DaycareGUI.GetUsedSlots() < DaycareGUI.GetMaxSlots() and #EnrollPets > 0
+        if Req1 or Req2 then
+            TeleportArea("Spawn")
+            local DaycarePath = game.workspace.__MAP.Interactive:FindFirstChild("Daycare")
+            if DaycarePath then
+                getgenv().noclip = true
+                plr.Character.HumanoidRootPart.CFrame = DaycarePath.Pad.CFrame 
+                wait(1)
+                if Req1 then
+                    L_Client.Network.Invoke("Daycare: Claim")
+                    wait(2)
+                    return
+                else
+                    L_Client.Network.Invoke("Daycare: Enroll", EnrollPets)
+                    wait(2)
+                end
+            end
+            if Library.WorldCmds.Get() ~= CurrentWorld then
+                Library.WorldCmds.Load(CurrentWorld)
+                wait(2)
+            end
+            if GetNearestArea() ~= CurrentArea then
+                AreaTeleport(CurrentArea)
+            end
+        end
+    end
+
+    if not LastWorldCheck or tick() - LastWorldCheck > 30 then
+        if Library.WorldCmds.HasArea("Kawaii Temple") then
+            AreaTeleport("Kawaii Temple")
+            getgenv().UnlockedKawaiiTemple = true
+            return
+        end
+        getgenv().LastWorldCheck = tick()
+    end
+
+    if UnlockedKawaiiTemple then return end
+
+    local saveData = Library.Save.Get()
+    local currentAreaName, nextAreaName = GetCurrentAndNextArea()
+    
+    local shouldSkip = false
+
+    if currentAreaName == "Cave" and nextAreaName == "Ice Tech" and not Library.WorldCmds.HasArea("Heavens Gate") and not CheckIfCanAffordArea("Ice Tech") then
+        if not FantasyTeleported and F_Lib.WorldCmds.Get() ~= "Fantasy" then
+            Library.WorldCmds.Load("Fantasy")
+            wait(2)
+            getgenv().FantasyTeleported = true
+            return
+        else
+            if Library.WorldCmds.HasArea("Heavens Gate") and not CheckIfCanAffordArea("Ice Tech") then
+                AreaTeleport("Heaven Island")
+                repeat wait(1)
+                until CheckIfCanAffordArea("Ice Tech")
+            else
+                currentAreaName, nextAreaName = "Enchanted Forest", "Fantasy Portals"
+                if Library.WorldCmds.HasArea("Fantasy Portals") then
+                    currentAreaName, nextAreaName = GetCurrentAndNextArea(true)
+                end
+            end
+        end
+    end
+
+    local currentArea = Library.Directory.Areas[currentAreaName]
+    local nextArea = Library.Directory.Areas[nextAreaName]
+
+    if Library.WorldCmds.Get() ~= currentArea.world then
+        Library.WorldCmds.Load(currentArea.world)
+        wait(2)
+    end
+    if GetNearestArea() ~= currentArea then
+        AreaTeleport(currentArea)
+    end
+
+    if currentAreaName == "Hacker Portal" then
+        shouldSkip = true
+        local ownsHackerGate = IsHardcore and saveData.Hardcore.HackerPortalUnlocked or not IsHardcore and saveData.HackerPortalUnlocked
+        if not ownsHackerGate then
+            local currentProgress, currentMission = unpack(IsHardcore and saveData.Hardcore.HackerPortalProgress or saveData.HackerPortalProgress)
+            if currentMission < 0 then
+                local map = Library.WorldCmds.GetMap()
+                local interactive = nil
+                if map then interactive = map:FindFirstChild("Interactive") end
+                local hackerPortal = nil
+                if interactive then hackerPortal = interactive:FindFirstChild("Hacker Portal") end
+                local interactLocation = nil
+                if hackerPortal then interactLocation = hackerPortal:FindFirstChild("_INTERACT") end
+                if interactLocation then
+                    plr.Character.HumanoidRootPart.CFrame = CFrame.new(interactLocation.CFrame.p) + (interactLocation.CFrame.RightVector * 10)
+                    L_Client.Network.Fire("Start Hacker Portal Quests")
+                    currentMission = 1
+                end
+            end
+            if currentMission > 1 then
+                currentMission = 1
+                currentProgress = Library.Shared.HackerPortalQuests[1]
+            end
+            if currentMission > -1 then
+                local totalToComplete = Library.Shared.HackerPortalQuests[currentMission]
+                if totalToComplete and tonumber(totalToComplete) and currentProgress >= totalToComplete then
+                    local map = Library.WorldCmds.GetMap()
+                    local interactive = nil
+                    if map then interactive = map:FindFirstChild("Interactive") end
+                    local hackerPortal = nil
+                    if interactive then hackerPortal = interactive:FindFirstChild("Hacker Portal") end
+                    local interactLocation = nil
+                    if hackerPortal then interactLocation = hackerPortal:FindFirstChild("_INTERACT") end
+                    if interactLocation then
+                        plr.Character.HumanoidRootPart.CFrame = CFrame.new(interactLocation.CFrame.p) + (interactLocation.CFrame.RightVector * 10)
+                        wait(0.3)
+                    end
+                    if Library.Network.Invoke("Finish Hacker Portal Quest")	then
+                        Library.WorldCmds.Load("Void")
+                        wait(2)
+                        Library.WorldCmds.Load(nextArea.world)
+                        wait(1)
+                    end
+                end
+            end
+        else 
+            Library.WorldCmds.Load("Void")
+            wait(2)
+            Library.WorldCmds.Load(nextArea.world)
+            wait(1)
+        end
+    end
+    if nextAreaName ~= "COMPLETED" and not shouldSkip then
+        if not CheckIfCanAffordArea(nextAreaName) then
+            AreaTeleport(currentAreaName)
+            repeat wait(1)
+            until CheckIfCanAffordArea(nextAreaName)
+        end 
+        local currentWorld = Library.WorldCmds.Get() 
+        if currentWorld ~= nextArea.world then 
+            Library.WorldCmds.Load(nextArea.world)
+            wait(1)
+        end
+        local map = Library.WorldCmds.GetMap()
+        local allGates = nil
+        if map then allGates = map:FindFirstChild("Gates") end
+        
+        local successfullyTeleported = false
+        if allGates and allGates:FindFirstChild(nextAreaName) then
+            local gate = allGates:FindFirstChild(nextAreaName):FindFirstChild("Gate")
+            if gate and gate:FindFirstChild("GateHUD") then
+                local gateTP = gate:FindFirstChild("GateHUD").Parent
+                if gateTP then 
+                    plr.Character.HumanoidRootPart.CFrame = CFrame.new(gateTP.CFrame.p) * CFrame.new(1,0,0)
+                    successfullyTeleported = true
+                end
+            end
+        elseif currentArea.world == "Fantasy" then
+            local interactive = map:FindFirstChild("Interactive")
+            local portals = nil
+            if interactive then portals = interactive:FindFirstChild("Portals") end
+            if portals and portals:FindFirstChild(nextAreaName) then 
+                local portal = portals:FindFirstChild(nextAreaName)
+                plr.Character.HumanoidRootPart.CFrame = CFrame.new(portal.PrimaryPart.CFrame.p) + (portal.PrimaryPart.CFrame.RightVector * 5)
+                successfullyTeleported = true
+            end
+        end
+        if successfullyTeleported then
+            wait(0.1)
+            local success, errorMsg = Library.Network.Invoke("Buy Area", nextAreaName)
+            if success then
+                if currentAreaName == "Cat Kingdom" then
+                    Library.WorldCmds.Load("Limbo")
+                    wait(1)
+                end
+                AreaTeleport(nextAreaName)
+            end
+        end
+        
+        wait(1)
+    else 
+        -- NOT AVAILABLE YET
+        -- Start farming? Teleport to area? Idk yet
+    end
+end
+function CheckBreakable(i, v)
+    if wThings.Coins:FindFirstChild(i)
+    and ((wThings.Coins[i].POS:FindFirstChild("HUD") and wThings.Coins[i].POS.HUD.ProgressText.Text ~= "0") or not wThings.Coins[i]:FindFirstChild("HUD"))
+    and v.h > 0 then
+        return true
+    end
+end
+getgenv().GetBreakable = function(in_area, x)
+    if x then
+        local P_Breakable = {}
+        local Breakable = {}
+        local P_BreakAdded = false
+        for i, v in pairs(L_Client.Network.Invoke("Get Coins")) do
+            if v.a == in_area then
+                if CheckBreakable(i, v) then
+                    if string.find(v.n, "Giant Chest") then
+                        table.insert(P_Breakable, i)
+                        P_BreakAdded = true
+                    elseif not P_BreakAdded then
+                        table.insert(Breakable, i)
+                    end
+                end
+            end
+        end
+        if P_BreakAdded then
+            return P_Breakable
+        else
+            return Breakable
+        end
+    else
+        local NotSendAllPart
+        local FoundPart
+        local count = 0
+        for i, v in ipairs(game.Workspace.__THINGS.Coins:GetChildren()) do 
+            if v:IsA("Folder")
+            and v:GetAttribute("Area") == in_area
+            and v:GetAttribute("Health") > 0 then
+                count = count + 1 
+                local name = v:GetAttribute("Name")
+                if string.find(name, "Giant Chest") then
+                    return v, count
+                end
+                if not DitPSX["Send all"] then
+                    if not v.POS:FindFirstChild("HUD") then
+                        NotSendAllPart = v
+                    end
+                end
+                if not FoundPart then FoundPart = v end
+            end
+        end
+        if NotSendAllPart then return NotSendAllPart, count end
+        return FoundPart, count
+    end
+end
+spawn(function()
+    while wait(1) do
+        getgenv().NearestArea = GetNearestArea()
+    end 
+end)
+function FarmBreakables()
+    if not NearestArea then return end
+    if DitPSX["Performance Mode"] then
+        if not DitPSX["Send all"] and not IfAFreePet() then return wait() end
+        local Breakable, B_Counts = GetBreakable(NearestArea)
+        if Breakable then
+            spawn(function()
+                if B_Counts <= 5 then
+                    Library.Signal.Fire("Group Select Coin", Breakable)
+                else
+                    Library.Signal.Fire("Select Coin", Breakable)
+                end
+            end)
+            if DitPSX["Send all"] or B_Counts == 1 then
+                repeat wait()
+                until not Breakable or not Breakable.Parent
+                or not Breakable:FindFirstChild("HUD", true)
+                or Breakable.POS.HUD.ProgressText.Text == "0"
+            end
+            wait(DitPSX["Farm Cooldown"])
+        else
+            game.workspace.Camera.CameraType = Enum.CameraType.Custom
+        end
+    else
+        local Breakables = GetBreakable(NearestArea, true)
+        if #Breakables ~= 0 then
+            local P_List = GetEquippedPets()
+            if #P_List == 0 then return end
+            local B_Count = 0
+            local P_Count = 1
+            spawn(function()
+                for i, v in ipairs(Breakables) do
+                    pcall(function()
+                        if v and wThings.Coins:FindFirstChild(v) then
+                            if DitPSX["Send all"] then
+                                L_Client.Network.Invoke('Join Coin', v, P_List)
+                                for _, x in ipairs(P_List) do
+                                    L_Client.Network.Fire('Farm Coin', v, x)
+                                end
+                                repeat wait()
+                                until not wThings.Coins:FindFirstChild(v)
+                                or not wThings.Coins[v]:FindFirstChild("HUD", true)
+                                or wThings.Coins[v].POS.HUD.ProgressText.Text == "0"
+                                B_Count = B_Count + 1
+                            else
+                                P_Count = P_Count + 1
+                                if #P_List <= P_Count then
+                                    P_Count = 1 
+                                end
+                                L_Client.Network.Invoke('Join Coin', v, {P_List[P_Count]})
+                                L_Client.Network.Fire('Farm Coin', v, P_List[P_Count])
+                            end
+                        else
+                            B_Count = B_Count + 1
+                        end
+                    end)
+                    if DitPSX["Send all"] then
+                        task.wait()
+                    else
+                        task.wait(DitPSX["Farm Cooldown"])
+                    end
+                end
+                table.clear(Breakables)
+            end)
+            if DitPSX["Send all"] then
+                repeat wait()
+                until B_Count >= #Breakables
+            else
+                wait(DitPSX["Farm Cooldown"])
+            end
+        else
+            game.workspace.Camera.CameraType = Enum.CameraType.Custom
+        end
+    end
+end
+warpF2(function() 
+    spawn(function()
+        wait(2)
+        while wait() do
+            local _, e = pcall(function()
+                FarmBreakables()
+            end)
+            if e then print(e) end
+        end
+    end)
+end)
+warpF2(function() 
+    while wait() do
+        local _, e = pcall(function()
+            AutoOverlord()
+        end)
+        if e then print(e) end
+    end
+end)
