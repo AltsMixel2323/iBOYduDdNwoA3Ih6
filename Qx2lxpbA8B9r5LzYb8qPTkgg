@@ -1028,7 +1028,6 @@ function Ditting_PSX()
         end)
         getgenv().LastCheckMail = tick()
     end
-    getgenv().CollapseMethod = true
     if CollapseMethod then
         if not getvar then
             if DitPSX["Mine Collapsed Method"]["Method"] == "Volcano Chest" and Library.WorldCmds.HasArea("Pirate Cove") then
