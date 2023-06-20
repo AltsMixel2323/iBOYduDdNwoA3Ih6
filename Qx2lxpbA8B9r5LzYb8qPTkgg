@@ -1,12 +1,31 @@
 if not script_key and not DitPSX then
     getgenv().DitPSX = {
-        ["Auto Triple Damage Boost"] = {
+        --[[
+            Collapse methods:
+            + "Farm Fruit" -- Farm fruits
+            + "Volcano Chest" -- Open Volcano Egg/Farm Pirate Cove Chest
+            + "Mansion Egg" -- Open Dog Egg/Farm Dog Mansion Chest
+        ]]
+        ["Mine Collapsed Method"] = {
+            ["Method"] = "Farm Fruit",
+            ["Open Amount"] = 8, -- 1 or 3 or 8
+            ["Open Golden Egg"] = true, -- Will open Golden egg instead
+        },
+        ["Auto Triple Damage Boost"] = { -- Active when Farm Fruit/Diamond
             ["Boost"] = true,
             ["Server"] = true
         },
-        ["Auto Farm Fruit"] = { -- Only check for Orange/Apple fruit
+        ["Auto Boost"] = { -- Active when Open Egg
+            ["Super Lucky"] = true,
+            ["Server Lucky"] = true,
+            ["Ultra Lucky"] = true,
+            ["Triple Coin"] = true
+        },
+        ["Auto Farm Fruit"] = {
+            -- Mainly farm Orange/Apple fruit while farming Diamonds
+            -- Mainly farm Apple/Banana/ while opening Egg
             ["Enable"] = true,
-            ["Farm when under"] = 40
+            ["Farm when under"] = 50
         },
         ["Auto Mailbox"] = { -- Auto send Diamonds to a person thru Mailbox when your Diamonds more than set diamond
             ["Enable"] = true,
@@ -20,27 +39,31 @@ if not script_key and not DitPSX then
             ["Got kicked"] = true,
             ["Leave Timer"] = {
                 ["Enable"] = true,
-                ["After seconds"] = 30*60 -- Auto Leave the server after AFK in for set seconds 
+                ["After seconds"] = 3600 -- Auto Leave the server after AFK in for set seconds 
             }
         },
         ["Hop Server"] = {
-            ["Hop Server Cooldown"] = 15*60, -- Wait set second after Hop Server
+            ["Hop Server Cooldown"] = 900, -- Wait set second after Hop Server
             ["Player nearby"] = false, -- Will hop to low player server if there's a player nearby Mystic Mine (2m cooldown)
             ["Out of diamond"] = false, -- Will hop to low player server if there are no diamond left to farm
         },
         ["Farm Cooldown"] = 0, -- Delay between switch to farm another thing (higher = less crashing)
         ["Send all"] = false, -- Send all pet to break or not, false will send single to break
-        ["Performance Mode"] = false, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
+        ["Performance Mode"] = true, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
         ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
         ["White Screen"] = true, -- Enable for disable game's rendering for less CPU/GPU usage
         ["Discord Webhook"] = {
             ["Stats Tracker"] = {
-                ["Url"] = "",
-                ["Cooldown"] = 60*60, -- Will notify every set seconds
+                ["URL"] = "Stat Tracker Webhook URL here",
+                ["Cooldown"] = 3600, -- Will notify every set seconds
             }, 
-            ["Hop Server"] = "https://discord.com/api/webhooks/1117383501352800387/FaHzAjgAKFiUpxM7J4iOV_BbwGHdKb9pUbBOFadOBIY5HqwqdkqLJUhGyMvlSTRDbBq4",
+            ["Hop Server"] = "Hop Server Logs Webhook URL here",
             ["Mailbox"] = "https://discord.com/api/webhooks/1117383548098326649/dElhcBLhQhLRZBTGocxOwjRymFCyXPCiZz-nTfcvuOt64i6Jz9vjoiTMWd3AQ7i1zVGB",
-            ["Mine Collapse"] = "https://discord.com/api/webhooks/1120365119768121344/aDlNg8BYG47z6BxU5npYRhMtCqYkiYCgLs4_ZnmM1mO9xfeSljowWEt9BbJHfsqpA0o5",
+            ["Mine Collapse"] = {
+                ["URL"] = "https://discord.com/api/webhooks/1120365119768121344/aDlNg8BYG47z6BxU5npYRhMtCqYkiYCgLs4_ZnmM1mO9xfeSljowWEt9BbJHfsqpA0o5",
+                ["Daily Collapse"] = true, -- Only notify if the collapse are daily (above 10m)
+            },
+            ["Huge Hatch"] = "https://discord.com/api/webhooks/1120730542418169960/lQD98jGUj-FXVwwL-pzEU9oNCj6iDyqiBjQsOxuEiozszlHBJeEN8OsVlbnCDrH8oa-o"
         },
     }
     getgenv().Setting = {
@@ -84,7 +107,7 @@ if Setting then
     end)
 end
     
-if Executed then return end
+--if Executed then return end
 getgenv().Executed = true
 
 repeat wait()
@@ -264,7 +287,11 @@ spawn(function()
                 local countdg = (plr.leaderstats.Diamonds.Value + SentDiamond) - OldDiamond
                 getgenv().dg = countdg
                 getgenv().dg2 = formatNumber(countdg)
-                SetText(DiamondsGained, dg2 .. "\n" .. S_Timer)
+                if EggOpened then
+                    SetText(DiamondsGained, EggOpened .. " Egg" .. "\n" .. S_Timer)
+                else
+                    SetText(DiamondsGained, dg2 .. "\n" .. S_Timer)
+                end
             end
         end)
     end
@@ -441,7 +468,7 @@ debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
 wait(1)
 debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
 wait(1)
-require(game.ReplicatedStorage.Framework.Library).WorldCmds.CanDoAction = function() return true end
+F_Lib.WorldCmds.CanDoAction = function() return true end
 wait(1)
 for i, v in ipairs(F_Lib.Save.Get().Gamepasses) do
     if v == 18674305 then
@@ -449,7 +476,7 @@ for i, v in ipairs(F_Lib.Save.Get().Gamepasses) do
     end
 end
 
-if string.find(DitPSX["Discord Webhook"]["Stats Tracker"]["Url"], "discord") then
+if string.find(DitPSX["Discord Webhook"]["Stats Tracker"]["URL"], "discord") then
     repeat wait()
     until dg and S_Timer
     spawn(function()
@@ -460,7 +487,7 @@ if string.find(DitPSX["Discord Webhook"]["Stats Tracker"]["Url"], "discord") the
                     ["name"] = "Stat Tracker",
                     ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)) .. "\nGem Gained: " .. tostring(shortNumber(tonumber(dg))) .. "\nTime: " .. tostring(S_Timer),
                     ["inline"] = false
-                }, DitPSX["Discord Webhook"]["Stats Tracker"]["Url"])
+                }, DitPSX["Discord Webhook"]["Stats Tracker"]["URL"])
                 local Timer = tick()
                 repeat wait(1)
                 until tick() - Timer >= DitPSX["Discord Webhook"]["Stats Tracker"]["Cooldown"]
@@ -679,7 +706,7 @@ local PrioFruits = {
     Apple = true,
 }
 local Library = require(game.ReplicatedStorage.Library)
-getgenv().GetBreakable = function(in_area, x)
+getgenv().GetBreakable = function(in_area, x, k)
     if x then
         local P_Breakable = {}
         local Breakable = {}
@@ -687,8 +714,8 @@ getgenv().GetBreakable = function(in_area, x)
         for i, v in pairs(L_Client.Network.Invoke("Get Coins")) do
             if v.a == in_area then
                 if CheckBreakable(i, v) then
-                    if PrioFruits[v.n]
-                    or (not DitPSX["Ignore Giant Chest"] and v.n == "Giant Kawaii Chest") then
+                    if not k and (PrioFruits[v.n] or (not DitPSX["Ignore Giant Chest"] and v.n == "Mystic Mine Diamond Mine Giant Chest"))
+                    or k and v.n == k then
                         table.insert(P_Breakable, i)
                         P_BreakAdded = true
                     elseif not P_BreakAdded then
@@ -700,6 +727,7 @@ getgenv().GetBreakable = function(in_area, x)
         if P_BreakAdded then
             return P_Breakable
         else
+            if k then return {} end
             return Breakable
         end
     else
@@ -712,8 +740,8 @@ getgenv().GetBreakable = function(in_area, x)
             and v:GetAttribute("Health") > 0 then
                 count = count + 1 
                 local name = v:GetAttribute("Name")
-                if PrioFruits[name]
-                or not DitPSX["Ignore Giant Chest"] and name == "Giant Kawaii Chest" then
+                if not k and (PrioFruits[name] or not DitPSX["Ignore Giant Chest"] and name == "Mystic Mine Diamond Mine Giant Chest")
+                or k and name == k then
                     return v, count
                 end
                 if not DitPSX["Send all"] then
@@ -724,6 +752,7 @@ getgenv().GetBreakable = function(in_area, x)
                 if not FoundPart then FoundPart = v end
             end
         end
+        if k then return end
         if NotSendAllPart then return NotSendAllPart, count end
         return FoundPart, count
     end
@@ -755,13 +784,22 @@ end
 function SetTempFarmFruit()
     local TF = workspace.__MAP.Interactive["Diamond Mine Collapsed Sign"].Main.SurfaceGui.Timer.Text:split("in:")[2]
     local TimeLeft = HMS_To_Number(TF)
-    if DitPSX["Discord Webhook"]["Mine Collapse"]
-    and string.find(DitPSX["Discord Webhook"]["Mine Collapse"], "discord") then
+    if (not DitPSX["Discord Webhook"]["Mine Collapse"]["Daily Collapse"] or TimeLeft > 600)
+    and DitPSX["Discord Webhook"]["Mine Collapse"]["URL"]
+    and string.find(DitPSX["Discord Webhook"]["Mine Collapse"]["URL"], "discord") then
         SendWebHook({
             ["name"] = "Mine Collapse",
             ["value"] = "Account: ||" .. plr.Name .. "||\n\nTime remain: " .. TF,
             ["inline"] = false
-        }, DitPSX["Discord Webhook"]["Mine Collapse"])
+        }, DitPSX["Discord Webhook"]["Mine Collapse"]["URL"])
+    end
+    if TimeLeft > 600 and DitPSX["Mine Collapsed Method"]["Method"] ~= "Farm Fruit" then
+        getgenv().CollapseMethod = true
+        delay(TimeLeft + 5, function()
+            getgenv().CollapseMethod = false
+            TeleportArea("Spawn")
+        end)
+        return
     end
     getgenv().FarmFruit = true
     getgenv().TempDisableCheckFruit = true
@@ -843,17 +881,19 @@ function GetEnrollPet()
     end
     return Enrolls
 end
-for i, v in ipairs(getgc()) do 
-    if islclosure(v) and tostring(getfenv(v).script) == "Pets" then 
-        for _, x in ipairs(debug.getconstants(v)) do 
-            if x == "Pets.Remove" then
-                getgenv().PetFunction = v
-                break
+loadstring([[
+    for i, v in ipairs(getgc()) do 
+        if islclosure(v) and tostring(getfenv(v).script) == "Pets" then 
+            for _, x in ipairs(debug.getconstants(v)) do 
+                if x == "Pets.Remove" then
+                    getgenv().PetFunction = v
+                    break
+                end
             end
+            if getgenv().PetFunction then break end
         end
-        if getgenv().PetFunction then break end
     end
-end
+]])()
 if getgenv().PetFunction then 
     getgenv().IsPetBusyValue = debug.getupvalues(getgenv().PetFunction)[1]
     getgenv().IsPetBusy = function(uid)
@@ -987,6 +1027,108 @@ function Ditting_PSX()
             end
         end)
         getgenv().LastCheckMail = tick()
+    end
+    getgenv().CollapseMethod = true
+    if CollapseMethod then
+        if not getvar then
+            if DitPSX["Mine Collapsed Method"]["Method"] == "Volcano Chest" and Library.WorldCmds.HasArea("Pirate Cove") then
+                getgenv().FarmMapUnlocked = true
+            elseif DitPSX["Mine Collapsed Method"]["Method"] == "Mansion Egg" and Library.WorldCmds.HasArea("Dog Mansion") then
+                getgenv().FarmMapUnlocked = true
+            end
+            if DitPSX["Mine Collapsed Method"]["Open Amount"] == 8 then
+                getgenv().tableopen1, getgenv().tableopen2 = false, true
+            elseif DitPSX["Mine Collapsed Method"]["Open Amount"] == 3 then
+                getgenv().tableopen1, getgenv().tableopen2 = true, nil
+            end
+            for i, v in pairs(getgc(true)) do
+                if (typeof(v) == 'table' and rawget(v, 'OpenEgg')) then
+                    v.OpenEgg = function()
+                        return
+                    end
+                end
+            end
+            wait(1)
+            spawn(function()
+                getgenv().EggOpened = 0
+                local old = getsenv(plr.PlayerScripts.Scripts.Game["Open Eggs"]).OpenEgg
+                getsenv(plr.PlayerScripts.Scripts.Game["Open Eggs"]).OpenEgg = function(a, b)
+                    getgenv().EggOpened = EggOpened + #b
+                    pcall(function()
+                        if string.find(DitPSX["Discord Webhook"]["Huge Hatch"], "discord") then
+                            for i, v in pairs(b) do 
+                                if F_Lib.Directory.Pets[v.id].huge then 
+                                    SendWebHook({
+                                        ["name"] = "Huge Hatch",
+                                        ["value"] = "Account: ||" .. plr.Name .. "||\n\nHuge Got: " .. F_Lib.Directory.Pets[v.id].name,
+                                        ["inline"] = false
+                                    }, DitPSX["Discord Webhook"]["Huge Hatch"])
+                                end
+                            end
+                        end
+                    end)
+                    return old(a, b)
+                end
+            end)
+            wait(1)
+            getgenv().getvar = true
+        end
+        if not FarmMapUnlocked then return end
+        local M_World, M_Zone, M_Chest, M_Egg, M_EggPath = "Summer Event", "Pirate Cove", "Summer Volcano Chest", "Volcano Egg", "Pirate Cove Eggs"
+        if DitPSX["Mine Collapsed Method"]["Method"] == "Mansion Egg" then
+            M_World, M_Zone, M_Chest, M_Egg, M_EggPath = "Dog", "Dog Mansion", "Giant Dog Chest", "Dog Egg", "Dog Firehouse Eggs"
+        end
+        if not Egg_Name then
+            getgenv().Egg_Name = M_Egg
+            if DitPSX["Mine Collapsed Method"]["Open Golden Egg"] then
+                getgenv().Egg_Name = "Golden " .. M_Egg
+            end
+        end
+        if F_Lib.WorldCmds.Get() ~= M_World then
+            Library.WorldCmds.Load(M_World)
+            wait(2)
+        end
+        if game.workspace.Camera.CameraType ~= Enum.CameraType.Custom then
+            game.workspace.Camera.CameraType = Enum.CameraType.Custom
+        end
+        if DitPSX["Performance Mode"] then
+            if IfAFreePet() then
+                local Breakable, B_Counts = GetBreakable(M_Zone, false, M_Chest)
+                if Breakable then
+                    plr.Character.HumanoidRootPart.CFrame = Breakable.POS.CFrame * CFrame.new(0, 20, 0)
+                    wait(.5)
+                    Library.Signal.Fire("Group Select Coin", Breakable)
+                    wait(.5)
+                end
+            end
+        else
+            local Breakables = GetBreakable(M_Zone, true, M_Chest)
+            if #Breakables == 1 then
+                local m = wThings.Coins:FindFirstChild(Breakables[1])
+                if not m:FindFirstChild("HUD", true) then
+                    local P_List = GetEquippedPets()
+                    if #P_List == 0 then return end
+                    plr.Character.HumanoidRootPart.CFrame = m.POS.CFrame * CFrame.new(0, 20, 0)
+                    wait(.5)
+                    L_Client.Network.Invoke('Join Coin', Breakables[1], P_List)
+                    for _, x in ipairs(P_List) do
+                        L_Client.Network.Fire('Farm Coin', Breakables[1], x)
+                    end
+                    wait(.5)
+                end
+            end
+        end
+        if Egg_Position then
+            if plr:DistanceFromCharacter(Egg_Position) > 30 then
+                plr.Character.HumanoidRootPart.CFrame = CFrame.new(Egg_Position)
+            else
+                L_Client.Network.Invoke("Buy Egg", Egg_Name, tableopen1, tableopen2)
+                wait(1)
+            end
+        else
+            getgenv().Egg_Position = Library.WorldCmds.GetMap().Eggs[M_EggPath].PLATFORM.Pad.Position + Vector3.new(0, 1, 0)
+        end
+        return
     end
     local V_World, V_Area, V_Pos = "Diamond Mine", "Mystic Mine", CFrame.new(9022, -40, 2507)
     if TempFarmCyber then
@@ -1174,18 +1316,45 @@ end
 warpF2(function() 
     spawn(function()
         while wait() do
-            --Ditting_PSX()
+            Ditting_PSX()
+            --[[
             local _, e = pcall(function()
                 Ditting_PSX()
             end)
             if e then print(e) end
+            ]]
         end
     end)
 end)
 spawn(function()
     while wait(30) do
         pcall(function()
-            if not FarmFruit then
+            if CollapseMethod then
+                if DitPSX["Auto Boost"]["Super Lucky"] and not F_Lib.Save.Get().Boosts["Super Lucky"] then
+                    L_Client.Network.Fire("Activate Boost", "Super Lucky")
+                    local Timer = tick()
+                    repeat wait(1)
+                    until F_Lib.Save.Get().Boosts["Super Lucky"] or tick() - Timer > 5
+                end
+                if DitPSX["Auto Boost"]["Server Lucky"] and not F_Lib.ServerBoosts.GetActiveBoosts()["Super Lucky"] then
+                    L_Client.Network.Fire("Activate Server Boost", "Super Lucky")
+                    local Timer = tick()
+                    repeat wait(1)
+                    until F_Lib.ServerBoosts.GetActiveBoosts()["Super Lucky"] or tick() - Timer > 5
+                end
+                if DitPSX["Auto Boost"]["Ultra Lucky"] and not F_Lib.Save.Get().Boosts["Ultra Lucky"] then
+                    L_Client.Network.Fire("Activate Boost", "Ultra Lucky")
+                    local Timer = tick()
+                    repeat wait(1)
+                    until F_Lib.Save.Get().Boosts["Ultra Lucky"] or tick() - Timer > 5
+                end
+                if DitPSX["Auto Boost"]["Triple Coin"] and not F_Lib.Save.Get().Boosts["Triple Coin"] then
+                    L_Client.Network.Fire("Activate Boost", "Triple Coin")
+                    local Timer = tick()
+                    repeat wait(1)
+                    until F_Lib.Save.Get().Boosts["Triple Coin"] or tick() - Timer > 5
+                end
+            elseif not FarmFruit then
                 if DitPSX["Auto Triple Damage Boost"].Boost and not F_Lib.Save.Get().Boosts["Triple Damage"] then
                     L_Client.Network.Fire("Activate Boost", "Triple Damage")
                     local Timer = tick()
