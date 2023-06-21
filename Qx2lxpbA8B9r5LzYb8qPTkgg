@@ -2,6 +2,7 @@ if not script_key and not DitPSX then
     getgenv().DitPSX = {
         --[[
             Collapse methods:
+            + "Stand Still" -- Do nothing (still check for daycare/rewards)
             + "Farm Fruit" -- Farm fruits
             + "Volcano Chest" -- Open Volcano Egg/Farm Pirate Cove Chest
             + "Mansion Egg" -- Open Dog Egg/Farm Dog Mansion Chest
@@ -1106,6 +1107,10 @@ function Ditting_PSX()
         getgenv().LastCheckMail = tick()
     end
     if CollapseMethod then
+        if DitPSX["Mine Collapsed Method"]["Method"] == "Stand Still" then
+            wait(30)
+            return
+        end
         if not getvar then
             if DitPSX["Mine Collapsed Method"]["Method"] == "Volcano Chest" and Library.WorldCmds.HasArea("Pirate Cove") then
                 getgenv().FarmMapUnlocked = true
@@ -1265,6 +1270,17 @@ function Ditting_PSX()
                     getgenv().DisableWalk_One = false
                 end)
             end
+        elseif DitPSX["Legit Mode"] and V_Area == "Cyber Cavern" then
+            if not LastZoneCheck2 or tick() - LastZoneCheck2 > 60 then
+                if GetNearestArea() ~= V_Area then
+                    AreaTeleport(V_Area)
+                end
+                getgenv().LastZoneCheck2 = tick()
+            end
+            local CCPos = CFrame.new(8784, -15, 3037)
+            if plr:DistanceFromCharacter(CCPos.Position) > 20 then
+                WalkToPath(CCPos)
+            end
         end
         if DitPSX["Performance Mode"] then
             if not DitPSX["Send all"] and not IfAFreePet() then return wait() end
@@ -1421,13 +1437,11 @@ end
 warpF2(function() 
     spawn(function()
         while wait() do
-            Ditting_PSX()
-            --[[
+            --Ditting_PSX()
             local _, e = pcall(function()
                 Ditting_PSX()
             end)
             if e then print(e) end
-            ]]
         end
     end)
 end)
