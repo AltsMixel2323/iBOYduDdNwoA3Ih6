@@ -953,9 +953,10 @@ local function followPath(destination)
             humanoid.MoveToFinished:connect(function()
                 finish = true
             end)
+            local walktimer = tick()
             repeat wait()
                 humanoid:MoveTo(v.Position)
-            until finish
+            until finish or tick() - walktimer > 60
             if (waypoints[#waypoints].Position - destination).magnitude > 15 then
                 break
             end
@@ -1254,7 +1255,7 @@ function Ditting_PSX()
                 getgenv().LastZoneCheck = tick()
             end
             if not DisableWalk_One then
-                local x, z = Random.new():NextInteger(8900, 9100), Random.new():NextInteger(2300, 2500)
+                local x, z = Random.new():NextInteger(8950, 9050), Random.new():NextInteger(2350, 2450)
                 WalkToPath(CFrame.new(x, -15.6077871, z))
                 getgenv().DisableWalk_One = true
                 getgenv().DisableWalk_Two = true
@@ -1262,7 +1263,7 @@ function Ditting_PSX()
                     getgenv().DisableWalk_Two = false
                 end)
             elseif not DisableWalk_Two then
-                local x, z = Random.new():NextInteger(8900, 9100), Random.new():NextInteger(2500, 2700)
+                local x, z = Random.new():NextInteger(8950, 9050), Random.new():NextInteger(2450, 2650)
                 WalkToPath(CFrame.new(x, -15.5574083, z))
                 getgenv().DisableWalk_One = true
                 getgenv().DisableWalk_Two = true
