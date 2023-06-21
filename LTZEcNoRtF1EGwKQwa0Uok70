@@ -1,5 +1,6 @@
 if not script_key and not DitPSX then
     getgenv().DitPSX = {
+        ["Unlock Mystic Mine"] = true, -- Make sure have atleast 100,100,000 gems and a huge pet
         ["Auto Daycare"] = false, -- Auto Claim Daycare and Enroll unequipped/unlocked Pets in your Inventory
         ["Farm Cooldown"] = 0, -- Delay between switch to farm another thing (higher = less crashing)
         ["Send all"] = true, -- Send all pet to break or not, false will send single to break
@@ -461,6 +462,18 @@ function GetNearestArea()
     end
     return NearestArea.Name
 end
+function GetHugeID()
+	local HugeID
+	for i, v in pairs(F_Lib.Save.Get().Pets) do
+		if F_Lib.Directory.Pets[v.id].huge then
+			if HugeID then
+				return
+			end
+			HugeID = v.uid
+		end
+	end
+	return HugeID
+end
 
 function AutoOverlord()
     if not LastRewardCheck or tick() - LastRewardCheck > 120 then
@@ -529,15 +542,63 @@ function AutoOverlord()
         end
     end
 
+    if OverlordReached then
+        if F_Lib.WorldCmds.Get() ~= "Diamond Mine" then
+            Library.WorldCmds.Load("Diamond Mine")
+        end
+        local DiamondMineLocked = "Paradise Cave"
+        if Library.WorldCmds.HasArea("Mystic Mine") then
+            getgenv().UnlockedMysticMine = true
+            return
+        elseif Library.WorldCmds.HasArea("Cyber Cavern") then
+            DiamondMineLocked = "Mystic Mine"
+        elseif Library.WorldCmds.HasArea("Paradise Cave") then
+            DiamondMineLocked = "Cyber Cavern"
+        end
+        if DiamondMineLocked == "Mystic Mine" then
+            local HugeID = GetHugeID()
+            if not HugeID then
+                print("Have no Huge or have more than 2 huges")
+                wait(5)
+                return
+            end
+            local success, errorMsg = Library.Network.Invoke("Diamond Mine: Release Pet", DiamondMineLocked, HugeID)
+            if errorMsg then
+                print(errorMsg)
+                wait(5)
+            end
+            return
+        end
+        local success, errorMsg = Library.Network.Invoke("Buy Area", DiamondMineLocked)
+        if errorMsg then
+            print(errorMsg)
+            wait(5)
+        end
+        return
+    end
+
     if not LastWorldCheck or tick() - LastWorldCheck > 30 then
         getgenv().LastWorldCheck = tick()
-        if plr:DistanceFromCharacter(Vector3.new(5335.78174, -16.4735279, 1833.3938)) > 20 and Library.WorldCmds.HasArea("Kawaii Temple") then
-            AreaTeleport("Kawaii Temple")
-            getgenv().UnlockedKawaiiTemple = true
+        if UnlockedDoodleCave or Library.WorldCmds.HasArea("Doodle Cave") then
+            getgenv().UnlockedDoodleCave = true
+            if plr:DistanceFromCharacter(Vector3.new(5335.78174, -16.4735279, 1833.3938)) > 20 then 
+                if F_Lib.WorldCmds.Get() ~= "Doodle" then
+                    Library.WorldCmds.Load("Doodle")
+                end
+                AreaTeleport("Doodle Cave")
+            end
         end
     end
 
-    if UnlockedKawaiiTemple then return end
+    if UnlockedDoodleCave then
+        if DitPSX["Unlock Mystic Mine"] and (not LastRankCheck or tick() - LastRankCheck > 60) then
+            if F_Lib.Save.Get().Rank == "PET OVERLORD" then
+                getgenv().OverlordReached = true
+            end
+            getgenv().LastRankCheck = tick()
+        end
+        return
+    end
 
     local saveData = Library.Save.Get()
     local currentAreaName, nextAreaName = GetCurrentAndNextArea()
@@ -703,7 +764,7 @@ getgenv().GetBreakable = function(in_area, x)
             if v.a == in_area then
                 if CheckBreakable(i, v) then
                     if PrioFruits[v.n]
-                    or v.n == "Giant Kawaii Chest" then
+                    or v.n == "Giant Doodle Cave Chest" then
                         table.insert(P_Breakable, i)
                         P_BreakAdded = true
                     elseif not P_BreakAdded then
@@ -729,7 +790,7 @@ getgenv().GetBreakable = function(in_area, x)
                 count = count + 1 
                 local name = v:GetAttribute("Name")
                 if PrioFruits[name]
-                or name == "Giant Kawaii Chest" then
+                or name == "Giant Doodle Cave Chest" then
                     return v, count
                 end
                 if not DitPSX["Send all"] then
@@ -746,10 +807,10 @@ getgenv().GetBreakable = function(in_area, x)
 end
 spawn(function()
     while wait(1) do
-        if not UnlockedKawaiiTemple then
+        if not UnlockedDoodleCave then
             getgenv().NearestArea = GetNearestArea()
         else
-            getgenv().NearestArea = "Kawaii Temple"
+            getgenv().NearestArea = "Doodle Cave"
         end
     end 
 end)
@@ -844,6 +905,7 @@ warpF2(function()
 end)
 warpF2(function() 
     while wait() do
+        if UnlockedMysticMine then break end
         local _, e = pcall(function()
             AutoOverlord()
         end)
