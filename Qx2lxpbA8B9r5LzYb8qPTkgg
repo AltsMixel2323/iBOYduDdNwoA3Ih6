@@ -29,7 +29,7 @@ if not script_key and not DitPSX then
             ["Farm when under"] = 50
         },
         ["Auto Mailbox"] = { -- Auto send Diamonds to a person thru Mailbox when your Diamonds more than set diamond
-            ["Enable"] = true,
+            ["Enable"] = false,
             ["Send to"] = "egodwastaken",
             ["Above amount"] = 100000000000
         },
