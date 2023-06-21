@@ -1255,7 +1255,7 @@ function Ditting_PSX()
                 getgenv().LastZoneCheck = tick()
             end
             if not DisableWalk_One then
-                local x, z = Random.new():NextInteger(8975, 9025), Random.new():NextInteger(2375, 2425)
+                local x, z = Random.new():NextInteger(9031-25, 9031+25), Random.new():NextInteger(2600-25, 2600+25)
                 WalkToPath(CFrame.new(x, -15.6077871, z))
                 getgenv().DisableWalk_One = true
                 getgenv().DisableWalk_Two = true
@@ -1263,7 +1263,7 @@ function Ditting_PSX()
                     getgenv().DisableWalk_Two = false
                 end)
             elseif not DisableWalk_Two then
-                local x, z = Random.new():NextInteger(8975, 9025), Random.new():NextInteger(2475, 2625)
+                local x, z = Random.new():NextInteger(9046-25, 9046+25), Random.new():NextInteger(2415-25, 2415+25)
                 WalkToPath(CFrame.new(x, -15.5574083, z))
                 getgenv().DisableWalk_One = true
                 getgenv().DisableWalk_Two = true
