@@ -108,7 +108,7 @@ if Setting then
     end)
 end
     
---if Executed then return end
+if Executed then return end
 getgenv().Executed = true
 
 repeat wait()
