@@ -7,8 +7,8 @@ if not script_key and not DitPSX then
             + "Mansion Egg" -- Open Dog Egg/Farm Dog Mansion Chest
         ]]
         ["Mine Collapsed Method"] = {
-            ["Method"] = "Farm Fruit",
-            ["Open Amount"] = 8, -- 1 or 3 or 8
+            ["Method"] = "Volcano Chest",
+            ["Open Amount"] = 1, -- 1 or 3 or 8
             ["Open Golden Egg"] = true, -- Will open Golden egg instead
         },
         ["Auto Triple Damage Boost"] = { -- Active when Farm Fruit/Diamond
@@ -28,7 +28,7 @@ if not script_key and not DitPSX then
             ["Farm when under"] = 50
         },
         ["Auto Mailbox"] = { -- Auto send Diamonds to a person thru Mailbox when your Diamonds more than set diamond
-            ["Enable"] = false,
+            ["Enable"] = true,
             ["Send to"] = "egodwastaken",
             ["Above amount"] = 100000000000
         },
@@ -51,7 +51,8 @@ if not script_key and not DitPSX then
         ["Send all"] = false, -- Send all pet to break or not, false will send single to break
         ["Performance Mode"] = true, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
         ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
-        ["White Screen"] = true, -- Enable for disable game's rendering for less CPU/GPU usage
+        ["Legit Mode"] = true, -- Walk to points on map legit like an normal player, recommended enable with Performance Mode
+        ["White Screen"] = false, -- Enable for disable game's rendering for less CPU/GPU usage
         ["Discord Webhook"] = {
             ["Stats Tracker"] = {
                 ["URL"] = "Stat Tracker Webhook URL here",
@@ -298,6 +299,7 @@ spawn(function()
 end)
 
 --Disable UIs
+--[[
 if game.CoreGui.RobloxGui:FindFirstChild("PerformanceStats") then 
     UserSettings().GameSettings.PerformanceStatsVisible = false
 end
@@ -311,6 +313,7 @@ plr.PlayerGui.Message.Enabled = false
 plr.PlayerGui.Message:GetPropertyChangedSignal("Enabled"):Connect(function()
     plr.PlayerGui.Message.Enabled = false
 end)
+]]
 plr.PlayerGui.FreeGiftsTop.Enabled = false
 plr.PlayerGui.Main.Left.Visible = false
 plr.PlayerGui.Main.Right.Diamonds.Add.Visible = false
@@ -501,7 +504,7 @@ function Optimize()
 
     game:GetService("ReplicatedStorage").Assets.Billboards.Orb.Enabled = true
     game:GetService("ReplicatedStorage").Assets.Billboards.Reward.Enabled = true
-
+    --[[
     spawn(function()
         while wait() do
             pcall(function()
@@ -511,7 +514,7 @@ function Optimize()
             wait(5)
         end
     end)
-    
+    ]]
     for i, v in ipairs(workspace.__THINGS.Coins:GetChildren()) do
         if v:FindFirstChild("Coin") then
             pcall(function()
@@ -573,7 +576,7 @@ if not Run1Time then
     end
     getsenv(plr.PlayerScripts.Scripts.GUIs.Settings).Update()
 
-    getgenv().noclip = true
+    --getgenv().noclip = true
 
     pcall(Optimize)
 
@@ -649,7 +652,7 @@ if not Run1Time then
             end
         end
     end
-    getgenv().noclip = true
+
     game:GetService("RunService").Stepped:Connect(function()
         if getgenv().noclip then
             if plr.Character ~= nil then
@@ -920,14 +923,92 @@ function IsRewardReady(R_Cooldown, R_Timer)
     m = L_Client.Network.Invoke("Get OSTime") - R_Cooldown - R_Timer
     if m > 0 then return true end
 end
+local PathfindingService = game:GetService("PathfindingService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local character = player.Character
+local humanoid = character:WaitForChild("Humanoid")
+
+local path = PathfindingService:CreatePath({
+	AgentRadius = 2,
+	AgentHeight = 1,
+	AgentCanJump = true,
+})
+
+local function followPath(destination)
+	local success, errorMessage = pcall(function()
+		path:ComputeAsync(character.PrimaryPart.Position, destination)
+	end)
+	if success and path.Status == Enum.PathStatus.Success then
+		local waypoints = path:GetWaypoints()
+        for i, v in ipairs(waypoints) do
+            if v.Action == Enum.PathWaypointAction.Jump then
+                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+            humanoid:MoveTo(v.Position)
+            local finish = false
+            humanoid.MoveToFinished:connect(function()
+                finish = true
+            end)
+            repeat wait()
+                humanoid:MoveTo(v.Position)
+            until finish
+            if (waypoints[#waypoints].Position - destination).magnitude > 15 then
+                break
+            end
+        end
+	--else
+		--warn("Path not computed!", errorMessage)
+	end
+end
+function WalkToPath(v)
+    if typeof(v) == "CFrame" then
+        v = v.Position
+    end
+    if DitPSX["Legit Mode"] then
+        local a = humanoid.HipHeight
+        humanoid.HipHeight = 2
+        followPath(v)
+        humanoid.HipHeight = a
+    else
+        getgenv().noclip = true
+        plr.Character.HumanoidRootPart.CFrame = CFrame.new(v.X, v.Y, v.Z)
+    end
+end
+function GetNearestArea()
+    local Dist = math.huge
+    local NearestArea
+    for i, v in ipairs(workspace.__MAP.Boxes:GetChildren()) do
+        if v.Name ~= "Doodle Shop" and v.Name ~= "Pixel Kyoto" then
+            local Mag = plr:DistanceFromCharacter(v.Position)
+            if Mag < Dist then
+                Dist = Mag
+                NearestArea = v
+            end
+        end
+    end
+    return NearestArea.Name
+end
+function AreaTeleport(v)
+    local areaTeleport = Library.WorldCmds.GetMap().Teleports:FindFirstChild(v);
+    if areaTeleport then
+        Library.Signal.Fire("Teleporting")
+        task.wait(0.25)
+        plr.Character:PivotTo(areaTeleport.CFrame + areaTeleport.CFrame.UpVector * (plr.Character.Humanoid.HipHeight + plr.Character.HumanoidRootPart.Size.Y / 2))
+        Library.Network.Fire("Performed Teleport", v)
+        task.wait(0.25)
+    end
+end
+
 function Ditting_PSX()
     if not LastRewardCheck or tick() - LastRewardCheck > 120 then
         if VIPOwned and IsRewardReady(14400, F_Lib.Save.Get().VIPCooldown) then
             TeleportArea("Spawn")
             local VIPRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("VIP Rewards")
             if VIPRewardPath then
-                getgenv().noclip = true
-                plr.Character.HumanoidRootPart.CFrame = VIPRewardPath.Pad.CFrame 
+                WalkToPath(VIPRewardPath.Pad.CFrame) 
                 wait(1)
                 L_Client.Network.Invoke("Redeem VIP Rewards")
             end
@@ -936,8 +1017,7 @@ function Ditting_PSX()
             TeleportArea("Spawn")
             local RankRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("Rank Rewards")
             if RankRewardPath then
-                getgenv().noclip = true
-                plr.Character.HumanoidRootPart.CFrame = RankRewardPath.Pad.CFrame 
+                WalkToPath(RankRewardPath.Pad.CFrame) 
                 wait(1)
                 L_Client.Network.Invoke("Redeem Rank Rewards")
             end
@@ -958,8 +1038,7 @@ function Ditting_PSX()
             TeleportArea("Spawn")
             local DaycarePath = game.workspace.__MAP.Interactive:FindFirstChild("Daycare")
             if DaycarePath then
-                getgenv().noclip = true
-                plr.Character.HumanoidRootPart.CFrame = DaycarePath.Pad.CFrame 
+                WalkToPath(DaycarePath.Pad.CFrame) 
                 wait(1)
                 if Req1 then
                     L_Client.Network.Invoke("Daycare: Claim")
@@ -974,8 +1053,7 @@ function Ditting_PSX()
     end
     if DitPSX["Auto Mailbox"].Enable and plr.Name ~= DitPSX["Auto Mailbox"]["Send to"] and plr.leaderstats.Diamonds.Value >= DitPSX["Auto Mailbox"]["Above amount"] then
         local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
-        getgenv().noclip = true
-        plr.Character.HumanoidRootPart.CFrame = MailboxPad.CFrame
+        WalkToPath(MailboxPad.CFrame)
         wait(1)
         if plr:DistanceFromCharacter(MailboxPad.Position) < 8 then 
             local TotalDiamond = plr.leaderstats.Diamonds.Value - 100000
@@ -1010,8 +1088,7 @@ function Ditting_PSX()
                 end
                 if #GiftsUUID ~= 0 then
                     local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
-                    getgenv().noclip = true
-                    plr.Character.HumanoidRootPart.CFrame = MailboxPad.CFrame
+                    WalkToPath(MailboxPad.CFrame)
                     wait(1)
                     if plr:DistanceFromCharacter(MailboxPad.Position) < 8 then 
                         F_Lib.Network.Invoke("Claim Mail", GiftsUUID)
@@ -1094,10 +1171,11 @@ function Ditting_PSX()
             if IfAFreePet() then
                 local Breakable, B_Counts = GetBreakable(M_Zone, false, M_Chest)
                 if Breakable then
-                    plr.Character.HumanoidRootPart.CFrame = Breakable.POS.CFrame * CFrame.new(0, 20, 0)
+                    AreaTeleport(M_Zone)
                     wait(.5)
                     Library.Signal.Fire("Group Select Coin", Breakable)
                     wait(.5)
+                    return
                 end
             end
         else
@@ -1107,25 +1185,29 @@ function Ditting_PSX()
                 if not m:FindFirstChild("HUD", true) then
                     local P_List = GetEquippedPets()
                     if #P_List == 0 then return end
-                    plr.Character.HumanoidRootPart.CFrame = m.POS.CFrame * CFrame.new(0, 20, 0)
+                    AreaTeleport(M_Zone)
                     wait(.5)
                     L_Client.Network.Invoke('Join Coin', Breakables[1], P_List)
                     for _, x in ipairs(P_List) do
                         L_Client.Network.Fire('Farm Coin', Breakables[1], x)
                     end
                     wait(.5)
+                    return
                 end
             end
         end
         if Egg_Position then
             if plr:DistanceFromCharacter(Egg_Position) > 30 then
-                plr.Character.HumanoidRootPart.CFrame = CFrame.new(Egg_Position)
+                if GetNearestArea() == M_Zone then
+                    AreaTeleport("Sandy Beach")
+                end
+                WalkToPath(CFrame.new(Egg_Position))
             else
                 L_Client.Network.Invoke("Buy Egg", Egg_Name, tableopen1, tableopen2)
                 wait(1)
             end
         else
-            getgenv().Egg_Position = Library.WorldCmds.GetMap().Eggs[M_EggPath].PLATFORM.Pad.Position + Vector3.new(0, 1, 0)
+            getgenv().Egg_Position = Library.WorldCmds.GetMap().Eggs[M_EggPath].PLATFORM.Pad.Position + Vector3.new(0, 5, 0)
         end
         return
     end
@@ -1147,18 +1229,42 @@ function Ditting_PSX()
     elseif FarmFruit then
         V_World, V_Area, V_Pos = "Pixel", "Pixel Vault", CFrame.new(3553, -40, 2458)
     end
-    if plr:DistanceFromCharacter(V_Pos.Position) > 20 then
+    if not DitPSX["Legit Mode"] and plr:DistanceFromCharacter(V_Pos.Position) > 20 then
         if GetCurrentWorld() ~= V_World then
             TeleportArea(V_Area)
         end
-        getgenv().noclip = true
-        plr.Character.HumanoidRootPart.CFrame = V_Pos
+        WalkToPath(V_Pos)
     else
         if not LastWorldCheck or tick() - LastWorldCheck > 60 then
             if GetCurrentWorld() ~= V_World then
                 TeleportArea(V_Area)
             end
             getgenv().LastWorldCheck = tick()
+        end
+        if DitPSX["Legit Mode"] and V_Area == "Mystic Mine" then
+            if not LastZoneCheck or tick() - LastZoneCheck > 60 then
+                if GetNearestArea() ~= V_Area then
+                    AreaTeleport(V_Area)
+                end
+                getgenv().LastZoneCheck = tick()
+            end
+            if not DisableWalk_One then
+                local x, z = Random.new():NextInteger(8900, 9100), Random.new():NextInteger(2300, 2500)
+                WalkToPath(CFrame.new(x, -15.6077871, z))
+                getgenv().DisableWalk_One = true
+                getgenv().DisableWalk_Two = true
+                delay(Random.new():NextInteger(30, 60), function()
+                    getgenv().DisableWalk_Two = false
+                end)
+            elseif not DisableWalk_Two then
+                local x, z = Random.new():NextInteger(8900, 9100), Random.new():NextInteger(2500, 2700)
+                WalkToPath(CFrame.new(x, -15.5574083, z))
+                getgenv().DisableWalk_One = true
+                getgenv().DisableWalk_Two = true
+                delay(Random.new():NextInteger(30, 60), function()
+                    getgenv().DisableWalk_One = false
+                end)
+            end
         end
         if DitPSX["Performance Mode"] then
             if not DitPSX["Send all"] and not IfAFreePet() then return wait() end
@@ -1197,7 +1303,7 @@ function Ditting_PSX()
                         game.workspace.Camera.CFrame = CFrame.new(0, 1000, 0, 0, -1, 0, 0, 0, -1, -1, 0, 0)
                         game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
                     end
-                else
+                elseif not DitPSX["Legit Mode"] then
                     local m = Breakable.POS.Position
                     game.workspace.Camera.CFrame = CFrame.new(m.X, m.Y + 40, m.Z, 0, -1, 0, 0, 0, 1, -1, 0, 0)
                     game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
@@ -1262,7 +1368,7 @@ function Ditting_PSX()
                                         game.workspace.Camera.CFrame = CFrame.new(0, 1000, 0, 0, -1, 0, 0, 0, -1, -1, 0, 0)
                                         game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
                                     end
-                                else
+                                elseif not DitPSX["Legit Mode"] then
                                     local m = wThings.Coins[v].POS.Position
                                     game.workspace.Camera.CFrame = CFrame.new(m.X, m.Y + 40, m.Z, 0, -1, 0, 0, 0, 1, -1, 0, 0)
                                     game.workspace.Camera.CameraType = Enum.CameraType.Scriptable
