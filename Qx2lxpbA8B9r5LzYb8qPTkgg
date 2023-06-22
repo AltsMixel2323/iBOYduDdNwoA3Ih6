@@ -1293,6 +1293,17 @@ function Ditting_PSX()
             if plr:DistanceFromCharacter(CCPos.Position) > 20 then
                 WalkToPath(CCPos)
             end
+        elseif DitPSX["Legit Mode"] and V_Area == "Pixel Vault" then
+            if not LastZoneCheck3 or tick() - LastZoneCheck3 > 60 then
+                if GetNearestArea() ~= V_Area then
+                    AreaTeleport(V_Area)
+                end
+                getgenv().LastZoneCheck3 = tick()
+            end
+            local CCPos = CFrame.new(3553, -16.7, 2458)
+            if plr:DistanceFromCharacter(CCPos.Position) > 20 then
+                WalkToPath(CCPos)
+            end
         end
         if DitPSX["Performance Mode"] then
             if not DitPSX["Send all"] and not IfAFreePet() then return wait() end
