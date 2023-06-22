@@ -435,8 +435,15 @@ end
 spawn(function()
     while wait(2) do
         pcall(function()
-            if plr.PlayerGui.Message.Enabled and plr.PlayerGui.Message.Frame.Visible and plr.PlayerGui.Message.Frame.No.Visible then
-                FireButton(plr.PlayerGui.Message.Frame.No)
+            if plr.PlayerGui.Message.Enabled and plr.PlayerGui.Message.Frame.Visible then
+                if plr.PlayerGui.Message.Frame.No.Visible then
+                    FireButton(plr.PlayerGui.Message.Frame.No)
+                elseif plr.PlayerGui.Message.Frame.Ok.Visible then
+                    FireButton(plr.PlayerGui.Message.Frame.Ok)
+                end
+            end
+            if plr.PlayerGui.Daycare.Enabled then
+                FireButton(plr.PlayerGui.Daycare.Frame.Close)
             end
         end)
     end
