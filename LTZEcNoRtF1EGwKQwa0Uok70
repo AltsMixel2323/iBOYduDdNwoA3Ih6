@@ -991,11 +991,12 @@ local function followPath(destination)
 		--warn("Path not computed!", errorMessage)
 	end
 end
-function WalkToPath(v)
+function WalkToPath(v, force)
     if typeof(v) == "CFrame" then
         v = v.Position
     end
-    if DitPSX["Legit Mode"] then
+    if DitPSX["Legit Mode"] and not force then
+        getgenv().noclip = false
         local a = humanoid.HipHeight
         humanoid.HipHeight = 2
         followPath(v)
@@ -1036,7 +1037,7 @@ function Ditting_PSX()
             TeleportArea("Spawn")
             local VIPRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("VIP Rewards")
             if VIPRewardPath then
-                WalkToPath(VIPRewardPath.Pad.CFrame) 
+                WalkToPath(VIPRewardPath.Pad.CFrame, true) 
                 wait(1)
                 L_Client.Network.Invoke("Redeem VIP Rewards")
             end
@@ -1045,7 +1046,7 @@ function Ditting_PSX()
             TeleportArea("Spawn")
             local RankRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("Rank Rewards")
             if RankRewardPath then
-                WalkToPath(RankRewardPath.Pad.CFrame) 
+                WalkToPath(RankRewardPath.Pad.CFrame, true) 
                 wait(1)
                 L_Client.Network.Invoke("Redeem Rank Rewards")
             end
@@ -1066,7 +1067,7 @@ function Ditting_PSX()
             TeleportArea("Spawn")
             local DaycarePath = game.workspace.__MAP.Interactive:FindFirstChild("Daycare")
             if DaycarePath then
-                WalkToPath(DaycarePath.Pad.CFrame) 
+                WalkToPath(DaycarePath.Pad.CFrame, true) 
                 wait(1)
                 if Req1 then
                     L_Client.Network.Invoke("Daycare: Claim")
@@ -1081,7 +1082,7 @@ function Ditting_PSX()
     end
     if DitPSX["Auto Mailbox"].Enable and plr.Name ~= DitPSX["Auto Mailbox"]["Send to"] and plr.leaderstats.Diamonds.Value >= DitPSX["Auto Mailbox"]["Above amount"] then
         local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
-        WalkToPath(MailboxPad.CFrame)
+        WalkToPath(MailboxPad.CFrame, true)
         wait(1)
         if plr:DistanceFromCharacter(MailboxPad.Position) < 8 then 
             local TotalDiamond = plr.leaderstats.Diamonds.Value - 100000
@@ -1116,7 +1117,7 @@ function Ditting_PSX()
                 end
                 if #GiftsUUID ~= 0 then
                     local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
-                    WalkToPath(MailboxPad.CFrame)
+                    WalkToPath(MailboxPad.CFrame, true)
                     wait(1)
                     if plr:DistanceFromCharacter(MailboxPad.Position) < 8 then 
                         F_Lib.Network.Invoke("Claim Mail", GiftsUUID)
