@@ -53,7 +53,7 @@ if not script_key and not DitPSX then
         ["Performance Mode"] = true, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
         ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
         ["Legit Mode"] = true, -- Walk to points on map legit like an normal player, recommended enable with Performance Mode
-        ["White Screen"] = true, -- Enable for disable game's rendering for less CPU/GPU usage
+        ["White Screen"] = false, -- Enable for disable game's rendering for less CPU/GPU usage
         ["Discord Webhook"] = {
             ["Stats Tracker"] = {
                 ["URL"] = "Stat Tracker Webhook URL here",
@@ -965,28 +965,24 @@ local function followPath(destination)
 		path:ComputeAsync(character.PrimaryPart.Position, destination)
 	end)
 	if success and path.Status == Enum.PathStatus.Success then
-		local waypoints = path:GetWaypoints()
-        for i, v in ipairs(waypoints) do
-            if v.Action == Enum.PathWaypointAction.Jump then
-                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-            end
-            humanoid:MoveTo(v.Position)
-            local finish = false
-            humanoid.MoveToFinished:connect(function()
-                finish = true
-            end)
-            local walktimer = tick()
-            repeat wait(2)
-                humanoid:MoveTo(v.Position)
-                if walktimer > 60 then
-                    plr.Character.HumanoidRootPart.CFrame = CFrame.new(v.Position.X, v.Position.Y, v.Position.Z)
-                    finish = true
-                end
-            until finish or tick() - walktimer > 65
-            if (waypoints[#waypoints].Position - destination).magnitude > 15 then
+		local walktimer = tick()
+        repeat wait()
+            if walktimer > 60 then
+                plr.Character.HumanoidRootPart.CFrame = CFrame.new(v.Position.X, v.Position.Y, v.Position.Z)
                 break
             end
-        end
+            local waypoints = path:GetWaypoints()
+            for i, v in ipairs(waypoints) do
+                if v.Action == Enum.PathWaypointAction.Jump then
+                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                end
+                humanoid:MoveTo(v.Position)
+                humanoid.MoveToFinished:Wait(2)
+                if (waypoints[#waypoints].Position - destination).magnitude > 15 then
+                    break
+                end
+            end
+        until plr:DistanceFromCharacter(destination) < 15
 	--else
 		--warn("Path not computed!", errorMessage)
 	end
