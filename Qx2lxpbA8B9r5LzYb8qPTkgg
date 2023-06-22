@@ -289,8 +289,16 @@ spawn(function()
                 local countdg = (plr.leaderstats.Diamonds.Value + SentDiamond) - OldDiamond
                 getgenv().dg = countdg
                 getgenv().dg2 = formatNumber(countdg)
-                if EggOpened then
+                if CollapseMethod and MineCollapseLeft then
+                    SetText(DiamondsGained, "Mine Collapsed (" .. MineCollapseLeft .. "s)"  .. "\n" .. S_Timer)
+                elseif CollapseMethod and EggOpened then
                     SetText(DiamondsGained, EggOpened .. " Egg" .. "\n" .. S_Timer)
+                elseif FarmFruit then
+                    if TempDisableCheckFruit then
+                        SetText(DiamondsGained, "Farming Fruit (Mine Collapsed)" .. "\n" .. S_Timer)
+                    else
+                        SetText(DiamondsGained, "Farming Fruit (Reach Max Amount)" .. "\n" .. S_Timer)
+                    end
                 else
                     SetText(DiamondsGained, dg2 .. "\n" .. S_Timer)
                 end
@@ -1108,8 +1116,12 @@ function Ditting_PSX()
         getgenv().LastCheckMail = tick()
     end
     if CollapseMethod then
-        if DitPSX["Mine Collapsed Method"]["Method"] == "Stand Still" then
-            wait(30)
+        if DitPSX["Mine Collapsed Method"]["Method"] == "Stand Still" or FarmMapUnlocked then
+            local timeleft = Library.Signal.Invoke("Get Diamond Mine Collpase Time")
+            if timeleft then
+                getgenv().MineCollapseLeft = math.round(timeleft)
+                wait(30)
+            end
             return
         end
         if not getvar then
@@ -1118,6 +1130,7 @@ function Ditting_PSX()
             elseif DitPSX["Mine Collapsed Method"]["Method"] == "Mansion Egg" and Library.WorldCmds.HasArea("Dog Mansion") then
                 getgenv().FarmMapUnlocked = true
             end
+            if not FarmMapUnlocked then return end
             if DitPSX["Mine Collapsed Method"]["Open Amount"] == 8 then
                 getgenv().tableopen1, getgenv().tableopen2 = false, true
             elseif DitPSX["Mine Collapsed Method"]["Open Amount"] == 3 then
@@ -1155,7 +1168,6 @@ function Ditting_PSX()
             wait(1)
             getgenv().getvar = true
         end
-        if not FarmMapUnlocked then return end
         local M_World, M_Zone, M_Chest, M_Egg, M_EggPath = "Summer Event", "Pirate Cove", "Summer Volcano Chest", "Volcano Egg", "Pirate Cove Eggs"
         if DitPSX["Mine Collapsed Method"]["Method"] == "Mansion Egg" then
             M_World, M_Zone, M_Chest, M_Egg, M_EggPath = "Dog", "Dog Mansion", "Giant Dog Chest", "Dog Egg", "Dog Firehouse Eggs"
