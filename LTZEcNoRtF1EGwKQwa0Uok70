@@ -834,15 +834,6 @@ function TeleportArea(area)
     end
     TeleportENV.Teleport(area, true)
     wait(3)
-    if area == "Mystic Mine" then
-        local MysticMine = workspace.__MAP.Areas["Mystic Mine"]:GetChildren()
-        if MysticMine[176].CFrame == CFrame.new(9069.40039, -14.5045195, 2644.36963, 0.294678926, 0, 0.955596268, 0, 1, 0, -0.955596268, 0, 0.294678926) then
-            MysticMine[176]:Destroy()
-        end
-        if MysticMine[177].CFrame == CFrame.new(9024.35352, -14.5045195, 2656.79395, 0.846772909, -0, -0.531954587, 0, 1, -0, 0.531954587, 0, 0.846772909) then
-            MysticMine[177]:Destroy()
-        end
-    end
 end
 function IsPlayerNearDiamondFarm()
     for i, v in ipairs(game.Players:GetChildren()) do
@@ -976,8 +967,22 @@ local function followPath(destination)
             end)
             local walktimer = tick()
             repeat wait()
+                if workspace.__MAP.Areas:FindFirstChild("Mystic Mine") and (not LastMysticMineCheck or tick() - LastMysticMineCheck > 60) then
+                    getgenv().LastMysticMineCheck = tick()
+                    local MysticMine = workspace.__MAP.Areas["Mystic Mine"]:GetChildren()
+                    if MysticMine[176].CFrame == CFrame.new(9069.40039, -14.5045195, 2644.36963, 0.294678926, 0, 0.955596268, 0, 1, 0, -0.955596268, 0, 0.294678926) then
+                        MysticMine[176]:Destroy()
+                    end
+                    if MysticMine[177].CFrame == CFrame.new(9024.35352, -14.5045195, 2656.79395, 0.846772909, -0, -0.531954587, 0, 1, -0, 0.531954587, 0, 0.846772909) then
+                        MysticMine[177]:Destroy()
+                    end
+                end
                 humanoid:MoveTo(v.Position)
-            until finish or tick() - walktimer > 60
+                if walktimer > 60 then
+                    plr.Character.HumanoidRootPart.CFrame = CFrame.new(v.Position.X, v.Position.Y, v.Position.Z)
+                    finish = true
+                end
+            until finish or tick() - walktimer > 65
             if (waypoints[#waypoints].Position - destination).magnitude > 15 then
                 break
             end
