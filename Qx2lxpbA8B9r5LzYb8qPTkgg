@@ -290,14 +290,14 @@ spawn(function()
                 getgenv().dg = countdg
                 getgenv().dg2 = formatNumber(countdg)
                 if CollapseMethod and MineCollapseLeft then
-                    SetText(DiamondsGained, "Mine Collapsed (" .. MineCollapseLeft .. "s)"  .. "\n" .. S_Timer)
+                    SetText(DiamondsGained, "Mine Collapsed\n(" .. MineCollapseLeft .. "s)"  .. "\n" .. S_Timer)
                 elseif CollapseMethod and EggOpened then
                     SetText(DiamondsGained, EggOpened .. " Egg" .. "\n" .. S_Timer)
                 elseif FarmFruit then
                     if TempDisableCheckFruit then
-                        SetText(DiamondsGained, "Farming Fruit (Mine Collapsed)" .. "\n" .. S_Timer)
+                        SetText(DiamondsGained, "Farming Fruit\n(Mine Collapsed)" .. "\n" .. S_Timer)
                     else
-                        SetText(DiamondsGained, "Farming Fruit (Reach Max Amount)" .. "\n" .. S_Timer)
+                        SetText(DiamondsGained, "Farming Fruit\n(Reach Max Amount)" .. "\n" .. S_Timer)
                     end
                 else
                     SetText(DiamondsGained, dg2 .. "\n" .. S_Timer)
