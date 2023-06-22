@@ -1,7 +1,7 @@
 if not script_key and not DitPSX then
     getgenv().DitPSX = {
         ["Unlock Mystic Mine"] = true, -- Make sure have atleast 100,100,000 gems and a huge pet
-        ["Auto Upgrade"] = true,
+        ["Auto Upgrade"] = true, -- Use Diamond to Upgrade your passives
         ["Auto Daycare"] = false, -- Auto Claim Daycare and Enroll unequipped/unlocked Pets in your Inventory
         ["Farm Cooldown"] = 0, -- Delay between switch to farm another thing (higher = less crashing)
         ["Send all"] = true, -- Send all pet to break or not, false will send single to break
@@ -550,6 +550,10 @@ function AutoOverlord()
     end
     if DitPSX["Auto Upgrade"] and not UpgradedAll
     and (not LastUpgradeCheck or tick() - LastUpgradeCheck > 120) then
+        if not Library.WorldCmds.HasArea("Forest") then
+            getgenv().LastUpgradeCheck = tick()
+            return
+        end
         local CompletedUpgrades = 0
         for i, v in pairs(Library.Save.Get().Upgrades) do
             if v < 5 then
