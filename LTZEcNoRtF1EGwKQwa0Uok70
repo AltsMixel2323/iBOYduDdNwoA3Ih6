@@ -1,7 +1,7 @@
 if not script_key and not DitPSX then
     getgenv().DitPSX = {
         ["Unlock Mystic Mine"] = true, -- Make sure have atleast 100,100,000 gems and a huge pet
-        ["Auto Upgrade"] = true, -- Use Diamond to Upgrade your passives
+        ["Auto Upgrade"] = true, -- Use Diamond to Upgrade your passives at Forest
         ["Auto Daycare"] = false, -- Auto Claim Daycare and Enroll unequipped/unlocked Pets in your Inventory
         ["Farm Cooldown"] = 0, -- Delay between switch to farm another thing (higher = less crashing)
         ["Send all"] = true, -- Send all pet to break or not, false will send single to break
@@ -647,8 +647,8 @@ function AutoOverlord()
     
     local shouldSkip = false
 
-    if currentAreaName == "Cave" and nextAreaName == "Ice Tech" then
-    --and not Library.WorldCmds.HasArea("Heavens Gate") and not CheckIfCanAffordArea("Ice Tech") then
+    if currentAreaName == "Cave" and nextAreaName == "Ice Tech"
+    and not Library.WorldCmds.HasArea("Heavens Gate") and not CheckIfCanAffordArea("Ice Tech") then
         if not FantasyTeleported and F_Lib.WorldCmds.Get() ~= "Fantasy" then
             Library.WorldCmds.Load("Fantasy")
             wait(2)
