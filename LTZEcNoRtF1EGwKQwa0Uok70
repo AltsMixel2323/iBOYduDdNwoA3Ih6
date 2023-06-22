@@ -1,6 +1,7 @@
 if not script_key and not DitPSX then
     getgenv().DitPSX = {
         ["Unlock Mystic Mine"] = true, -- Make sure have atleast 100,100,000 gems and a huge pet
+        ["Auto Upgrade"] = true,
         ["Auto Daycare"] = false, -- Auto Claim Daycare and Enroll unequipped/unlocked Pets in your Inventory
         ["Farm Cooldown"] = 0, -- Delay between switch to farm another thing (higher = less crashing)
         ["Send all"] = true, -- Send all pet to break or not, false will send single to break
@@ -479,7 +480,9 @@ function AutoOverlord()
     if not LastRewardCheck or tick() - LastRewardCheck > 120 then
         local CurrentArea, CurrentWorld = GetNearestArea(), Library.WorldCmds.Get() 
         if VIPOwned and IsRewardReady(14400, F_Lib.Save.Get().VIPCooldown) then
-            TeleportArea("Spawn")
+            if F_Lib.WorldCmds.Get() ~= "Spawn" then
+                TeleportArea("Spawn")
+            end
             local VIPRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("VIP Rewards")
             if VIPRewardPath then
                 plr.Character.HumanoidRootPart.CFrame = VIPRewardPath.Pad.CFrame 
@@ -488,7 +491,9 @@ function AutoOverlord()
             end
         end
         if IsRewardReady(L_Directory.Ranks[F_Lib.Save.Get().Rank].rewardCooldown, F_Lib.Save.Get().RankTimer) then
-            TeleportArea("Spawn")
+            if F_Lib.WorldCmds.Get() ~= "Spawn" then
+                TeleportArea("Spawn")
+            end
             local RankRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("Rank Rewards")
             if RankRewardPath then
                 plr.Character.HumanoidRootPart.CFrame = RankRewardPath.Pad.CFrame 
@@ -517,7 +522,9 @@ function AutoOverlord()
         local EnrollPets = GetEnrollPet()
         local Req1, Req2 = DaycareReady(), DaycareGUI.GetUsedSlots() < DaycareGUI.GetMaxSlots() and #EnrollPets > 0
         if Req1 or Req2 then
-            TeleportArea("Spawn")
+            if F_Lib.WorldCmds.Get() ~= "Spawn" then
+                TeleportArea("Spawn")
+            end
             local DaycarePath = game.workspace.__MAP.Interactive:FindFirstChild("Daycare")
             if DaycarePath then
                 getgenv().noclip = true
@@ -541,7 +548,38 @@ function AutoOverlord()
             end
         end
     end
-
+    if DitPSX["Auto Upgrade"] and not UpgradedAll
+    and (not LastUpgradeCheck or tick() - LastUpgradeCheck > 120) then
+        local CompletedUpgrades = 0
+        for i, v in pairs(Library.Save.Get().Upgrades) do
+            if v < 5 then
+                if plr.leaderstats.Diamonds.Value >= Library.Directory.Upgrades[i].prices[v + 1] then
+                    if F_Lib.WorldCmds.Get() ~= "Spawn" then
+                        TeleportArea("Spawn")
+                    end
+                    local UpgradeStationPath = game.workspace.__MAP.Interactive:FindFirstChild("Upgrade Station")
+                    if UpgradeStationPath then
+                        if plr:DistanceFromCharacter(UpgradeStationPath.Pad.Position) > 30 then
+                            WalkToPath(UpgradeStationPath.Pad.CFrame)
+                        end
+                        wait(1)
+                        Library.Network.Invoke("Buy Upgrade", i)
+                        if v + 1 == 5 then
+                            CompletedUpgrades = CompletedUpgrades + 1
+                        end
+                    end
+                else
+                    getgenv().LastUpgradeCheck = tick()
+                end
+            elseif v == 5 then
+                CompletedUpgrades = CompletedUpgrades + 1
+            end
+        end
+        if CompletedUpgrades == 5 then
+            getgenv().UpgradedAll = true
+        end
+        return
+    end
     if OverlordReached then
         if F_Lib.WorldCmds.Get() ~= "Diamond Mine" then
             Library.WorldCmds.Load("Diamond Mine")
@@ -605,7 +643,8 @@ function AutoOverlord()
     
     local shouldSkip = false
 
-    if currentAreaName == "Cave" and nextAreaName == "Ice Tech" and not Library.WorldCmds.HasArea("Heavens Gate") and not CheckIfCanAffordArea("Ice Tech") then
+    if currentAreaName == "Cave" and nextAreaName == "Ice Tech" then
+    --and not Library.WorldCmds.HasArea("Heavens Gate") and not CheckIfCanAffordArea("Ice Tech") then
         if not FantasyTeleported and F_Lib.WorldCmds.Get() ~= "Fantasy" then
             Library.WorldCmds.Load("Fantasy")
             wait(2)
@@ -906,9 +945,9 @@ end)
 warpF2(function() 
     while wait() do
         if UnlockedMysticMine then break end
-        local _, e = pcall(function()
+        --local _, e = pcall(function()
             AutoOverlord()
-        end)
+        --end)
         if e then print(e) end
     end
 end)
