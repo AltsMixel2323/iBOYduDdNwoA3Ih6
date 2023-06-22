@@ -53,7 +53,7 @@ if not script_key and not DitPSX then
         ["Performance Mode"] = true, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
         ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
         ["Legit Mode"] = true, -- Walk to points on map legit like an normal player, recommended enable with Performance Mode
-        ["White Screen"] = false, -- Enable for disable game's rendering for less CPU/GPU usage
+        ["White Screen"] = true, -- Enable for disable game's rendering for less CPU/GPU usage
         ["Discord Webhook"] = {
             ["Stats Tracker"] = {
                 ["URL"] = "Stat Tracker Webhook URL here",
@@ -951,16 +951,22 @@ local path = PathfindingService:CreatePath({
 })
 
 local function followPath(destination)
-    if workspace.__MAP.Areas:FindFirstChild("Mystic Mine") and (not LastMysticMineCheck or tick() - LastMysticMineCheck > 60) then
-        getgenv().LastMysticMineCheck = tick()
-        local MysticMine = workspace.__MAP.Areas["Mystic Mine"]:GetChildren()
-        if MysticMine[176].CFrame == CFrame.new(9069.40039, -14.5045195, 2644.36963, 0.294678926, 0, 0.955596268, 0, 1, 0, -0.955596268, 0, 0.294678926) then
-            MysticMine[176]:Destroy()
+    pcall(function()
+        if workspace.__MAP.Areas:FindFirstChild("Mystic Mine") and (not LastMysticMineCheck or tick() - LastMysticMineCheck > 60) then
+            getgenv().LastMysticMineCheck = tick()
+            local MysticMine = workspace.__MAP.Areas["Mystic Mine"]:GetChildren()
+            pcall(function()
+                if MysticMine[176].CFrame == CFrame.new(9069.40039, -14.5045195, 2644.36963, 0.294678926, 0, 0.955596268, 0, 1, 0, -0.955596268, 0, 0.294678926) then
+                    MysticMine[176]:Destroy()
+                end
+            end)
+            pcall(function()
+                if MysticMine[177].CFrame == CFrame.new(9024.35352, -14.5045195, 2656.79395, 0.846772909, -0, -0.531954587, 0, 1, -0, 0.531954587, 0, 0.846772909) then
+                    MysticMine[177]:Destroy()
+                end
+            end)
         end
-        if MysticMine[177].CFrame == CFrame.new(9024.35352, -14.5045195, 2656.79395, 0.846772909, -0, -0.531954587, 0, 1, -0, 0.531954587, 0, 0.846772909) then
-            MysticMine[177]:Destroy()
-        end
-    end
+    end)
 	local success, errorMessage = pcall(function()
 		path:ComputeAsync(character.PrimaryPart.Position, destination)
 	end)
