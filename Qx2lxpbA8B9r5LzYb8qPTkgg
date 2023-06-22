@@ -53,7 +53,7 @@ if not script_key and not DitPSX then
         ["Performance Mode"] = true, -- Enable if you want to AFK overnight, farm will be slower but low chance crashing roblox 
         ["Swap to Cyber Cavern"] = true, -- Will swap to Cyber Cavern if Mystic Mine out of Diamonds
         ["Legit Mode"] = true, -- Walk to points on map legit like an normal player, recommended enable with Performance Mode
-        ["White Screen"] = false, -- Enable for disable game's rendering for less CPU/GPU usage
+        ["White Screen"] = true, -- Enable for disable game's rendering for less CPU/GPU usage
         ["Discord Webhook"] = {
             ["Stats Tracker"] = {
                 ["URL"] = "Stat Tracker Webhook URL here",
@@ -834,9 +834,6 @@ function TeleportArea(area)
     end
     TeleportENV.Teleport(area, true)
     wait(3)
-    if area == "Mystic Mine" and IsMineCollapsed() then
-        SetTempFarmFruit()
-    end
 end
 function IsPlayerNearDiamondFarm()
     for i, v in ipairs(game.Players:GetChildren()) do
@@ -969,22 +966,37 @@ local function followPath(destination)
                 finish = true
             end)
             local walktimer = tick()
-            repeat wait()
+            repeat wait(2)
+                if workspace.__MAP.Areas:FindFirstChild("Mystic Mine") and (not LastMysticMineCheck or tick() - LastMysticMineCheck > 60) then
+                    getgenv().LastMysticMineCheck = tick()
+                    local MysticMine = workspace.__MAP.Areas["Mystic Mine"]:GetChildren()
+                    if MysticMine[176].CFrame == CFrame.new(9069.40039, -14.5045195, 2644.36963, 0.294678926, 0, 0.955596268, 0, 1, 0, -0.955596268, 0, 0.294678926) then
+                        MysticMine[176]:Destroy()
+                    end
+                    if MysticMine[177].CFrame == CFrame.new(9024.35352, -14.5045195, 2656.79395, 0.846772909, -0, -0.531954587, 0, 1, -0, 0.531954587, 0, 0.846772909) then
+                        MysticMine[177]:Destroy()
+                    end
+                end
                 humanoid:MoveTo(v.Position)
-            until finish or tick() - walktimer > 60
-            if (waypoints[#waypoints].Position - destination).magnitude > 15 then
-                break
-            end
+                if walktimer > 60 then
+                    plr.Character.HumanoidRootPart.CFrame = CFrame.new(v.Position.X, v.Position.Y, v.Position.Z)
+                    finish = true
+                end
+                if (waypoints[#waypoints].Position - destination).magnitude > 15 then
+                    break
+                end
+            until finish or tick() - walktimer > 65
         end
 	--else
 		--warn("Path not computed!", errorMessage)
 	end
 end
-function WalkToPath(v)
+function WalkToPath(v, force)
     if typeof(v) == "CFrame" then
         v = v.Position
     end
-    if DitPSX["Legit Mode"] then
+    if DitPSX["Legit Mode"] and not force then
+        getgenv().noclip = false
         local a = humanoid.HipHeight
         humanoid.HipHeight = 2
         followPath(v)
@@ -1025,7 +1037,7 @@ function Ditting_PSX()
             TeleportArea("Spawn")
             local VIPRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("VIP Rewards")
             if VIPRewardPath then
-                WalkToPath(VIPRewardPath.Pad.CFrame) 
+                WalkToPath(VIPRewardPath.Pad.CFrame, true) 
                 wait(1)
                 L_Client.Network.Invoke("Redeem VIP Rewards")
             end
@@ -1034,7 +1046,7 @@ function Ditting_PSX()
             TeleportArea("Spawn")
             local RankRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("Rank Rewards")
             if RankRewardPath then
-                WalkToPath(RankRewardPath.Pad.CFrame) 
+                WalkToPath(RankRewardPath.Pad.CFrame, true) 
                 wait(1)
                 L_Client.Network.Invoke("Redeem Rank Rewards")
             end
@@ -1055,7 +1067,7 @@ function Ditting_PSX()
             TeleportArea("Spawn")
             local DaycarePath = game.workspace.__MAP.Interactive:FindFirstChild("Daycare")
             if DaycarePath then
-                WalkToPath(DaycarePath.Pad.CFrame) 
+                WalkToPath(DaycarePath.Pad.CFrame, true) 
                 wait(1)
                 if Req1 then
                     L_Client.Network.Invoke("Daycare: Claim")
@@ -1070,7 +1082,7 @@ function Ditting_PSX()
     end
     if DitPSX["Auto Mailbox"].Enable and plr.Name ~= DitPSX["Auto Mailbox"]["Send to"] and plr.leaderstats.Diamonds.Value >= DitPSX["Auto Mailbox"]["Above amount"] then
         local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
-        WalkToPath(MailboxPad.CFrame)
+        WalkToPath(MailboxPad.CFrame, true)
         wait(1)
         if plr:DistanceFromCharacter(MailboxPad.Position) < 8 then 
             local TotalDiamond = plr.leaderstats.Diamonds.Value - 100000
@@ -1105,7 +1117,7 @@ function Ditting_PSX()
                 end
                 if #GiftsUUID ~= 0 then
                     local MailboxPad = game.workspace.__MAP.Interactive.Mailbox.Pad
-                    WalkToPath(MailboxPad.CFrame)
+                    WalkToPath(MailboxPad.CFrame, true)
                     wait(1)
                     if plr:DistanceFromCharacter(MailboxPad.Position) < 8 then 
                         F_Lib.Network.Invoke("Claim Mail", GiftsUUID)
@@ -1277,7 +1289,7 @@ function Ditting_PSX()
                 WalkToPath(CFrame.new(x, -15.6077871, z))
                 getgenv().DisableWalk_One = true
                 getgenv().DisableWalk_Two = true
-                delay(Random.new():NextInteger(30, 60), function()
+                delay(Random.new():NextInteger(30, 120), function()
                     getgenv().DisableWalk_Two = false
                 end)
             elseif not DisableWalk_Two then
@@ -1285,7 +1297,7 @@ function Ditting_PSX()
                 WalkToPath(CFrame.new(x, -15.5574083, z))
                 getgenv().DisableWalk_One = true
                 getgenv().DisableWalk_Two = true
-                delay(Random.new():NextInteger(30, 60), function()
+                delay(Random.new():NextInteger(30, 120), function()
                     getgenv().DisableWalk_One = false
                 end)
             end
