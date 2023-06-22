@@ -966,7 +966,7 @@ local function followPath(destination)
                 finish = true
             end)
             local walktimer = tick()
-            repeat wait()
+            repeat wait(2)
                 if workspace.__MAP.Areas:FindFirstChild("Mystic Mine") and (not LastMysticMineCheck or tick() - LastMysticMineCheck > 60) then
                     getgenv().LastMysticMineCheck = tick()
                     local MysticMine = workspace.__MAP.Areas["Mystic Mine"]:GetChildren()
@@ -982,10 +982,10 @@ local function followPath(destination)
                     plr.Character.HumanoidRootPart.CFrame = CFrame.new(v.Position.X, v.Position.Y, v.Position.Z)
                     finish = true
                 end
+                if (waypoints[#waypoints].Position - destination).magnitude > 15 then
+                    break
+                end
             until finish or tick() - walktimer > 65
-            if (waypoints[#waypoints].Position - destination).magnitude > 15 then
-                break
-            end
         end
 	--else
 		--warn("Path not computed!", errorMessage)
