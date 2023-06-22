@@ -468,6 +468,7 @@ getgenv().formatNumber = F_Lib.Functions.Commas
 getgenv().shortNumber = F_Lib.Functions.NumberShorten
 
 local Library = require(game.ReplicatedStorage.Library)
+Signal.Invoke("Get Diamond Mine Collpase Time")
 debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
 wait(1)
 debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
@@ -765,6 +766,7 @@ function GetCurrentWorld()
     return F_Lib.WorldCmds.Get()
 end
 local TeleportENV = getsenv(plr.PlayerScripts.Scripts.GUIs.Teleport)
+--[[
 function HMS_To_Number(v)
 	local sec = 0
 	v = v:split(":")
@@ -779,15 +781,16 @@ function HMS_To_Number(v)
 	sec = sec + s
 	return sec
 end
+]]
 function IsMineCollapsed()
     if workspace.__MAP.Interactive:FindFirstChild("Diamond Mine Collapsed Sign")
-    and workspace.__MAP.Interactive["Diamond Mine Collapsed Sign"].Main.SurfaceGui.Enabled then
+    and workspace.__MAP.Interactive["Diamond Mine Collapsed Sign"].Main.SurfaceGui.Enabled
+    or Library.Signal.Invoke("Get Diamond Mine Collpase Time") then
         return true
     end
 end
 function SetTempFarmFruit()
-    local TF = workspace.__MAP.Interactive["Diamond Mine Collapsed Sign"].Main.SurfaceGui.Timer.Text:split("in:")[2]
-    local TimeLeft = HMS_To_Number(TF)
+    local TimeLeft = Library.Signal.Invoke("Get Diamond Mine Collpase Time")
     if (not DitPSX["Discord Webhook"]["Mine Collapse"]["Daily Collapse"] or TimeLeft > 600)
     and DitPSX["Discord Webhook"]["Mine Collapse"]["URL"]
     and string.find(DitPSX["Discord Webhook"]["Mine Collapse"]["URL"], "discord") then
@@ -801,7 +804,6 @@ function SetTempFarmFruit()
         getgenv().CollapseMethod = true
         delay(TimeLeft + 5, function()
             getgenv().CollapseMethod = false
-            TeleportArea("Spawn")
         end)
         return
     end
@@ -810,7 +812,6 @@ function SetTempFarmFruit()
     delay(TimeLeft + 5, function()
         getgenv().FarmFruit = false
         getgenv().TempDisableCheckFruit = false
-        TeleportArea("Spawn")
     end)
 end
 function TeleportArea(area)
@@ -1226,7 +1227,6 @@ function Ditting_PSX()
         local Apple, Orange = GetFruitAmount("Apple"), GetFruitAmount("Orange")
         if FarmFruit and Apple > 195 and Orange > 195 then
             getgenv().FarmFruit = false
-            TeleportArea("Spawn")
             return
         elseif Apple <= DitPSX["Auto Farm Fruit"]["Farm when under"] or Orange <= DitPSX["Auto Farm Fruit"]["Farm when under"] then
             getgenv().FarmFruit = true
