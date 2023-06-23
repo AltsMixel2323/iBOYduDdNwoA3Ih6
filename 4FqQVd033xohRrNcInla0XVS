@@ -212,14 +212,14 @@ function TradingPlazaSniper()
     end
     wait(5)
 end
-warpF2(function() 
-    while wait() do
-        local _, e = pcall(function()
-            TradingPlazaSniper()
-        end)
-        if e then print(e) end
-        if breakscript then
-            break
-        end
+--warpF2(function() 
+while wait() do
+    local _, e = pcall(function()
+        TradingPlazaSniper()
+    end)
+    if e then print(e) end
+    if breakscript then
+        break
     end
-end)
+end
+--end)
