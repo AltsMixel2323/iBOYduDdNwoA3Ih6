@@ -18,7 +18,7 @@ if not script_key and not DitPSX then
     }
 end
 
---if Executed then return end
+if Executed then return end
 getgenv().Executed = true
 
 repeat wait()
@@ -86,8 +86,8 @@ getgenv().shortNumber = F_Lib.Functions.NumberShorten
 local Library = require(game.ReplicatedStorage.Library)
 debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
 wait(1)
-debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
-wait(1)
+--debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
+--wait(1)
 require(game.ReplicatedStorage.Framework.Library).WorldCmds.CanDoAction = function() return true end
 
 local connect
