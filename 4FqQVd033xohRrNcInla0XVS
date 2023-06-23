@@ -1,7 +1,7 @@
 if not script_key and not DitPSX then
     getgenv().DitPSX = {
         ["Product"] = {
-            ["Name"] = "Exclusive Egg 14", -- Item Name / Pet Name (must match exact name)
+            ["Name"] = "Sailor Egg", -- Item Name / Pet Name (must match exact name)
             -- Require for the Pet, ignore if buying Item
             ["Golden"] = false,
             ["Rainbow"] = false,
@@ -9,7 +9,7 @@ if not script_key and not DitPSX then
             ["Shiny"] = false,
             ["Hardcore"] = false,
         }, 
-        ["Below Diamond"] = 25000000000, -- Only buy the Product if it below the set Diamond
+        ["Below Diamond"] = 2500000000, -- Only buy the Product if it below the set Diamond
         ["Search"] = {
             ["Enable"] = true, -- Use game's search (Bloomberg) to teleport to the product you looking for
             ["Search Cooldown"] = 0, -- Wait set second after Teleported to Searched Server
