@@ -86,8 +86,8 @@ getgenv().shortNumber = F_Lib.Functions.NumberShorten
 local Library = require(game.ReplicatedStorage.Library)
 debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
 wait(1)
---debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
---wait(1)
+debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
+wait(1)
 require(game.ReplicatedStorage.Framework.Library).WorldCmds.CanDoAction = function() return true end
 
 local connect
@@ -166,7 +166,8 @@ function GetBuyProduct()
         if v.Owner == NearestBooth_Name.UserId then 
             for k, x in pairs(v.Listings) do
                 local StatPet = L_Client.PetCmds.Get(k)
-                if StatPet.id == GetPetID(DitPSX["Product"]["Name"]) 
+                if StatPet.id
+                and StatPet.id == GetPetID(DitPSX["Product"]["Name"]) 
                 and x.Price <= DitPSX["Below Diamond"]
                 and (not StatPet.dm or StatPet.dm == DitPSX["Product"]["Dark Matter"])
                 and (not StatPet.sh or StatPet.sh == DitPSX["Product"]["Shiny"]) 
@@ -214,14 +215,14 @@ function TradingPlazaSniper()
     end
     wait(5)
 end
---warpF2(function() 
-while wait() do
-    local _, e = pcall(function()
-        TradingPlazaSniper()
-    end)
-    if e then print(e) end
-    if breakscript then
-        break
+warpF2(function() 
+    while wait() do
+        local _, e = pcall(function()
+            TradingPlazaSniper()
+        end)
+        if e then print(e) end
+        if breakscript then
+            break
+        end
     end
-end
---end)
+end)
