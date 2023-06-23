@@ -26,51 +26,6 @@ end
 
 if not DitPSX then return Kick("Config not found\nPlease check out #script-config channel") end
 
-local Http = game:GetService("HttpService")
-local TPS = game:GetService("TeleportService")
-local Api = "https://games.roblox.com/v1/games/"
-local _place = game.PlaceId 
-local _servers = Api.._place.."/servers/Public?sortOrder=Asc&limit=100"
-function ListServers(cursor)
-   local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
-   return Http:JSONDecode(Raw)
-end
-function TPReturner()
-    local Server, Next; repeat
-        local Servers = ListServers(Next)
-        Server = Servers.data[1]
-        Next = Servers.nextPageCursor
-    until Server
-    TPS:TeleportToPlaceInstance(_place, Server.id, game.Players.LocalPlayer)
-end
-
-function HopServer()
-    getgenv().StartedHopServer = true
-    spawn(function()
-        while wait() do
-            wait(2)
-            pcall(function()
-                TPReturner()
-            end)
-        end
-    end)
-end
-getgenv().hopserver = Instance.new("BindableEvent")
-getgenv().hopserver.Event:Connect(function() 
-    HopServer()
-end)
-
-function LeaveOrHop()
-    pcall(UpdateDashboard)
-    if DitPSX["Hop Server"]["Out of diamond"] or DitPSX["Hop Server"]["Player nearby"] then
-        queue_on_teleport("getgenv().LastHopTick = " .. tick())
-        getgenv().hopserver:Fire()
-    else
-        game:Shutdown()
-    end
-    wait(10)
-end
-
 if true then
     local LoadingCount = tick()
     repeat wait(1)
@@ -81,7 +36,8 @@ if true then
         end)
         pcall(function()
             if tick() - LoadingCount > 60 or plr.PlayerGui["__INTRO"].Frame.Notice.Visible then 
-                LeaveOrHop()
+                game:Shutdown()
+                wait(10)
             end
         end)
     until not plr.PlayerGui:FindFirstChild("__INTRO")
@@ -150,15 +106,7 @@ plr.PlayerGui.FreeGiftsTop.Enabled = false
 plr.PlayerGui.Main.Left.Visible = false
 plr.PlayerGui.Main.Right.Diamonds.Add.Visible = false
 plr.PlayerGui.Main.Bottom.Visible = false
---[[
-for i, v in ipairs(plr.PlayerGui.Main.Boosts:GetChildren()) do
-    if v:IsA("Frame")
-    and not string.find(v.Name, "Damage")
-    and v.Name ~= "Apple" and v.Name ~= "Orange" then
-        v.Visible = false
-    end
-end
-]]
+
 pcall(function()
     plr.PlayerGui.Main.EventHud.Visible = false
     plr.PlayerGui.Main.EventHud:GetPropertyChangedSignal("Visible"):Connect(function()
@@ -475,7 +423,13 @@ function GetHugeID()
 	end
 	return HugeID
 end
-
+local UpgradeList = {
+    "Orb Pickup Distance",
+    "Pet Walkspeed",
+    "More Diamonds",
+    "Pet Strength",
+    "Pet Storage"
+}
 function AutoOverlord()
     if not LastRewardCheck or tick() - LastRewardCheck > 120 then
         local CurrentArea, CurrentWorld = GetNearestArea(), Library.WorldCmds.Get() 
@@ -555,6 +509,31 @@ function AutoOverlord()
             return
         end
         local CompletedUpgrades = 0
+        if not UpgradeUnlocked then
+            local UpgradesUnlock = 0
+            local Upgrades = Library.Save.Get().Upgrades
+            for i, v in pairs(UpgradeList) do
+                if Upgrades[v] then
+                    UpgradesUnlock = UpgradesUnlock + 1
+                elseif not Upgrades[v] and plr.leaderstats.Diamonds.Value >= Library.Directory.Upgrades[v].prices[1] then
+                    if F_Lib.WorldCmds.Get() ~= "Spawn" then
+                        TeleportArea("Spawn")
+                    end
+                    local UpgradeStationPath = game.workspace.__MAP.Interactive:FindFirstChild("Upgrade Station")
+                    if UpgradeStationPath then
+                        if plr:DistanceFromCharacter(UpgradeStationPath.Pad.Position) > 30 then
+                            plr.Character.HumanoidRootPart.CFrame = UpgradeStationPath.Pad.CFrame
+                        end
+                        wait(1)
+                        Library.Network.Invoke("Buy Upgrade", v)
+                    end
+                end
+            end
+            if UpgradesUnlock == 5 then
+                getgenv().UpgradeUnlocked = true
+            end
+            return
+        end
         for i, v in pairs(Library.Save.Get().Upgrades) do
             if v < 5 then
                 if plr.leaderstats.Diamonds.Value >= Library.Directory.Upgrades[i].prices[v + 1] then
@@ -564,7 +543,7 @@ function AutoOverlord()
                     local UpgradeStationPath = game.workspace.__MAP.Interactive:FindFirstChild("Upgrade Station")
                     if UpgradeStationPath then
                         if plr:DistanceFromCharacter(UpgradeStationPath.Pad.Position) > 30 then
-                            WalkToPath(UpgradeStationPath.Pad.CFrame)
+                            plr.Character.HumanoidRootPart.CFrame = UpgradeStationPath.Pad.CFrame
                         end
                         wait(1)
                         Library.Network.Invoke("Buy Upgrade", i)
@@ -640,6 +619,11 @@ function AutoOverlord()
             getgenv().LastRankCheck = tick()
         end
         return
+    end
+
+    if plr:DistanceFromCharacter(Vector3.new(-2724.53613, 93.8879547, 238.074982)) < 20 then
+        TeleportArea("Spawn")
+        wait(2)
     end
 
     local saveData = Library.Save.Get()
