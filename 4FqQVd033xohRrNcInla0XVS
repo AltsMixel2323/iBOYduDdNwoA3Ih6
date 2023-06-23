@@ -160,8 +160,10 @@ function GetNearestBooth_Name()
     end
 end
 function GetBuyProduct()
+    local NearestBooth_Name = GetNearestBooth_Name()
+    if not NearestBooth_Name then return end
     for i, v in pairs(L_Client.Network.Invoke("Get All Booths")) do 
-        if v.Owner == GetNearestBooth_Name().UserId then 
+        if v.Owner == NearestBooth_Name.UserId then 
             for k, x in pairs(v.Listings) do
                 local StatPet = L_Client.PetCmds.Get(k)
                 if StatPet.id == GetPetID(DitPSX["Product"]["Name"]) 
