@@ -1,0 +1,225 @@
+if not script_key and not DitPSX then
+    getgenv().DitPSX = {
+        ["Product"] = {
+            ["Name"] = "Exclusive Egg 14", -- Item Name / Pet Name (must match exact name)
+            -- Require for the Pet, ignore if buying Item
+            ["Golden"] = false,
+            ["Rainbow"] = false,
+            ["Dark Matter"] = false,
+            ["Shiny"] = false,
+            ["Hardcore"] = false,
+        }, 
+        ["Below Diamond"] = 25000000000, -- Only buy the Product if it below the set Diamond
+        ["Search"] = {
+            ["Enable"] = true, -- Use game's search (Bloomberg) to teleport to the product you looking for
+            ["Search Cooldown"] = 0, -- Wait set second after Teleported to Searched Server
+        },
+        ["Buy Webhook"] = "Buy Webhook URL here"
+    }
+end
+
+--if Executed then return end
+getgenv().Executed = true
+
+repeat wait()
+until game:IsLoaded()
+and game.Players.LocalPlayer
+and game.Players.LocalPlayer:FindFirstChild("leaderstats")
+
+local plr = game.Players.LocalPlayer
+
+function Kick(v)
+    plr:Kick(v)
+end
+
+if not DitPSX then return Kick("Config not found\nPlease check out #script-config channel") end
+
+if true then
+    local LoadingCount = tick()
+    repeat wait(1)
+        pcall(function()
+            for i, v in ipairs(getconnections(plr.PlayerGui["__INTRO"].Frame.Skip.MouseButton1Up)) do
+                v.Function()
+            end
+        end)
+        pcall(function()
+            if tick() - LoadingCount > 60 or plr.PlayerGui["__INTRO"].Frame.Notice.Visible then 
+                game:Shutdown()
+                wait(10)
+            end
+        end)
+    until not plr.PlayerGui:FindFirstChild("__INTRO")
+    repeat wait(1)
+    until plr.PlayerGui:FindFirstChild("Loading")
+    and not plr.PlayerGui:FindFirstChild("Loading").Enabled
+    and plr:FindFirstChild("__LOADED") and plr["__LOADED"].Value
+end
+
+-- FPS Boost
+local Lighting = game:GetService("Lighting")
+local Terrain = workspace:FindFirstChildOfClass("Terrain")
+sethiddenproperty(Terrain, "Decoration", false)
+sethiddenproperty(game.Lighting, "Technology", 0)
+settings().Rendering.QualityLevel = 1
+Lighting.Brightness = 0
+if DitPSX["White Screen"] then
+    game:GetService("RunService"):Set3dRenderingEnabled(false)
+end
+spawn(function()
+    getsenv(plr.PlayerScripts.Scripts.Game.Coins).CoinDamageAnimation = function() end
+end)
+
+local vu = game:GetService("VirtualUser")
+plr.Idled:connect(function()
+    vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+    wait(1)
+    vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+end)
+
+getgenv().F_Lib = require(game.ReplicatedStorage.Framework.Library)
+getgenv().L_Client = require(game.ReplicatedStorage.Library.Client)
+getgenv().L_Directory = require(game.ReplicatedStorage.Library.Directory)
+getgenv().wThings = workspace.__THINGS
+getgenv().formatNumber = F_Lib.Functions.Commas
+getgenv().shortNumber = F_Lib.Functions.NumberShorten
+
+local Library = require(game.ReplicatedStorage.Library)
+debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
+wait(1)
+debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
+wait(1)
+require(game.ReplicatedStorage.Framework.Library).WorldCmds.CanDoAction = function() return true end
+
+local connect
+local old
+old = hookmetamethod(game,"__index",function(...) 
+    if checkcaller() then return old(...) end
+    if not connect then 
+        connect = Instance.new("BindableFunction")
+        connect.OnInvoke = function(f) 
+            return f()
+        end
+    end
+    return old(...)
+end)
+repeat wait() until connect
+function warpF2(f) 
+    return connect:Invoke(f)
+end
+
+function SendWebHook(v, x)
+    http_request({
+        Url = x,
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = game:GetService("HttpService"):JSONEncode({
+            ["embeds"] = {{
+                ["title"] = "Pet Simulator X",
+                ["type"] = "rich",
+                ["color"] = tonumber(0x04BBFF),
+                ["fields"] = {
+                    v,
+                },
+                ["footer"] = {
+                    ["icon_url"] = "https://media.discordapp.net/attachments/832898415083913237/1116993951132549180/psx.png",
+                    ["text"] = "Dit PSX - Make life easier"
+                }
+            }}
+        })
+    })
+end
+
+function GetPetID(k)
+    for i, v in pairs(L_Directory.Pets) do 
+        if v.name == k then 
+            return i 
+        end
+    end
+end
+function GetNearestBooth()
+    local dist = math.huge
+    local Nearest_Booth 
+    for i, v in pairs(game.Workspace.__MAP.Interactive.Booths:GetChildren()) do
+        if v:IsA("Model") then 
+            local magnitude = plr:DistanceFromCharacter(v.Info.Position)
+            if magnitude < dist then 
+                dist = magnitude  
+                Nearest_Booth = v.Info.SurfaceGui.Frame.Top.Text
+            end
+        end
+    end
+    return Nearest_Booth
+end
+function GetNearestBooth_Name()
+    for i, v in pairs(game.Players:GetChildren()) do 
+        if v.DisplayName == string.gsub(GetNearestBooth(), "'s Stand", "") then 
+            return v 
+        end
+    end
+end
+function GetBuyProduct()
+    for i, v in pairs(L_Client.Network.Invoke("Get All Booths")) do 
+        if v.Owner == GetNearestBooth_Name().UserId then 
+            for k, x in pairs(v.Listings) do
+                local StatPet = L_Client.PetCmds.Get(k)
+                if StatPet.id == GetPetID(DitPSX["Product"]["Name"]) 
+                and x.Price <= DitPSX["Below Diamond"]
+                and (not StatPet.dm or StatPet.dm == DitPSX["Product"]["Dark Matter"])
+                and (not StatPet.sh or StatPet.sh == DitPSX["Product"]["Shiny"]) 
+                and (not StatPet.hc or StatPet.hc == DitPSX["Product"]["Hardcore"])
+                and (not StatPet.g or StatPet.g == DitPSX["Product"]["Golden"])
+                and (not StatPet.r or StatPet.r == DitPSX["Product"]["Rainbow"]) then 
+                    return tonumber(i), k, x.Price
+                end
+            end
+        end
+    end
+end
+function TradingPlazaSniper()
+    local BoothID, ProductUID, ProductPrice = GetBuyProduct()
+    if BoothID and ProductUID and ProductPrice then 
+        if plr.leaderstats.Diamonds.Value >= ProductPrice then 
+            local i, v = L_Client.Network.Invoke("Purchase Trading Booth Pet", BoothID, ProductUID, ProductPrice)
+            if i and not v then
+                if string.find(DitPSX["Buy Webhook"], "discord") then
+                    SendWebHook({
+                        ["name"] = "Trading Plaza Sniper",
+                        ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)) .. "\nBought Item: " .. DitPSX["Product"]["Name"] .. "\nPrice: " .. tostring(shortNumber(ProductPrice)),
+                        ["inline"] = false
+                    }, DitPSX["Buy Webhook"])
+                end
+            end
+        elseif string.find(DitPSX["Buy Webhook"], "discord") then
+            SendWebHook({
+                ["name"] = "Trading Plaza Sniper",
+                ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)) .. "\nOut of Diamonds to buy selected Product",
+                ["inline"] = false
+            }, DitPSX["Buy Webhook"])
+            getgenv().breakscript = true
+        end
+    elseif DitPSX["Search"]["Enable"] and (not LastHopTick or tick() - LastHopTick >= DitPSX["Search"]["Search Cooldown"]) then
+        if not Bloomberg_PetID then
+            getgenv().Bloomberg_PetID = GetPetID(DitPSX["Product"]["Name"])
+            queue_on_teleport("getgenv().LastHopTick = " .. tick()+10)
+        end
+        local v8, v9 = L_Client.Network.Invoke("Bloomberg: Validate Pet Search", false, Bloomberg_PetID, DitPSX["Product"]["Golden"], DitPSX["Product"]["Rainbow"], DitPSX["Product"]["Dark Matter"], DitPSX["Product"]["Shiny"], DitPSX["Product"]["Hardcore"])
+        local v10, v11 = L_Client.Network.Invoke("Bloomberg: Finish Teleport")
+        if v8 and not v9 and v10 and not v11 then
+            wait(10)
+        end
+    end
+    wait(5)
+end
+warpF2(function() 
+    while wait() do
+        local _, e = pcall(function()
+            TradingPlazaSniper()
+        end)
+        if e then print(e) end
+        if breakscript then
+            break
+        end
+    end
+end)
