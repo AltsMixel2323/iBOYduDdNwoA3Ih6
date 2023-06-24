@@ -138,52 +138,39 @@ function GetPetID(k)
         end
     end
 end
-function GetNearestBooth()
-    local dist = math.huge
-    local Nearest_Booth 
-    for i, v in pairs(game.Workspace.__MAP.Interactive.Booths:GetChildren()) do
-        if v:IsA("Model") then 
-            local magnitude = plr:DistanceFromCharacter(v.Info.Position)
-            if magnitude < dist then 
-                dist = magnitude  
-                Nearest_Booth = v.Info.SurfaceGui.Frame.Top.Text
-            end
-        end
-    end
-    return Nearest_Booth
-end
-function GetNearestBooth_Name()
-    for i, v in pairs(game.Players:GetChildren()) do 
-        if v.DisplayName == string.gsub(GetNearestBooth(), "'s Stand", "") then 
-            return v 
-        end
-    end
-end
 function GetBuyProduct()
-    local NearestBooth_Name = GetNearestBooth_Name()
-    if not NearestBooth_Name then return end
     for i, v in pairs(L_Client.Network.Invoke("Get All Booths")) do 
-        if v.Owner == NearestBooth_Name.UserId then 
-            for k, x in pairs(v.Listings) do
-                local StatPet = L_Client.PetCmds.Get(k)
-                if StatPet.id
-                and StatPet.id == GetPetID(DitPSX["Product"]["Name"]) 
-                and x.Price <= DitPSX["Below Diamond"]
-                and (not StatPet.dm or StatPet.dm == DitPSX["Product"]["Dark Matter"])
-                and (not StatPet.sh or StatPet.sh == DitPSX["Product"]["Shiny"]) 
-                and (not StatPet.hc or StatPet.hc == DitPSX["Product"]["Hardcore"])
-                and (not StatPet.g or StatPet.g == DitPSX["Product"]["Golden"])
-                and (not StatPet.r or StatPet.r == DitPSX["Product"]["Rainbow"]) then 
-                    return tonumber(i), k, x.Price
-                end
+        for k, x in pairs(v.Listings) do
+            local ProductStat = L_Client.PetCmds.Get(k)
+            if ProductStat
+            and ProductStat.id == GetPetID(DitPSX["Product"]["Name"]) 
+            and x.Price <= DitPSX["Below Diamond"]
+            and (not ProductStat.dm or ProductStat.dm == DitPSX["Product"]["Dark Matter"])
+            and (not ProductStat.sh or ProductStat.sh == DitPSX["Product"]["Shiny"]) 
+            and (not ProductStat.hc or ProductStat.hc == DitPSX["Product"]["Hardcore"])
+            and (not ProductStat.g or ProductStat.g == DitPSX["Product"]["Golden"])
+            and (not ProductStat.r or ProductStat.r == DitPSX["Product"]["Rainbow"]) then
+                return tonumber(i), k, x.Price, v.Owner
             end
+        end
+    end
+end
+function GetBoothPos(k)
+    for i, v in pairs(workspace.__MAP.BoothSpawns:GetChildren()) do
+        if v:GetAttribute("ID") == k then
+            return v.CFrame * CFrame.new(0, 5, -5)
         end
     end
 end
 function TradingPlazaSniper()
-    local BoothID, ProductUID, ProductPrice = GetBuyProduct()
-    if BoothID and ProductUID and ProductPrice then 
-        if plr.leaderstats.Diamonds.Value >= ProductPrice then 
+    local BoothID, ProductUID, ProductPrice, Owner = GetBuyProduct()
+    if BoothID and ProductUID and ProductPrice and Owner then 
+        if plr.leaderstats.Diamonds.Value >= ProductPrice then
+            local BoothPos = GetBoothPos(BoothID)
+            if plr:DistanceFromCharacter(BoothPos.Position) > 20 then
+                plr.Character.HumanoidRootPart.CFrame = BoothPos
+            end
+            wait(1)
             local i, v = L_Client.Network.Invoke("Purchase Trading Booth Pet", BoothID, ProductUID, ProductPrice)
             if i and not v then
                 if string.find(DitPSX["Buy Webhook"], "discord") then
@@ -194,6 +181,7 @@ function TradingPlazaSniper()
                     }, DitPSX["Buy Webhook"])
                 end
             end
+            print(i, v)
         elseif string.find(DitPSX["Buy Webhook"], "discord") then
             SendWebHook({
                 ["name"] = "Trading Plaza Sniper",
