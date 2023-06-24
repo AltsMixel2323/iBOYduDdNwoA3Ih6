@@ -12,7 +12,7 @@ getgenv().DitPSX = {
             "Royalty",
         }
     }, 
-    ["Below Diamond"] = "1b", -- Only buy the Product if it below the set Diamond (k/m/b/t)
+    ["Below Diamond"] = "1.5b", -- Only buy the Product if it below the set Diamond (k/m/b/t)
     ["Search"] = {
         ["Enable"] = true, -- Use game's search (Bloomberg) to teleport to the product you looking for
         ["Search Cooldown"] = 0, -- Wait set second after Teleported to Searched Server
@@ -138,7 +138,7 @@ end
 function GetPetID(k)
     for i, v in pairs(L_Directory.Pets) do 
         if v.name == k then 
-            return i 
+            return i, v.isGift
         end
     end
 end
@@ -159,20 +159,25 @@ function IsMatchedEnchant(ProductStat)
     end 
 end
 function GetBuyProduct()
+    if LastProductGet and tick() - LastProductGet < 5 then
+        return
+    end
+    getgenv().LastProductGet = tick()
+    local PetID = GetPetID(DitPSX["Product"]["Name"])
     for i, v in pairs(L_Client.Network.Invoke("Get All Booths")) do 
         for k, x in pairs(v.Listings) do
             local ProductStat = L_Client.PetCmds.Get(k)
             if ProductStat
-            and ProductStat.id == GetPetID(DitPSX["Product"]["Name"]) 
+            and ProductStat.id == PetID
             and x.Price <= un_shortNumber(DitPSX["Below Diamond"])
             and (not ProductStat.powers or IsMatchedEnchant(ProductStat))
-            and (not ProductStat.g == nil or ProductStat.g == DitPSX["Product"]["Golden"])
-            and (not ProductStat.r == nil or ProductStat.r == DitPSX["Product"]["Rainbow"])
-            and (not ProductStat.dm == nil or ProductStat.dm == DitPSX["Product"]["Dark Matter"])
-            and (not ProductStat.sh == nil or ProductStat.sh == DitPSX["Product"]["Shiny"]) 
-            and (not ProductStat.hc == nil or ProductStat.hc == DitPSX["Product"]["Hardcore"]) then
+            and ((DitPSX["Product"]["Golden"] and ProductStat.g) or not ProductStat.g)
+            and ((DitPSX["Product"]["Rainbow"] and ProductStat.r) or not ProductStat.r)
+            and ((DitPSX["Product"]["Dark Matter"] and ProductStat.dm) or not ProductStat.dm)
+            and ((DitPSX["Product"]["Shiny"] and ProductStat.sh) or not ProductStat.sh) 
+            and ((DitPSX["Product"]["Hardcore"] and ProductStat.hc) or not ProductStat.hc) then
                 local IsItem = false
-                if ProductStat.g == nil or ProductStat.sh == nil then
+                if not ProductStat.nk then
                     IsItem = true
                 end
                 return tonumber(i), k, x.Price, v.Owner, IsItem, ProductStat
@@ -205,18 +210,19 @@ function TradingPlazaSniper()
             if i and not v then
                 if string.find(DitPSX["Buy Webhook"], "discord") then
                     local ProductInfo = "\nBought Product: " .. DitPSX["Product"]["Name"]
-                    if IsItem then
+                    if not IsItem then
                         ProductInfo = ProductInfo .. "\nProduct Stat: "
+                        local PI = ""
+                        if ProductStat.sh then
+                            PI = "Shiny "
+                        end
+                        if ProductStat.hc then
+                            PI = PI .. "Hardcore "
+                        end
                         for i, v in pairs(ProductTypes) do
                             if ProductStat[i] then
-                                local PI = ""
-                                if ProductStat.sh then
-                                    PI = "Shiny "
-                                end
-                                if ProductStat.hc then
-                                    PI = PI .. "Hardcore "
-                                end
                                 ProductInfo = ProductInfo .. "\n+ Type: " .. PI .. v
+                                break
                             end
                         end
                         if ProductStat.powers then
@@ -244,13 +250,17 @@ function TradingPlazaSniper()
         end
     elseif DitPSX["Search"]["Enable"] and (not LastHopTick or tick() - LastHopTick >= DitPSX["Search"]["Search Cooldown"]) then
         if not Bloomberg_PetID then
-            getgenv().Bloomberg_PetID = GetPetID(DitPSX["Product"]["Name"])
+            getgenv().Bloomberg_PetID, getgenv().IsGift = GetPetID(DitPSX["Product"]["Name"])
             queue_on_teleport("getgenv().LastHopTick = " .. tick()+10)
         end
-        local v8, v9 = L_Client.Network.Invoke("Bloomberg: Validate Pet Search", false, Bloomberg_PetID, DitPSX["Product"]["Golden"], DitPSX["Product"]["Rainbow"], DitPSX["Product"]["Dark Matter"], DitPSX["Product"]["Shiny"], DitPSX["Product"]["Hardcore"])
+        local ProductTypeRequire = {DitPSX["Product"]["Golden"], DitPSX["Product"]["Rainbow"], DitPSX["Product"]["Dark Matter"], DitPSX["Product"]["Shiny"], DitPSX["Product"]["Hardcore"]}
+        if IsGift then
+            ProductTypeRequire = {false, false, false, false, false}
+        end
+        local v8, v9 = L_Client.Network.Invoke("Bloomberg: Validate Pet Search", false, Bloomberg_PetID, table.unpack(ProductTypeRequire))
         local v10, v11 = L_Client.Network.Invoke("Bloomberg: Finish Teleport")
-        if v8 and not v9 and v10 and not v11 then
-            wait(10)
+        if v9 and string.find(v9, "No matching sales found!") then
+            return wait(1)
         end
     end
     wait(5)
