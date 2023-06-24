@@ -166,11 +166,11 @@ function GetBuyProduct()
             and ProductStat.id == GetPetID(DitPSX["Product"]["Name"]) 
             and x.Price <= un_shortNumber(DitPSX["Below Diamond"])
             and (not ProductStat.powers or IsMatchedEnchant(ProductStat))
-            and (not ProductStat.g or ProductStat.g == DitPSX["Product"]["Golden"])
-            and (not ProductStat.r or ProductStat.r == DitPSX["Product"]["Rainbow"])
-            and (not ProductStat.dm or ProductStat.dm == DitPSX["Product"]["Dark Matter"])
-            and (not ProductStat.sh or ProductStat.sh == DitPSX["Product"]["Shiny"]) 
-            and (not ProductStat.hc or ProductStat.hc == DitPSX["Product"]["Hardcore"]) then
+            and (not ProductStat.g == nil or ProductStat.g == DitPSX["Product"]["Golden"])
+            and (not ProductStat.r == nil or ProductStat.r == DitPSX["Product"]["Rainbow"])
+            and (not ProductStat.dm == nil or ProductStat.dm == DitPSX["Product"]["Dark Matter"])
+            and (not ProductStat.sh == nil or ProductStat.sh == DitPSX["Product"]["Shiny"]) 
+            and (not ProductStat.hc == nil or ProductStat.hc == DitPSX["Product"]["Hardcore"]) then
                 local IsItem = false
                 if ProductStat.g == nil or ProductStat.sh == nil then
                     IsItem = true
