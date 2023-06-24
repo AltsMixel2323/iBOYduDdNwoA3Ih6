@@ -1,21 +1,24 @@
 if not script_key and not DitPSX then
-    getgenv().DitPSX = {
-        ["Product"] = {
-            ["Name"] = "Hot Dog", -- Item Name / Pet Name (must match exact name)
-            -- Require for the Pet, ignore if buying Item
-            ["Golden"] = false,
-            ["Rainbow"] = false,
-            ["Dark Matter"] = false,
-            ["Shiny"] = false,
-            ["Hardcore"] = false,
-        }, 
-        ["Below Diamond"] = "1.1b", -- Only buy the Product if it below the set Diamond (k/m/b/t)
-        ["Search"] = {
-            ["Enable"] = true, -- Use game's search (Bloomberg) to teleport to the product you looking for
-            ["Search Cooldown"] = 0, -- Wait set second after Teleported to Searched Server
-        },
-        ["Buy Webhook"] = "Buy Webhook URL here"
-    }
+getgenv().DitPSX = {
+    ["Product"] = {
+        ["Name"] = "Hot Dog", -- Item Name / Pet Name (must match exact name)
+        -- Require for the Pet, ignore if buying Item
+        ["Golden"] = false,
+        ["Rainbow"] = false,
+        ["Dark Matter"] = true,
+        ["Shiny"] = false,
+        ["Hardcore"] = false,
+        ["Enchant"] = {
+            "Royalty",
+        }
+    }, 
+    ["Below Diamond"] = "1b", -- Only buy the Product if it below the set Diamond (k/m/b/t)
+    ["Search"] = {
+        ["Enable"] = true, -- Use game's search (Bloomberg) to teleport to the product you looking for
+        ["Search Cooldown"] = 0, -- Wait set second after Teleported to Searched Server
+    },
+    ["Buy Webhook"] = "https://discord.com/api/webhooks/940949923325706250/iQiyM_V4OS858fAsWW4k1_TOy3h32ZPwbtBaQqrFi5cbkP42QcmmNhhVw46NqGmr9iAM"
+}
 end
 
 if Executed then return end
@@ -87,8 +90,8 @@ getgenv().un_shortNumber = F_Lib.Functions.ParseNumberSmart
 local Library = require(game.ReplicatedStorage.Library)
 debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
 wait(1)
-debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
-wait(1)
+--debug.setupvalue(L_Client.Network.Fire, 1, function() return true end)
+--wait(1)
 require(game.ReplicatedStorage.Framework.Library).WorldCmds.CanDoAction = function() return true end
 
 local connect
@@ -139,6 +142,22 @@ function GetPetID(k)
         end
     end
 end
+function IsMatchedEnchant(ProductStat)
+    if #DitPSX["Product"]["Enchant"] == 0 then return true end
+    local MatchedEnchant = {}
+    for _, v in pairs(ProductStat.powers) do
+        for _, k in pairs(DitPSX["Product"]["Enchant"]) do 
+            local split = string.split(k, " ")
+            local split2 = tonumber(split[2]) or 1
+            if v[1] == split[1] and v[2] >= split2 then
+                table.insert(MatchedEnchant, split[1])
+            end
+        end
+    end
+    if #MatchedEnchant == #DitPSX["Product"]["Enchant"] then
+        return true 
+    end 
+end
 function GetBuyProduct()
     for i, v in pairs(L_Client.Network.Invoke("Get All Booths")) do 
         for k, x in pairs(v.Listings) do
@@ -146,12 +165,17 @@ function GetBuyProduct()
             if ProductStat
             and ProductStat.id == GetPetID(DitPSX["Product"]["Name"]) 
             and x.Price <= un_shortNumber(DitPSX["Below Diamond"])
+            and (not ProductStat.powers or IsMatchedEnchant(ProductStat))
+            and (not ProductStat.g or ProductStat.g == DitPSX["Product"]["Golden"])
+            and (not ProductStat.r or ProductStat.r == DitPSX["Product"]["Rainbow"])
             and (not ProductStat.dm or ProductStat.dm == DitPSX["Product"]["Dark Matter"])
             and (not ProductStat.sh or ProductStat.sh == DitPSX["Product"]["Shiny"]) 
-            and (not ProductStat.hc or ProductStat.hc == DitPSX["Product"]["Hardcore"])
-            and (not ProductStat.g or ProductStat.g == DitPSX["Product"]["Golden"])
-            and (not ProductStat.r or ProductStat.r == DitPSX["Product"]["Rainbow"]) then
-                return tonumber(i), k, x.Price, v.Owner
+            and (not ProductStat.hc or ProductStat.hc == DitPSX["Product"]["Hardcore"]) then
+                local IsItem = false
+                if ProductStat.g == nil or ProductStat.sh == nil then
+                    IsItem = true
+                end
+                return tonumber(i), k, x.Price, v.Owner, IsItem, ProductStat
             end
         end
     end
@@ -163,9 +187,14 @@ function GetBoothPos(k)
         end
     end
 end
+local ProductTypes = {
+    ["dm"] = "Dark Matter",
+    ["r"] = "Rainbow",
+    ["g"] = "Gold",
+}
 function TradingPlazaSniper()
-    local BoothID, ProductUID, ProductPrice, Owner = GetBuyProduct()
-    if BoothID and ProductUID and ProductPrice and Owner then 
+    local BoothID, ProductUID, ProductPrice, Owner, IsItem, ProductStat = GetBuyProduct()
+    if BoothID and ProductUID and ProductPrice and Owner and ProductStat then 
         if plr.leaderstats.Diamonds.Value >= ProductPrice then
             local BoothPos = GetBoothPos(BoothID)
             if plr:DistanceFromCharacter(BoothPos.Position) > 20 then
@@ -175,9 +204,31 @@ function TradingPlazaSniper()
             local i, v = L_Client.Network.Invoke("Purchase Trading Booth Pet", BoothID, ProductUID, ProductPrice)
             if i and not v then
                 if string.find(DitPSX["Buy Webhook"], "discord") then
+                    local ProductInfo = "\nBought Product: " .. DitPSX["Product"]["Name"]
+                    if IsItem then
+                        ProductInfo = ProductInfo .. "\nProduct Stat: "
+                        for i, v in pairs(ProductTypes) do
+                            if ProductStat[i] then
+                                local PI = ""
+                                if ProductStat.sh then
+                                    PI = "Shiny "
+                                end
+                                if ProductStat.hc then
+                                    PI = PI .. "Hardcore "
+                                end
+                                ProductInfo = ProductInfo .. "\n+ Type: " .. PI .. v
+                            end
+                        end
+                        if ProductStat.powers then
+                            ProductInfo = ProductInfo .. "\n+ Enchant: "
+                            for i, v in pairs(ProductStat.powers) do
+                                ProductInfo = ProductInfo .. "\n. " .. v[1] .. " " .. v[2]
+                            end
+                        end
+                    end
                     SendWebHook({
                         ["name"] = "Trading Plaza Sniper",
-                        ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)) .. "\nBought Item: " .. DitPSX["Product"]["Name"] .. "\nPrice: " .. tostring(shortNumber(ProductPrice)),
+                        ["value"] = "Account: ||" .. plr.Name .. "||\n\nTotal Gem: " .. tostring(shortNumber(plr.leaderstats.Diamonds.Value)) .. ProductInfo .. "\nPrice: " .. tostring(shortNumber(ProductPrice)),
                         ["inline"] = false
                     }, DitPSX["Buy Webhook"])
                 end
@@ -206,12 +257,17 @@ function TradingPlazaSniper()
 end
 warpF2(function() 
     while wait() do
-        local _, e = pcall(function()
-            TradingPlazaSniper()
-        end)
-        if e then print(e) end
-        if breakscript then
-            break
+        if game.PlaceId ~= 7722306047 then 
+            L_Client.Network.Invoke("Travel to Trading Plaza", "DEFAULT")
+            wait(10)
+        else
+            local _, e = pcall(function()
+                TradingPlazaSniper()
+            end)
+            if e then print(e) end
+            if breakscript then
+                break
+            end
         end
     end
 end)
