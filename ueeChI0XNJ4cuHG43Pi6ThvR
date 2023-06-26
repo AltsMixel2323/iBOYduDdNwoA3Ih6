@@ -1,0 +1,212 @@
+if not script_key and not DitPSX then
+getgenv().DitPSX = {
+    ["Bank Owner"] = "Roblox Username", -- Name of the bank's owner
+}
+end
+
+if Executed then return end
+getgenv().Executed = true
+
+repeat wait()
+until game:IsLoaded()
+and game.Players.LocalPlayer
+and game.Players.LocalPlayer:FindFirstChild("leaderstats")
+
+local plr = game.Players.LocalPlayer
+
+function Kick(v)
+    plr:Kick(v)
+end
+
+if not DitPSX then return Kick("Config not found\nPlease check out #script-config channel") end
+
+if true then
+    local LoadingCount = tick()
+    repeat wait(1)
+        pcall(function()
+            for i, v in ipairs(getconnections(plr.PlayerGui["__INTRO"].Frame.Skip.MouseButton1Up)) do
+                v.Function()
+            end
+        end)
+        pcall(function()
+            if tick() - LoadingCount > 60 or plr.PlayerGui["__INTRO"].Frame.Notice.Visible then 
+                game:Shutdown()
+                wait(10)
+            end
+        end)
+    until not plr.PlayerGui:FindFirstChild("__INTRO")
+    repeat wait(1)
+    until plr.PlayerGui:FindFirstChild("Loading")
+    and not plr.PlayerGui:FindFirstChild("Loading").Enabled
+    and plr:FindFirstChild("__LOADED") and plr["__LOADED"].Value
+end
+
+-- FPS Boost
+local Lighting = game:GetService("Lighting")
+local Terrain = workspace:FindFirstChildOfClass("Terrain")
+sethiddenproperty(Terrain, "Decoration", false)
+sethiddenproperty(game.Lighting, "Technology", 0)
+settings().Rendering.QualityLevel = 1
+Lighting.Brightness = 0
+if DitPSX["White Screen"] then
+    game:GetService("RunService"):Set3dRenderingEnabled(false)
+end
+spawn(function()
+    getsenv(plr.PlayerScripts.Scripts.Game.Coins).CoinDamageAnimation = function() end
+end)
+
+local vu = game:GetService("VirtualUser")
+plr.Idled:connect(function()
+    vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+    wait(1)
+    vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+end)
+
+function SetText(v, x)
+    v.Amount.Text = tostring(x)
+    if v:FindFirstChild("Amount_odometerGUIFX") then
+        v.Amount_odometerGUIFX.Text = tostring(x)
+    end
+end
+
+Status = plr.PlayerGui.Main.Right.Diamonds:Clone()
+Status.Name = "Status"
+Status.LayoutOrder = 99998995 + 100
+Status.Parent = plr.PlayerGui.Main.Right
+Status.Icon.Image = "rbxassetid://6248942117"
+Status.Icon.Size = UDim2.new(0.25, 4, 1.79999995, 4)
+Status.Icon.Rotation = 90
+Status.Icon.Position = UDim2.new(0.954999983, 2, 0.5, 0)
+Status.Add.Visible = false
+if Status:FindFirstChild("Amount_odometerGUIFX") then
+    Status.Amount_odometerGUIFX["Diamonds Gradient"].Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.new(189/255, 207/255, 70/255)),
+        ColorSequenceKeypoint.new(0.432612, Color3.new(189/255, 207/255, 70/255)),
+        ColorSequenceKeypoint.new(1, Color3.new(53/255, 54/255, 49/255))
+    })
+end
+SetText(Status, "Script by egoD\nLoading script...")
+
+getgenv().F_Lib = require(game.ReplicatedStorage.Framework.Library)
+getgenv().L_Client = require(game.ReplicatedStorage.Library.Client)
+
+local Library = require(game.ReplicatedStorage.Library)
+debug.setupvalue(L_Client.Network.Invoke, 1, function() return true end)
+wait(1)
+require(game.ReplicatedStorage.Framework.Library).WorldCmds.CanDoAction = function() return true end
+wait(1)
+
+function SendNoti(v)
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Dit PSX",
+        Text = v,
+        Duration = 20,
+    })
+end
+
+local GetBank = L_Client.Network.Invoke("Get My Banks")
+local BankList  = {}
+if GetBank then
+    for i, v in pairs(GetBank) do
+        BankList[F_Lib.Functions.UserIdToUsername(v.Owner)] = v.BUID
+    end
+else
+    return Kick("No bank found")
+end
+
+function CountInventory(z)
+    local a = {}
+    for i, v in next, F_Lib.Save.Get().Pets do
+        if z or not z and not v.l then
+            table.insert(a,v.uid)
+        end
+    end
+    return a 
+end
+if #CountInventory(true) == 0 then
+    Kick("Must have a locked pet in Inventory")
+end
+
+SendNoti("Make sure that your inventory is clean\n(Should have only 1 locked pet)")
+
+function GetUnlockPet()
+    local mmb = {}
+    for i, v in pairs(F_Lib.Shared.GetAllCollectablePets()) do 
+        local P_Type
+        if v.isGolden then
+            P_Type = 2
+        elseif v.isRainbow then
+            P_Type = 3
+        elseif v.isDarkMatter then
+            P_Type = 4
+        else
+            P_Type = 1
+        end
+        if not table.find(F_Lib.Save.Get().Collection, v.petId .. "-" .. P_Type) then
+            table.insert(mmb,v.petId .. "-" .. P_Type)
+        end
+    end
+    return mmb
+end
+function GetUnlockPetUID()
+    local v288, v289 = L_Client.Network.Invoke("Get Bank", BankList[DitPSX["Bank Owner"]])
+    local mmb = {}
+    for i,v in next, v288.Storage.Pets do
+        local v51
+        local Amount = F_Lib.Save.Get().MaxSlots - #F_Lib.Save.Get().Pets
+        if Amount >= 50 then 
+            Amount = 50 
+        end 
+        if v.g then
+            v51 = 2;
+        elseif v.r then
+            v51 = 3;
+        elseif v.dm then
+            v51 = 4;
+        else
+            v51 = 1;
+        end
+        if table.find(GetUnlockPet(), v.id .. "-" .. v51) then 
+            if #mmb < Amount then 
+                table.insert(mmb,v.uid)
+            end
+        end
+    end
+    return mmb
+end
+function GetDepositPet()
+    local a = {}
+    local b = {}
+    for i,v in next, F_Lib.Save.Get().Pets do
+        if #a < 50 and not v.l then
+            table.insert(a,v.uid)
+        end
+    end
+    return a 
+end
+while wait() do
+    if game:GetService("Workspace")["__MAP"].Interactive:FindFirstChild("Bank") then 
+        if (plr.Character.HumanoidRootPart.Position-game:GetService("Workspace")["__MAP"].Interactive.Bank.Pad.Position).Magnitude < 8 then
+            if #CountInventory() > 1 then   
+                SetText(Status, "Depositing Pets\nto Bank")
+                local v1, v2 = L_Client.Network.Invoke("Bank Deposit", BankList[DitPSX["Bank Owner"]], GetDepositPet(), 0)
+                if F_Lib.Save.Get().CollectionTier == 7 then
+                    SetText(Status, "Tier 7 Pet Collection unlocked")
+                    break
+                end
+            else
+                SetText(Status, "Withdrawing Pets\nfrom Bank")
+                local v12, v13 = L_Client.Network.Invoke("Bank Withdraw", BankList[DitPSX["Bank Owner"]], GetUnlockPetUID(), 0)
+                local a = #F_Lib.Save.Get().Collection
+                SetText(Status, "Waiting for Pet Collection update")
+                repeat wait(1)
+                until #F_Lib.Save.Get().Collection > a
+            end
+        else
+            plr.Character.HumanoidRootPart.CFrame = game:GetService("Workspace")["__MAP"].Interactive.Bank.Pad.CFrame
+        end
+        wait(2)
+    else
+        getsenv(plr.PlayerScripts.Scripts.GUIs.Teleport).Teleport("Shop", true)
+    end
+end
