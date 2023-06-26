@@ -6,6 +6,7 @@ if not script_key and not DitPSX then
             + "Farm Fruit" -- Farm fruits
             + "Volcano Chest" -- Open Volcano Egg/Farm Pirate Cove Chest
             + "Mansion Egg" -- Open Dog Egg/Farm Dog Mansion Chest
+            + "Diamond Egg" -- Open Spawn Diamond Limited Egg
         ]]
         ["Mine Collapsed Method"] = {
             ["Method"] = "Volcano Chest",
@@ -1090,7 +1091,7 @@ function Ditting_PSX()
             local TotalDiamond = plr.leaderstats.Diamonds.Value - 100000
             L_Client.Network.Invoke("Send Mail", {
                 Recipient = DitPSX["Auto Mailbox"]["Send to"], 
-                Message = "Dit PSX", 
+                Message = "", 
                 Pets = {}, 
                 Diamonds = TotalDiamond,
             })
