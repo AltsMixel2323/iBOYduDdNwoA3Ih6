@@ -320,9 +320,7 @@ and not plr.Character:FindFirstChildOfClass("Tool") then
 end
 
 local Library = loadstring([[
-    setidentity(5)
-    wait(1)
-    if getgenv().Tvk then 
+	if getgenv().Tvk then 
 		if game.CoreGui:FindFirstChild("Sea Hub GUI") then for i, v in ipairs(game.CoreGui:GetChildren()) do if v.Name == "Sea Hub GUI" then v:Destroy() end end end
 	end
 	getgenv().Tvk = true
@@ -476,7 +474,7 @@ local Library = loadstring([[
 	
 	
 		local BuoiFolder = Instance.new('Folder')
-		BuoiFolder.Parent = Library_Function.gui
+		BuoiFolder.Parent = Gui
 		BuoiFolder.Name = 'Game nhu buoi'
 	
 		local a = Instance.new('NumberValue')
@@ -531,21 +529,21 @@ local Library = loadstring([[
 	end
 	
 	
-	Library_Function.Gui = Instance.new('ScreenGui')
-	Library_Function.Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	Library_Function.Gui.Name = 'Sea Hub GUI'
+	Gui = Instance.new('ScreenGui')
+	Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	Gui.Name = 'Sea Hub GUI'
 	
 	getgenv().ReadyForGuiLoaded = false
 	spawn(function()
-		Library_Function.Gui.Enabled = false
+		Gui.Enabled = false
 		repeat wait()
 		until getgenv().ReadyForGuiLoaded
-		Library_Function.Gui.Enabled = true
+		Gui.Enabled = true
 	end)
 	
-	Library_Function.NotiGui = Instance.new('ScreenGui')
-	Library_Function.NotiGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	Library_Function.NotiGui.Name = 'Sea Hub Notification'
+	NotiGui = Instance.new('ScreenGui')
+	NotiGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	NotiGui.Name = 'Sea Hub Notification'
 	
 	
 	local NotiContainer = Instance.new("Frame")
@@ -553,7 +551,7 @@ local Library = loadstring([[
 	
 	
 	NotiContainer.Name = "NotiContainer"
-	NotiContainer.Parent = Library_Function.NotiGui
+	NotiContainer.Parent = NotiGui
 	NotiContainer.AnchorPoint = Vector2.new(1, 1)
 	NotiContainer.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
 	NotiContainer.BackgroundTransparency = 1.000
@@ -567,8 +565,8 @@ local Library = loadstring([[
 	NotiList.Padding = UDim.new(0, 5)
 	
 	
-	Library_Function.Gui.Parent = gethui()
-	Library_Function.NotiGui.Parent = gethui()
+	Gui.Parent = game:GetService('CoreGui')
+	NotiGui.Parent = game:GetService('CoreGui')
 	
 	
 	
@@ -816,7 +814,7 @@ local Library = loadstring([[
 		local MainContainer
 	
 		Main.Name = "Main"
-		Main.Parent = Library_Function.Gui
+		Main.Parent = Gui
 		Main.BackgroundColor3 = Color3.fromRGB(42, 42, 42)
 		Main.BackgroundTransparency = 1.000
 		Main.Position = UDim2.new(0.5, 0, 0.5, 0)
