@@ -7610,13 +7610,13 @@ plr.Data.Level:GetPropertyChangedSignal("Value"):Connect(function()
     getgenv().plrLevel = plr.Data.Level.Value
 end)
 function HaveQuest(MobTable, FMob, x)
+    if plrLevel < MobTable[FMob].QLevel then
+        return true
+    end
     if x and #x >= 3 then return
         true
     end
     if not MobTable[FMob] then
-        return true
-    end
-    if plrLevel < MobTable[FMob].QLevel then
         return true
     end
     if plr.PlayerGui.Main.Quest.Visible
@@ -11511,10 +11511,10 @@ spawn(function()
     if TabStatus and TabStatus == "In" then wait(4) end
     repeat wait() until AutoFSSLabel and AutoFarmLabel and S_Timer
     while wait() do
-        --local _, e = pcall(function()
+        local _, e = pcall(function()
             AutoFarmFeatures()
-        --end)
-        --if e then print(e) end
+        end)
+        if e then print(e) end
     end
 end)
 if game.PlaceId ~= 7449423635 then
