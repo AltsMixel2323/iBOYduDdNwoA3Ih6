@@ -567,8 +567,8 @@ local Library = loadstring([[
 	NotiList.Padding = UDim.new(0, 5)
 	
 	
-	Library_Function.Gui.Parent = game:GetService('CoreGui')
-	Library_Function.NotiGui.Parent = game:GetService('CoreGui')
+	Library_Function.Gui.Parent = gethui()
+	Library_Function.NotiGui.Parent = gethui()
 	
 	
 	
