@@ -374,11 +374,12 @@ loadstring([[
                     end)
                 end
                 local p13 = ret.activeController
-                --p13:attack()
-                p13.timeToNextAttack = 0
-                p13.attacking = false
-                p13.increment = 3
-                game:GetService("VirtualUser"):Button1Down(Vector2.new(50, 50))
+                if p13 and p13.timeToNextAttack then
+                    p13.timeToNextAttack = 0
+                    p13.attacking = false
+                    p13.increment = 3
+                    game:GetService("VirtualUser"):Button1Down(Vector2.new(50, 50))
+                end
             end
         end
     end)
@@ -7413,6 +7414,7 @@ function BringMob(a)
             end
         end
     end]]
+    if string.find(a.Name, "Boss") then return end
     if a and NameMobBring ~= a then
         NameMobBring = a 
         --PositionBring = DetectPartMobBring(a.Name,a).CFrame
