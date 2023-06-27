@@ -4755,57 +4755,6 @@ function ShootM1(v)
     end
 end
 
-
-
-local Mobs = {}
-local MobsName = {}
-
-local Bosses = {}
-local BossesName = {}
-
-if game.PlaceId == 4442272183 then
-    local ExtraBoss = {
-        "Cursed Captain",
-        "Don Swan"
-    }
-    for i, v in pairs(ExtraBoss) do
-        Bosses[v] = {
-            ["QLevel"] = math.huge,
-        }
-        table.insert(BossesName, v)
-    end
-end
-function GetMobNameOnly(v)
-    local mName = v:gsub(" %pLv. %d+%p", "")
-    if string.find(mName, "Boss") then
-        mName = mName:split(" \[")[1]
-    end
-    return mName
-end
-
-function GetMidPoint(mob)
-    local count = 0
-    local vec
-    local AllMobs = {}
-    for i, v in ipairs(EnemySpawns) do
-        if mob == GetMobNameOnly(v.Name) then
-            table.insert(AllMobs, v)
-        end
-    end
-    for i, v in pairs(AllMobs) do
-        if vec == nil then
-            vec = v.Position
-            count = count + 1
-        else
-            vec = vec + v.Position
-            count = count + 1
-        end
-    end
-    vec = vec / count
-    return vec
-end
-
-
 local Title = Library.CreateMain({Title = 'Blox Fruits'})
 
 Page1 = Title.CreatePage({Page_Name = 'Main', Page_Title = 'Main Tab'})
