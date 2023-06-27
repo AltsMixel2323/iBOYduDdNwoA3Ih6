@@ -4395,70 +4395,6 @@ pcall(function()
     require(plr.PlayerScripts.CombatFramework.CameraShaker).Shake = function() end
 end)
 
-loadstring([[
-    local connect
-    local old
-    old = hookmetamethod(game,"__index",function(...) 
-        if checkcaller() then return old(...) end
-        if not connect then 
-            connect = Instance.new("BindableFunction")
-            connect.OnInvoke = function(f) 
-                return f()
-            end
-        end
-        return old(...)
-    end)
-    repeat wait() until connect
-    getgenv().warpF2 = function(f) 
-        return connect:Invoke(f)
-    end
-]])()
-loadstring([[
-    local up = getupvalues(require(game:GetService("Players").LocalPlayer.PlayerScripts.CombatFramework))
-    local ret = up[2]
-    getgenv().countattack = 0
-    local riglib = require(game.ReplicatedStorage.CombatFramework.RigLib)
-    local plr 
-    
-    local old
-    old = hookfunction(riglib.getBladeHits,function(...) 
-        local a,b = ...
-        local returned = old(game.Players.LocalPlayer.Character,{game.Players.LocalPlayer.Character.HumanoidRootPart},50)
-        if #returned > 0 then 
-            game:GetService("ReplicatedStorage").RigControllerEvent:FireServer("weaponChange",b[1].Parent.Parent.Name)
-        end
-        return returned
-    end)
-    
-    function GetMobLevel(v)
-        a = string.gsub(v, "%D", "")
-        return tonumber(a)
-    end
-    getgenv().TimerAttack = tick()
-    warpF2(function()
-        getgenv().AttackM1 = function()
-            if game.Players.LocalPlayer.Character.Stun.Value == 0 then
-                if Settings.AttackAutoScale
-                and (not AttackingMob or IsMobAlive(AttackingMob) and (string.find(AttackingMob.Name, "Boss") or GetMobLevel(AttackingMob.Name) - plrLevel > 300))
-                and tick() - TimerAttack > 4 and not AttackCheck then 
-                    getgenv().AttackCheck = true
-                    getgenv().AntiLagSvKick = false
-                    delay(2, function()
-                        getgenv().AttackCheck = false
-                        getgenv().AntiLagSvKick = true
-                        getgenv().TimerAttack = tick()
-                    end)
-                end
-                local p13 = ret.activeController
-                --p13:attack()
-                p13.timeToNextAttack = 0
-                p13.attacking = false
-                p13.increment = 3
-                game:GetService("VirtualUser"):Button1Down(Vector2.new(50, 50))
-            end
-        end
-    end)
-]])()
 function ClickM1()
     spawn(function()
         if not plr.Character:FindFirstChildOfClass("Tool") then return end
@@ -4499,73 +4435,7 @@ function ClickM1()
         end
     end)
 end
-loadstring([[
-    Mouse = plr:GetMouse()
-    mt = getrawmetatable(game)
-    old = mt.__index
-    setreadonly(mt, false)
-    mt.__index = newcclosure(function(a, b)
-        if not checkcaller()
-        and a == Mouse
-        and b == "Hit" then
-            if AimPos
-            and (Settings.MasteryFarm or Settings.SilentAim or Settings.BountyFarm or Settings.SeaBeastFarm)
-            and not game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.F) -- Flight Skills
-            and not game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.R) -- Flash Step
-            and not plr.Character.HumanoidRootPart:FindFirstChild("PounceRush") -- Godhuman Z
-            and not plr.Character.HumanoidRootPart:FindFirstChild("ShadowGlide") -- Shadow Z
-            then
-                if AimPos.Y == 0 then return end
-                return CFrame.new(AimPos.X, AimPos.Y, AimPos.Z)
-            end
-        end
-        return old(a, b)
-    end)
-    setreadonly(mt, true)
-]])()
---[[
-    local mt = getrawmetatable(game)
-    local old = mt.__namecall
-    setreadonly(mt, false)
-    mt.__namecall = function(self, ...)
-        local args = {...}
-        if getnamecallmethod() == "FireServer"
-        and self.Name == "RemoteEvent" then
-            if Settings.MasteryFarm
-            and AimPos
-            or Settings.SilentAim
-            and AimPos then
-                if typeof(args[1]) == "Vector3" then
-                    args[1] = Vector3.new(AimPos.X, AimPos.Y, AimPos.Z)
-                elseif typeof(args[1]) == "CFrame" then
-                    args[1] = CFrame.new(AimPos.X, AimPos.Y, AimPos.Z)
-                end
-            end
-        end
-        return old(self, unpack(args))
-    end
 
-    Mouse = plr:GetMouse()
-    mt = getrawmetatable(game)
-    old = mt.__index
-    setreadonly(mt, false)
-    mt.__index = newcclosure(function(a, b)
-        if not checkcaller()
-        and a == Mouse
-        and b == "Hit" then
-            if Settings.SilentAim
-            and AimPos then
-                local WP = plr.Character:FindFirstChildOfClass("Tool")
-                if WP and WP.ToolTip == "Gun"
-                and getcallingscript() == WP:FindFirstChildOfClass("LocalScript") then
-                    return CFrame.new(AimPos.X, AimPos.Y, AimPos.Z)
-                end
-            end
-        end
-        return old(a, b)
-    end)
-    setreadonly(mt, true)
-]]
 function ShootM1(v)
     local Pos, OnScreen = CurCam:WorldToViewportPoint(v.HumanoidRootPart.Position)
     if OnScreen then
@@ -4583,7 +4453,6 @@ for i, v in pairs(DialogueList) do
         QuestNPCs[RemoteList[i]] = DialogueList[i]
     end
 end
-
 local Mobs = {}
 local MobsName = {}
 for i, x in pairs(require(game.ReplicatedStorage.Quests)) do
@@ -4617,7 +4486,6 @@ for i, x in pairs(require(game.ReplicatedStorage.Quests)) do
         end
     end
 end
-
 local Bosses = {}
 local BossesName = {}
 for i, x in pairs(require(game.ReplicatedStorage.Quests)) do
