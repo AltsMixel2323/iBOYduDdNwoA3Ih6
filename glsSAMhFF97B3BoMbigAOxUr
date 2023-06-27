@@ -4394,6 +4394,159 @@ local Library = loadstring([[
 pcall(function()
     require(plr.PlayerScripts.CombatFramework.CameraShaker).Shake = function() end
 end)
+
+loadstring([[
+    local old
+    old = hookfunction(require(game:GetService("ReplicatedStorage").CombatFramework.RigLib).getBladeHits,function(...) 
+        local a,b = ...
+        local returned = old(game.Players.LocalPlayer.Character,{game.Players.LocalPlayer.Character.HumanoidRootPart},50)
+        if StartAutoAttack then
+            local cac = {}
+            local hash = {}
+            for k, v in pairs(returned) do
+                if v.Parent:FindFirstChild("HumanoidRootPart") and not hash[v.Parent] then
+                    if v.Parent.Parent.Name == "Enemies" then
+                        table.insert(cac, v.Parent.HumanoidRootPart)
+                        hash[v.Parent] = true
+                    end
+                end
+            end
+            returned = cac
+        end
+        if #returned > 0 or StartAutoAttack then 
+            game:GetService("ReplicatedStorage").RigControllerEvent:FireServer("weaponChange",b[1].Parent.Parent.Name)
+            game:GetService("ReplicatedStorage").RigControllerEvent:FireServer("hit", returned, 1, "")
+        end
+        return returned
+    end)
+    local CbFw = getupvalues(require(plr.PlayerScripts.CombatFramework))
+    local CbFw2 = CbFw[2]
+    local AC = CbFw2.activeController
+    getgenv().AttackM1 = function()
+        getgenv().StartAutoAttack = true
+        getgenv().LastEnableAttack = tick()
+        game:GetService("VirtualUser"):Button1Down(Vector2.new(50, 50))
+        AC.timeToNextAttack = 0
+        AC.attacking = false
+        AC.increment = 3
+    end
+    spawn(function()
+        while wait(10) do
+            if LastEnableAttack and tick() - LastEnableAttack >= 5 then
+                getgenv().StartAutoAttack = false
+                getgenv().LastEnableAttack = nil
+            end
+        end
+    end)
+]])
+loadstring([[
+    local CbFw = getupvalues(require(plr.PlayerScripts.CombatFramework))
+    local CbFw2 = CbFw[2]
+    
+    function GetCurrentBlade() 
+        local p13 = CbFw2.activeController
+        local ret = p13.blades[1]
+        if not ret then
+            return
+        end
+        while ret.Parent ~= plr.Character do
+            ret = ret.Parent
+        end
+        return ret
+    end
+    getgenv().TimerAttack = tick()
+    getgenv().AttackM1 = function(BladeHitRoot) 
+        local CurrentEquipWP = plr.Character:FindFirstChildOfClass("Tool")
+        if not CurrentEquipWP
+        or not CheckM1Weapon(CurrentEquipWP) then
+            return
+        end
+        local AC = CbFw2.activeController
+        if not AC.attack then return end
+        for i = 1, 1 do 
+            local bladehit
+            if BladeHitRoot then
+                bladehit = require(game.ReplicatedStorage.CombatFramework.RigLib).getBladeHits(
+                    game.Players[BladeHitRoot.Name].Character,
+                    {BladeHitRoot.HumanoidRootPart},
+                    60
+                )
+            else
+                bladehit = require(game.ReplicatedStorage.CombatFramework.RigLib).getBladeHits(
+                    plr.Character,
+                    {plr.Character.HumanoidRootPart},
+                    60
+                )
+            end
+            local cac = {}
+            local hash = {}
+            for k, v in pairs(bladehit) do
+                if v.Parent:FindFirstChild("HumanoidRootPart") and not hash[v.Parent] then
+                    table.insert(cac, v.Parent.HumanoidRootPart)
+                    hash[v.Parent] = true
+                end
+            end
+            bladehit = cac
+            if #bladehit > 0 then
+                local u8 = debug.getupvalue(AC.attack, 5)
+                local u9 = debug.getupvalue(AC.attack, 6)
+                local u7 = debug.getupvalue(AC.attack, 4)
+                local u10 = debug.getupvalue(AC.attack, 7)
+                local u12 = (u8 * 798405 + u7 * 727595) % u9
+                local u13 = u7 * 798405
+                (function()
+                    u12 = (u12 * u9 + u13) % 1099511627776
+                    u8 = math.floor(u12 / u9)
+                    u7 = u12 - u8 * u9
+                end)()
+                u10 = u10 + 1
+                debug.setupvalue(AC.attack, 5, u8)
+                debug.setupvalue(AC.attack, 6, u9)
+                debug.setupvalue(AC.attack, 4, u7)
+                debug.setupvalue(AC.attack, 7, u10)
+                pcall(function()
+                    for k, v in pairs(AC.animator.anims.basic) do
+                        v:Play()
+                    end                  
+                end)
+                if AC.blades and AC.blades[1] then 
+                    if Settings.AttackAutoScale
+                    and (not AttackingMob or IsMobAlive(AttackingMob) and string.find(AttackingMob.Name, "Boss"))
+                    and tick() - TimerAttack > 4 and not AttackCheck then 
+                        getgenv().AttackCheck = true
+                        getgenv().AntiLagSvKick = false
+                        delay(2, function()
+                            getgenv().AttackCheck = false
+                            getgenv().AntiLagSvKick = true
+                            getgenv().TimerAttack = tick()
+                        end)
+                    end
+                    game:GetService("ReplicatedStorage").RigControllerEvent:FireServer("weaponChange", tostring(GetCurrentBlade()))
+                    game.ReplicatedStorage.Remotes.Validator:FireServer(math.floor(u12 / 1099511627776 * 16777215), u10)
+                    game:GetService("ReplicatedStorage").RigControllerEvent:FireServer("hit", bladehit, i, "")
+                elseif not AC.blades
+                and (AttackNoCDAura or AttackingMob and IsMobAlive(AttackingMob)) then
+                    local TimerWait = tick()
+                    local AMHealth
+                    if AttackingMob then 
+                        AMHealth = AttackingMob.Humanoid.Health
+                    end
+                    repeat wait()
+                    until CbFw2.activeController.blades
+                    or tick() - TimerWait >= 2
+                    and (AttackNoCDAura or AttackingMob.Humanoid.Health == AMHealth)
+                    if tick() - TimerWait >= 2 then 
+                        local CurEWP = plr.Character:FindFirstChildOfClass("Tool")
+                        plr.Character.Humanoid:UnequipTools()
+                        wait()
+                        plr.Character.Humanoid:EquipTool(CurEWP)
+                        wait(.5)
+                    end
+                end
+            end
+        end
+    end
+]])
 loadstring([[
     local connect
     local old
@@ -4413,6 +4566,240 @@ loadstring([[
     end
 ]])()
 
+
+function ClickM1()
+    spawn(function()
+        if not plr.Character:FindFirstChildOfClass("Tool") then return end
+        if Settings.AttackNoCD
+        and not getgenv().AntiLagSvKick then
+            if not getgenv().AntiLagSvKick2 and not Settings.AttackAutoScale then
+                getgenv().AntiLagSvKick2 = true
+                delay(Settings.AttackDuration, function()
+                    getgenv().AntiLagSvKick = true
+                    local Timer = tick()
+                    repeat wait()
+                    until tick() - Timer >= Settings.AttackCooldown
+                    getgenv().AntiLagSvKick = false
+                end)
+                getgenv().AntiLagSvKick2 = false
+            end
+            spawn(AttackM1)
+        else
+            spawn(function()
+                if AttackInCooldown then
+                    local Timer = tick()
+                    while getgenv().AttackInCooldown do wait()
+                        if tick() - Timer > 5 then
+                            getgenv().AttackInCooldown = false
+                        end
+                    end
+                else
+                    if TimerAttack and tick() - TimerAttack > 3 and not Settings.AttackAutoScale then 
+                        getgenv().AntiLagSvKick = false
+                        getgenv().TimerAttack = tick()
+                    end
+                    getgenv().AttackInCooldown = true
+                    spawn(AttackM1)
+                    wait(.3)
+                    getgenv().AttackInCooldown = false
+                end
+            end)
+        end
+    end)
+end
+loadstring([[
+    Mouse = plr:GetMouse()
+    mt = getrawmetatable(game)
+    old = mt.__index
+    setreadonly(mt, false)
+    mt.__index = newcclosure(function(a, b)
+        if not checkcaller()
+        and a == Mouse
+        and b == "Hit" then
+            if AimPos
+            and (Settings.MasteryFarm or Settings.SilentAim or Settings.BountyFarm or Settings.SeaBeastFarm)
+            and not game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.F) -- Flight Skills
+            and not game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.R) -- Flash Step
+            and not plr.Character.HumanoidRootPart:FindFirstChild("PounceRush") -- Godhuman Z
+            and not plr.Character.HumanoidRootPart:FindFirstChild("ShadowGlide") -- Shadow Z
+            then
+                if AimPos.Y == 0 then return end
+                return CFrame.new(AimPos.X, AimPos.Y, AimPos.Z)
+            end
+        end
+        return old(a, b)
+    end)
+    setreadonly(mt, true)
+]])()
+--[[
+    local mt = getrawmetatable(game)
+    local old = mt.__namecall
+    setreadonly(mt, false)
+    mt.__namecall = function(self, ...)
+        local args = {...}
+        if getnamecallmethod() == "FireServer"
+        and self.Name == "RemoteEvent" then
+            if Settings.MasteryFarm
+            and AimPos
+            or Settings.SilentAim
+            and AimPos then
+                if typeof(args[1]) == "Vector3" then
+                    args[1] = Vector3.new(AimPos.X, AimPos.Y, AimPos.Z)
+                elseif typeof(args[1]) == "CFrame" then
+                    args[1] = CFrame.new(AimPos.X, AimPos.Y, AimPos.Z)
+                end
+            end
+        end
+        return old(self, unpack(args))
+    end
+
+    Mouse = plr:GetMouse()
+    mt = getrawmetatable(game)
+    old = mt.__index
+    setreadonly(mt, false)
+    mt.__index = newcclosure(function(a, b)
+        if not checkcaller()
+        and a == Mouse
+        and b == "Hit" then
+            if Settings.SilentAim
+            and AimPos then
+                local WP = plr.Character:FindFirstChildOfClass("Tool")
+                if WP and WP.ToolTip == "Gun"
+                and getcallingscript() == WP:FindFirstChildOfClass("LocalScript") then
+                    return CFrame.new(AimPos.X, AimPos.Y, AimPos.Z)
+                end
+            end
+        end
+        return old(a, b)
+    end)
+    setreadonly(mt, true)
+]]
+function ShootM1(v)
+    local Pos, OnScreen = CurCam:WorldToViewportPoint(v.HumanoidRootPart.Position)
+    if OnScreen then
+        warpF2(function() 
+            spawn(function()
+                getconnections(game:GetService("UserInputService").TouchTapInWorld)[1].Function(Pos, false)
+            end)
+        end)
+    end
+end
+
+local QuestNPCs = {}
+for i, v in pairs(DialogueList) do
+    if QuestPoses[v] then
+        QuestNPCs[RemoteList[i]] = DialogueList[i]
+    end
+end
+
+local Mobs = {}
+local MobsName = {}
+for i, x in pairs(require(game.ReplicatedStorage.Quests)) do
+    for m, v in pairs(x) do
+        for k, _ in pairs(v.Task) do
+            if v.Task[k] > 1 and QuestNPCs[i] and v.LevelReq then
+                a = v.Name
+                if a:sub(#a, #a) == "s"
+                and a:sub(#a - 1, #a) ~= "ss" then
+                    b = a:sub(#a, #a)
+                    a = a:gsub(b, "")
+                end
+                if game.PlaceId == 2753915549 
+                and string.find(a, "Mil.") then
+                    a = a:gsub("Mil.", "Military")
+                end
+                Mobs[a] = {
+                    ["QNPC"] = QuestNPCs[i],
+                    ["QPos"] = QuestPoses[QuestNPCs[i]],
+                    ["QName"] = i,
+                    ["QNumber"] = m,
+                    ["QLevel"] = v.LevelReq,
+                }
+                if a == "God's Guard" then
+                    Mobs[a].QPos = CFrame.new(-4721.5625, 845.2771606445312, -1952.377685546875)
+                elseif a == "Wysper" then
+                    Mobs[a].QPos = CFrame.new(-7860.703125, 5545.51904296875, -380.1561584472656)
+                end
+                table.insert(MobsName, a)
+            end
+        end
+    end
+end
+
+local Bosses = {}
+local BossesName = {}
+for i, x in pairs(require(game.ReplicatedStorage.Quests)) do
+    for m, v in pairs(x) do
+        for k, _ in pairs(v.Task) do
+            if v.Task[k] == 1 and QuestNPCs[i] and v.LevelReq then
+                local d = v.Name
+                if d == "Ice Admiral" then
+                    d = "Awakened Ice Admiral"
+                end
+                Bosses[d] = {
+                    ["QNPC"] = QuestNPCs[i],
+                    ["QPos"] = QuestPoses[QuestNPCs[i]],
+                    ["QName"] = i,
+                    ["QNumber"] = m,
+                    ["QLevel"] = v.LevelReq,
+                }
+                table.insert(BossesName, d)
+            end
+        end
+    end
+end
+if game.PlaceId == 4442272183 then
+    local ExtraBoss = {
+        "Cursed Captain",
+        "Don Swan"
+    }
+    for i, v in pairs(ExtraBoss) do
+        Bosses[v] = {
+            ["QLevel"] = math.huge,
+        }
+        table.insert(BossesName, v)
+    end
+end
+function GetMobNameOnly(v)
+    local mName = v:gsub(" %pLv. %d+%p", "")
+    if string.find(mName, "Boss") then
+        mName = mName:split(" \[")[1]
+    end
+    return mName
+end
+local EnemySpawns = {}
+for i, v in ipairs(wOrigin.EnemySpawns:GetChildren()) do
+    table.insert(EnemySpawns, v)
+end
+for i, v in pairs(getnilinstances()) do
+    if v:IsA("Part") and string.find(v.Name, "Lv. ") then
+        table.insert(EnemySpawns, v)
+    end
+end
+function GetMidPoint(mob)
+    local count = 0
+    local vec
+    local AllMobs = {}
+    for i, v in ipairs(EnemySpawns) do
+        if mob == GetMobNameOnly(v.Name) then
+            table.insert(AllMobs, v)
+        end
+    end
+    for i, v in pairs(AllMobs) do
+        if vec == nil then
+            vec = v.Position
+            count = count + 1
+        else
+            vec = vec + v.Position
+            count = count + 1
+        end
+    end
+    vec = vec / count
+    return vec
+end
+for i, v in pairs(Mobs) do
+    Mobs[i].MPos = GetMidPoint(i)
+end
 
 local Title = Library.CreateMain({Title = 'Blox Fruits'})
 
