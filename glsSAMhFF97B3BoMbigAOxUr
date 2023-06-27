@@ -11511,10 +11511,10 @@ spawn(function()
     if TabStatus and TabStatus == "In" then wait(4) end
     repeat wait() until AutoFSSLabel and AutoFarmLabel and S_Timer
     while wait() do
-        local _, e = pcall(function()
+        --local _, e = pcall(function()
             AutoFarmFeatures()
-        end)
-        if e then print(e) end
+        --end)
+        --if e then print(e) end
     end
 end)
 if game.PlaceId ~= 7449423635 then
