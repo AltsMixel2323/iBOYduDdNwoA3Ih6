@@ -463,6 +463,7 @@ local Library = loadstring([[
 	
 	--Button Effect
 	function Library_Function.ButtonEffect()
+        if true then return end
 		local mouse = game:GetService("Players").LocalPlayer:GetMouse();
 		local buttoneffect = Drawing.new("Circle")
 		buttoneffect.Visible = true
