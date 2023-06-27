@@ -320,6 +320,8 @@ and not plr.Character:FindFirstChildOfClass("Tool") then
 end
 
 local Library = loadstring([[
+    setidentity(5)
+    wait(1)
     if getgenv().Tvk then 
 		if game.CoreGui:FindFirstChild("Sea Hub GUI") then for i, v in ipairs(game.CoreGui:GetChildren()) do if v.Name == "Sea Hub GUI" then v:Destroy() end end end
 	end
