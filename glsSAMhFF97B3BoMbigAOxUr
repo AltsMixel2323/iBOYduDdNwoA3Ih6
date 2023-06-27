@@ -11256,8 +11256,8 @@ function AutoFarmFeatures()
                 repeat wait()
                     Attempts = Attempts + 1
                     PH = CommF:InvokeServer("PlayerHunter")
-                    v = PH:split("player ")[2]
-                    v = v:split(" roaming")[1]
+                    PH2 = PH:split("player ")[2]
+                    v = PH2:split(" roaming")[1]
                     wait(.5)
                 until PHCheck(v) or Attempts > 12 * 3
                 if Attempts > 12 * 3 then
@@ -11356,6 +11356,7 @@ function AutoFarmFeatures()
                 return
             end
             if not HaveQuest(MobTable, SelectedFMob, FMob) then
+                warn'1'
                 if not TargetBoss
                 and SelectedFMob ~= "Factory Staff" then
                     HopIfNearFarmArea(Mobs[SelectedFMob].MPos)
