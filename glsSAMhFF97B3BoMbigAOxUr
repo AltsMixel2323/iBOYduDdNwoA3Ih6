@@ -4567,46 +4567,7 @@ loadstring([[
 ]])()
 
 
-function ClickM1()
-    spawn(function()
-        if not plr.Character:FindFirstChildOfClass("Tool") then return end
-        if Settings.AttackNoCD
-        and not getgenv().AntiLagSvKick then
-            if not getgenv().AntiLagSvKick2 and not Settings.AttackAutoScale then
-                getgenv().AntiLagSvKick2 = true
-                delay(Settings.AttackDuration, function()
-                    getgenv().AntiLagSvKick = true
-                    local Timer = tick()
-                    repeat wait()
-                    until tick() - Timer >= Settings.AttackCooldown
-                    getgenv().AntiLagSvKick = false
-                end)
-                getgenv().AntiLagSvKick2 = false
-            end
-            spawn(AttackM1)
-        else
-            spawn(function()
-                if AttackInCooldown then
-                    local Timer = tick()
-                    while getgenv().AttackInCooldown do wait()
-                        if tick() - Timer > 5 then
-                            getgenv().AttackInCooldown = false
-                        end
-                    end
-                else
-                    if TimerAttack and tick() - TimerAttack > 3 and not Settings.AttackAutoScale then 
-                        getgenv().AntiLagSvKick = false
-                        getgenv().TimerAttack = tick()
-                    end
-                    getgenv().AttackInCooldown = true
-                    spawn(AttackM1)
-                    wait(.3)
-                    getgenv().AttackInCooldown = false
-                end
-            end)
-        end
-    end)
-end
+
 loadstring([[
     Mouse = plr:GetMouse()
     mt = getrawmetatable(game)
