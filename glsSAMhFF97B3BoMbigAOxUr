@@ -319,6 +319,236 @@ and not plr.Character:FindFirstChildOfClass("Tool") then
     or plr.Character:FindFirstChildOfClass("Tool")
 end
 
+loadstring([[
+    local connect
+    local old
+    old = hookmetamethod(game,"__index",function(...) 
+        if checkcaller() then return old(...) end
+        if not connect then 
+            connect = Instance.new("BindableFunction")
+            connect.OnInvoke = function(f) 
+                return f()
+            end
+        end
+        return old(...)
+    end)
+    repeat wait() until connect
+    getgenv().warpF2 = function(f) 
+        return connect:Invoke(f)
+    end
+]])()
+loadstring([[
+    local up = getupvalues(require(game:GetService("Players").LocalPlayer.PlayerScripts.CombatFramework))
+    local ret = up[2]
+    getgenv().countattack = 0
+    local riglib = require(game.ReplicatedStorage.CombatFramework.RigLib)
+    local plr 
+    
+    local old
+    old = hookfunction(riglib.getBladeHits,function(...) 
+        local a,b = ...
+        local returned = old(game.Players.LocalPlayer.Character,{game.Players.LocalPlayer.Character.HumanoidRootPart},50)
+        if #returned > 0 then 
+            game:GetService("ReplicatedStorage").RigControllerEvent:FireServer("weaponChange",b[1].Parent.Parent.Name)
+        end
+        return returned
+    end)
+    
+    function GetMobLevel(v)
+        a = string.gsub(v, "%D", "")
+        return tonumber(a)
+    end
+    getgenv().TimerAttack = tick()
+    warpF2(function()
+        getgenv().AttackM1 = function()
+            if game.Players.LocalPlayer.Character.Stun.Value == 0 then
+                if Settings.AttackAutoScale
+                and (not AttackingMob or IsMobAlive(AttackingMob) and (string.find(AttackingMob.Name, "Boss") or GetMobLevel(AttackingMob.Name) - plrLevel > 300))
+                and tick() - TimerAttack > 4 and not AttackCheck then 
+                    getgenv().AttackCheck = true
+                    getgenv().AntiLagSvKick = false
+                    delay(2, function()
+                        getgenv().AttackCheck = false
+                        getgenv().AntiLagSvKick = true
+                        getgenv().TimerAttack = tick()
+                    end)
+                end
+                local p13 = ret.activeController
+                --p13:attack()
+                p13.timeToNextAttack = 0
+                p13.attacking = false
+                p13.increment = 3
+                game:GetService("VirtualUser"):Button1Down(Vector2.new(50, 50))
+            end
+        end
+    end)
+]])()
+function ClickM1()
+    spawn(function()
+        if not plr.Character:FindFirstChildOfClass("Tool") then return end
+        if Settings.AttackNoCD
+        and not getgenv().AntiLagSvKick then
+            if not getgenv().AntiLagSvKick2 and not Settings.AttackAutoScale then
+                getgenv().AntiLagSvKick2 = true
+                delay(Settings.AttackDuration, function()
+                    getgenv().AntiLagSvKick = true
+                    local Timer = tick()
+                    repeat wait()
+                    until tick() - Timer >= Settings.AttackCooldown
+                    getgenv().AntiLagSvKick = false
+                end)
+                getgenv().AntiLagSvKick2 = false
+            end
+            spawn(AttackM1)
+        else
+            spawn(function()
+                if AttackInCooldown then
+                    local Timer = tick()
+                    while getgenv().AttackInCooldown do wait()
+                        if tick() - Timer > 5 then
+                            getgenv().AttackInCooldown = false
+                        end
+                    end
+                else
+                    if TimerAttack and tick() - TimerAttack > 3 and not Settings.AttackAutoScale then 
+                        getgenv().AntiLagSvKick = false
+                        getgenv().TimerAttack = tick()
+                    end
+                    getgenv().AttackInCooldown = true
+                    spawn(AttackM1)
+                    wait(.3)
+                    getgenv().AttackInCooldown = false
+                end
+            end)
+        end
+    end)
+end
+
+function ShootM1(v)
+    local Pos, OnScreen = CurCam:WorldToViewportPoint(v.HumanoidRootPart.Position)
+    if OnScreen then
+        warpF2(function() 
+            spawn(function()
+                getconnections(game:GetService("UserInputService").TouchTapInWorld)[1].Function(Pos, false)
+            end)
+        end)
+    end
+end
+
+local QuestNPCs = {}
+for i, v in pairs(DialogueList) do
+    if QuestPoses[v] then
+        QuestNPCs[RemoteList[i]] = DialogueList[i]
+    end
+end
+local Mobs = {}
+local MobsName = {}
+for i, x in pairs(require(game.ReplicatedStorage.Quests)) do
+    for m, v in pairs(x) do
+        for k, _ in pairs(v.Task) do
+            if v.Task[k] > 1 and QuestNPCs[i] and v.LevelReq then
+                a = v.Name
+                if a:sub(#a, #a) == "s"
+                and a:sub(#a - 1, #a) ~= "ss" then
+                    b = a:sub(#a, #a)
+                    a = a:gsub(b, "")
+                end
+                if game.PlaceId == 2753915549 
+                and string.find(a, "Mil.") then
+                    a = a:gsub("Mil.", "Military")
+                end
+                Mobs[a] = {
+                    ["QNPC"] = QuestNPCs[i],
+                    ["QPos"] = QuestPoses[QuestNPCs[i]],
+                    ["QName"] = i,
+                    ["QNumber"] = m,
+                    ["QLevel"] = v.LevelReq,
+                }
+                if a == "God's Guard" then
+                    Mobs[a].QPos = CFrame.new(-4721.5625, 845.2771606445312, -1952.377685546875)
+                elseif a == "Wysper" then
+                    Mobs[a].QPos = CFrame.new(-7860.703125, 5545.51904296875, -380.1561584472656)
+                end
+                table.insert(MobsName, a)
+            end
+        end
+    end
+end
+local Bosses = {}
+local BossesName = {}
+for i, x in pairs(require(game.ReplicatedStorage.Quests)) do
+    for m, v in pairs(x) do
+        for k, _ in pairs(v.Task) do
+            if v.Task[k] == 1 and QuestNPCs[i] and v.LevelReq then
+                local d = v.Name
+                if d == "Ice Admiral" then
+                    d = "Awakened Ice Admiral"
+                end
+                Bosses[d] = {
+                    ["QNPC"] = QuestNPCs[i],
+                    ["QPos"] = QuestPoses[QuestNPCs[i]],
+                    ["QName"] = i,
+                    ["QNumber"] = m,
+                    ["QLevel"] = v.LevelReq,
+                }
+                table.insert(BossesName, d)
+            end
+        end
+    end
+end
+if game.PlaceId == 4442272183 then
+    local ExtraBoss = {
+        "Cursed Captain",
+        "Don Swan"
+    }
+    for i, v in pairs(ExtraBoss) do
+        Bosses[v] = {
+            ["QLevel"] = math.huge,
+        }
+        table.insert(BossesName, v)
+    end
+end
+function GetMobNameOnly(v)
+    local mName = v:gsub(" %pLv. %d+%p", "")
+    if string.find(mName, "Boss") then
+        mName = mName:split(" \[")[1]
+    end
+    return mName
+end
+local EnemySpawns = {}
+for i, v in ipairs(wOrigin.EnemySpawns:GetChildren()) do
+    table.insert(EnemySpawns, v)
+end
+for i, v in pairs(getnilinstances()) do
+    if v:IsA("Part") and string.find(v.Name, "Lv. ") then
+        table.insert(EnemySpawns, v)
+    end
+end
+function GetMidPoint(mob)
+    local count = 0
+    local vec
+    local AllMobs = {}
+    for i, v in ipairs(EnemySpawns) do
+        if mob == GetMobNameOnly(v.Name) then
+            table.insert(AllMobs, v)
+        end
+    end
+    for i, v in pairs(AllMobs) do
+        if vec == nil then
+            vec = v.Position
+            count = count + 1
+        else
+            vec = vec + v.Position
+            count = count + 1
+        end
+    end
+    vec = vec / count
+    return vec
+end
+for i, v in pairs(Mobs) do
+    Mobs[i].MPos = GetMidPoint(i)
+end
+
 local Library = loadstring([[
 	if getgenv().Tvk then 
 		if game.CoreGui:FindFirstChild("Sea Hub GUI") then for i, v in ipairs(game.CoreGui:GetChildren()) do if v.Name == "Sea Hub GUI" then v:Destroy() end end end
@@ -4394,172 +4624,6 @@ local Library = loadstring([[
 pcall(function()
     require(plr.PlayerScripts.CombatFramework.CameraShaker).Shake = function() end
 end)
-
-function ClickM1()
-    spawn(function()
-        if not plr.Character:FindFirstChildOfClass("Tool") then return end
-        if Settings.AttackNoCD
-        and not getgenv().AntiLagSvKick then
-            if not getgenv().AntiLagSvKick2 and not Settings.AttackAutoScale then
-                getgenv().AntiLagSvKick2 = true
-                delay(Settings.AttackDuration, function()
-                    getgenv().AntiLagSvKick = true
-                    local Timer = tick()
-                    repeat wait()
-                    until tick() - Timer >= Settings.AttackCooldown
-                    getgenv().AntiLagSvKick = false
-                end)
-                getgenv().AntiLagSvKick2 = false
-            end
-            spawn(AttackM1)
-        else
-            spawn(function()
-                if AttackInCooldown then
-                    local Timer = tick()
-                    while getgenv().AttackInCooldown do wait()
-                        if tick() - Timer > 5 then
-                            getgenv().AttackInCooldown = false
-                        end
-                    end
-                else
-                    if TimerAttack and tick() - TimerAttack > 3 and not Settings.AttackAutoScale then 
-                        getgenv().AntiLagSvKick = false
-                        getgenv().TimerAttack = tick()
-                    end
-                    getgenv().AttackInCooldown = true
-                    spawn(AttackM1)
-                    wait(.3)
-                    getgenv().AttackInCooldown = false
-                end
-            end)
-        end
-    end)
-end
-
-function ShootM1(v)
-    local Pos, OnScreen = CurCam:WorldToViewportPoint(v.HumanoidRootPart.Position)
-    if OnScreen then
-        warpF2(function() 
-            spawn(function()
-                getconnections(game:GetService("UserInputService").TouchTapInWorld)[1].Function(Pos, false)
-            end)
-        end)
-    end
-end
-
-local QuestNPCs = {}
-for i, v in pairs(DialogueList) do
-    if QuestPoses[v] then
-        QuestNPCs[RemoteList[i]] = DialogueList[i]
-    end
-end
-local Mobs = {}
-local MobsName = {}
-for i, x in pairs(require(game.ReplicatedStorage.Quests)) do
-    for m, v in pairs(x) do
-        for k, _ in pairs(v.Task) do
-            if v.Task[k] > 1 and QuestNPCs[i] and v.LevelReq then
-                a = v.Name
-                if a:sub(#a, #a) == "s"
-                and a:sub(#a - 1, #a) ~= "ss" then
-                    b = a:sub(#a, #a)
-                    a = a:gsub(b, "")
-                end
-                if game.PlaceId == 2753915549 
-                and string.find(a, "Mil.") then
-                    a = a:gsub("Mil.", "Military")
-                end
-                Mobs[a] = {
-                    ["QNPC"] = QuestNPCs[i],
-                    ["QPos"] = QuestPoses[QuestNPCs[i]],
-                    ["QName"] = i,
-                    ["QNumber"] = m,
-                    ["QLevel"] = v.LevelReq,
-                }
-                if a == "God's Guard" then
-                    Mobs[a].QPos = CFrame.new(-4721.5625, 845.2771606445312, -1952.377685546875)
-                elseif a == "Wysper" then
-                    Mobs[a].QPos = CFrame.new(-7860.703125, 5545.51904296875, -380.1561584472656)
-                end
-                table.insert(MobsName, a)
-            end
-        end
-    end
-end
-local Bosses = {}
-local BossesName = {}
-for i, x in pairs(require(game.ReplicatedStorage.Quests)) do
-    for m, v in pairs(x) do
-        for k, _ in pairs(v.Task) do
-            if v.Task[k] == 1 and QuestNPCs[i] and v.LevelReq then
-                local d = v.Name
-                if d == "Ice Admiral" then
-                    d = "Awakened Ice Admiral"
-                end
-                Bosses[d] = {
-                    ["QNPC"] = QuestNPCs[i],
-                    ["QPos"] = QuestPoses[QuestNPCs[i]],
-                    ["QName"] = i,
-                    ["QNumber"] = m,
-                    ["QLevel"] = v.LevelReq,
-                }
-                table.insert(BossesName, d)
-            end
-        end
-    end
-end
-if game.PlaceId == 4442272183 then
-    local ExtraBoss = {
-        "Cursed Captain",
-        "Don Swan"
-    }
-    for i, v in pairs(ExtraBoss) do
-        Bosses[v] = {
-            ["QLevel"] = math.huge,
-        }
-        table.insert(BossesName, v)
-    end
-end
-function GetMobNameOnly(v)
-    local mName = v:gsub(" %pLv. %d+%p", "")
-    if string.find(mName, "Boss") then
-        mName = mName:split(" \[")[1]
-    end
-    return mName
-end
-local EnemySpawns = {}
-for i, v in ipairs(wOrigin.EnemySpawns:GetChildren()) do
-    table.insert(EnemySpawns, v)
-end
-for i, v in pairs(getnilinstances()) do
-    if v:IsA("Part") and string.find(v.Name, "Lv. ") then
-        table.insert(EnemySpawns, v)
-    end
-end
-function GetMidPoint(mob)
-    local count = 0
-    local vec
-    local AllMobs = {}
-    for i, v in ipairs(EnemySpawns) do
-        if mob == GetMobNameOnly(v.Name) then
-            table.insert(AllMobs, v)
-        end
-    end
-    for i, v in pairs(AllMobs) do
-        if vec == nil then
-            vec = v.Position
-            count = count + 1
-        else
-            vec = vec + v.Position
-            count = count + 1
-        end
-    end
-    vec = vec / count
-    return vec
-end
-for i, v in pairs(Mobs) do
-    Mobs[i].MPos = GetMidPoint(i)
-end
 
 local Title = Library.CreateMain({Title = 'Blox Fruits'})
 
