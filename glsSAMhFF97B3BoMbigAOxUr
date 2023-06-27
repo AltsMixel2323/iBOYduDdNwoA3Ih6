@@ -473,7 +473,7 @@ function Library_Function.ButtonEffect()
 
 
     local BuoiFolder = Instance.new('Folder')
-    BuoiFolder.Parent = Library_Function.gui
+    BuoiFolder.Parent = Gui
     BuoiFolder.Name = 'Game nhu buoi'
 
     local a = Instance.new('NumberValue')
@@ -528,16 +528,16 @@ Library_Function.GetIMG = function(url)
 end
 
 
-Library_Function.Gui = Instance.new('ScreenGui')
-Library_Function.Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-Library_Function.Gui.Name = 'Sea Hub GUI'
+Gui = Instance.new('ScreenGui')
+Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+Gui.Name = 'Sea Hub GUI'
 
 getgenv().ReadyForGuiLoaded = false
 spawn(function()
-    Library_Function.Gui.Enabled = false
+    Gui.Enabled = false
     repeat wait()
     until getgenv().ReadyForGuiLoaded
-    Library_Function.Gui.Enabled = true
+    Gui.Enabled = true
 end)
 
 Library_Function.NotiGui = Instance.new('ScreenGui')
@@ -564,7 +564,7 @@ NotiList.VerticalAlignment = Enum.VerticalAlignment.Bottom
 NotiList.Padding = UDim.new(0, 5)
 
 
-Library_Function.Gui.Parent = game:GetService('CoreGui')
+Gui.Parent = game:GetService('CoreGui')
 Library_Function.NotiGui.Parent = game:GetService('CoreGui')
 
 
