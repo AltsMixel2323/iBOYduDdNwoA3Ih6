@@ -27,7 +27,8 @@ if not script_key and not DitPSX then
             -- Mainly farm Orange/Apple fruit while farming Diamonds
             -- Mainly farm Apple/Banana/ while opening Egg
             ["Enable"] = true,
-            ["Farm when under"] = 50
+            ["Farm when under"] = 50,
+            ["Farm until"] = 100,
         },
         ["Auto Mailbox"] = { -- Auto send Diamonds to a person thru Mailbox when your Diamonds more than set diamond
             ["Enable"] = false,
@@ -36,6 +37,7 @@ if not script_key and not DitPSX then
         },
         ["Auto Claim Mailbox"] = true, -- Claim Diamonds on the account received the Diamonds from Auto Mailbox
         ["Auto Daycare"] = true, -- Auto Claim Daycare and Enroll unequipped/unlocked Pets in your Inventory
+        ["Auto Collect Rewards"] = true, -- Auto Collect Rank/VIP Rewards
         ["Auto Leave"] = {
             ["Ping Froze"] = true,
             ["Got kicked"] = true,
@@ -1035,7 +1037,7 @@ function AreaTeleport(v)
 end
 
 function Ditting_PSX()
-    if not LastRewardCheck or tick() - LastRewardCheck > 120 then
+    if DitPSX["Auto Collect Rewards"] and (not LastRewardCheck or tick() - LastRewardCheck > 120) then
         if VIPOwned and IsRewardReady(14400, F_Lib.Save.Get().VIPCooldown) then
             TeleportArea("Spawn")
             local VIPRewardPath = game.workspace.__MAP.Interactive:FindFirstChild("VIP Rewards")
@@ -1258,7 +1260,8 @@ function Ditting_PSX()
     if not TempDisableCheckFruit and DitPSX["Auto Farm Fruit"].Enable and (not LastCheckFruit or tick() - LastCheckFruit > 60) then
         getgenv().LastCheckFruit = tick()
         local Apple, Orange = GetFruitAmount("Apple"), GetFruitAmount("Orange")
-        if FarmFruit and Apple > 195 and Orange > 195 then
+        local FarmUntilAmount = DitPSX["Auto Farm Fruit"]["Farm until"] or 195
+        if FarmFruit and Apple >= FarmUntilAmount and Orange >= FarmUntilAmount then
             getgenv().FarmFruit = false
             return
         elseif Apple <= DitPSX["Auto Farm Fruit"]["Farm when under"] or Orange <= DitPSX["Auto Farm Fruit"]["Farm when under"] then
