@@ -151,24 +151,26 @@ end
 function GetUnlockPetUID()
     local v288, v289 = L_Client.Network.Invoke("Get Bank", BankList[DitPSX["Bank Owner"]])
     local mmb = {}
-    for i,v in next, v288.Storage.Pets do
-        local v51
-        local Amount = F_Lib.Save.Get().MaxSlots - #F_Lib.Save.Get().Pets
-        if Amount >= 50 then 
-            Amount = 50 
-        end 
-        if v.g then
-            v51 = 2;
-        elseif v.r then
-            v51 = 3;
-        elseif v.dm then
-            v51 = 4;
-        else
-            v51 = 1;
-        end
-        if table.find(GetUnlockPet(), v.id .. "-" .. v51) then 
-            if #mmb < Amount then 
-                table.insert(mmb,v.uid)
+    for i, v in next, v288.Storage.Pets do
+        if not v.l then
+            local v51
+            local Amount = F_Lib.Save.Get().MaxSlots - #F_Lib.Save.Get().Pets
+            if Amount >= 50 then 
+                Amount = 50 
+            end 
+            if v.g then
+                v51 = 2;
+            elseif v.r then
+                v51 = 3;
+            elseif v.dm then
+                v51 = 4;
+            else
+                v51 = 1;
+            end
+            if table.find(GetUnlockPet(), v.id .. "-" .. v51) then 
+                if #mmb < Amount then 
+                    table.insert(mmb, v.uid)
+                end
             end
         end
     end
@@ -179,7 +181,7 @@ function GetDepositPet()
     local b = {}
     for i,v in next, F_Lib.Save.Get().Pets do
         if #a < 50 and not v.l then
-            table.insert(a,v.uid)
+            table.insert(a, v.uid)
         end
     end
     return a 
