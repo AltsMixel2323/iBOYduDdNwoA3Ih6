@@ -423,18 +423,18 @@ function R_ClickM1()
     end
 end
 function ClickM1()
-    getgenv().ClickM1, getgenv().CM1_LastCall = true, tick()
+    getgenv().S_ClickM1, getgenv().CM1_LastCall = true, tick()
 end
 spawn(function()
     while task.wait() do
-        if ClickM1 then
-            spawn(ClickM1)
+        if S_ClickM1 then
+            spawn(R_ClickM1)
         end
     end
 end)
 spawn(function()
     while wait(2) do
-        if ClickM1 and tick() - CM1_LastCall > 4 then
+        if S_ClickM1 and tick() - CM1_LastCall > 4 then
             getgenv().ClickM1 = false
         end
     end
