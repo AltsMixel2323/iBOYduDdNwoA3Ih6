@@ -199,6 +199,9 @@ while wait() do
             else
                 SetText(Status, "Withdrawing Pets\nfrom Bank")
                 local v12, v13 = L_Client.Network.Invoke("Bank Withdraw", BankList[DitPSX["Bank Owner"]], GetUnlockPetUID(), 0)
+                if v13 then
+                    print(v12, v13)
+                end
                 local a = #F_Lib.Save.Get().Collection
                 SetText(Status, "Waiting for Pet Collection update")
                 repeat wait(1)
