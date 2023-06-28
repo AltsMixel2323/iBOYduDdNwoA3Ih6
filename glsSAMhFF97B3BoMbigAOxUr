@@ -427,7 +427,7 @@ function ClickM1()
 end
 spawn(function()
     while task.wait() do
-        if S_ClickM1 then
+        if S_ClickM1 and not TakingQuest then
             spawn(R_ClickM1)
         end
     end
@@ -11371,21 +11371,24 @@ function AutoFarmFeatures()
                 return
             end
             if not HaveQuest(MobTable, SelectedFMob, FMob) then
-                warn'1'
                 if not TargetBoss
                 and SelectedFMob ~= "Factory Staff" then
                     HopIfNearFarmArea(Mobs[SelectedFMob].MPos)
                 end
-                repeat wait()
-                    Tween(MobTable[SelectedFMob].QPos)
-                    wait(.5)
-                    if plr:DistanceFromCharacter(MobTable[SelectedFMob].QPos.Position) < 5 then
-                        CommF:InvokeServer("StartQuest", MobTable[SelectedFMob].QName, MobTable[SelectedFMob].QNumber)
-                        wait(.25)
-                    end 
-                until HaveQuest(MobTable, SelectedFMob, FMob)
-                or TargetBoss and (not Settings.BossFarm or child_stringfind(game.workspace.Enemies, SelectedFMob, true) == 0 and child_stringfind(game.ReplicatedStorage, SelectedFMob, true) == 0)
-                or not TargetBoss and not Settings.MobFarm
+                getgenv().TakingQuest = true
+                pcall(function()
+                    repeat wait()
+                        Tween(MobTable[SelectedFMob].QPos)
+                        wait(.5)
+                        if plr:DistanceFromCharacter(MobTable[SelectedFMob].QPos.Position) < 5 then
+                            CommF:InvokeServer("StartQuest", MobTable[SelectedFMob].QName, MobTable[SelectedFMob].QNumber)
+                            wait(.25)
+                        end 
+                    until HaveQuest(MobTable, SelectedFMob, FMob)
+                    or TargetBoss and (not Settings.BossFarm or child_stringfind(game.workspace.Enemies, SelectedFMob, true) == 0 and child_stringfind(game.ReplicatedStorage, SelectedFMob, true) == 0)
+                    or not TargetBoss and not Settings.MobFarm
+                end)
+                getgenv().TakingQuest = false
             end
             repeat wait()
                 --[[
