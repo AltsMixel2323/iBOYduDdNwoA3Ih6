@@ -15065,6 +15065,6 @@ end
 while wait() do
     local Status = GetScriptStatus()
     local S_AutoFarm, S_AutoFSS = Status["Auto Farm"], Status["Auto Fighting Style / Sword"]
-    typeWrite(textLabel, [[<font color="rgb(129,255,115)">Auto Farm:</font> ]] .. S_AutoFarm .. "\n" .. [[<font color="rgb(129,255,115)">Auto Item:</font> ]] .. S_AutoFSS, 0.05)
+    changeText(textLabel, [[<font color="rgb(129,255,115)">Auto Farm:</font> ]] .. S_AutoFarm .. "\n" .. [[<font color="rgb(129,255,115)">Auto Item:</font> ]] .. S_AutoFSS, 0.05)
     wait(1)
 end
