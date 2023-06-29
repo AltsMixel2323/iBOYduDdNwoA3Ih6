@@ -6602,7 +6602,7 @@ if game.PlaceId == 7449423635 then
         local Mote = game.workspace:FindFirstChild("Mote")
         if Mote then
             repeat wait()
-                local Prompt = game:GetService("Workspace").Map["Temple of Time"]:FindFirstChild("Prompt")
+                local Prompt = game.workspace.Map["Temple of Time"]:FindFirstChild("Prompt")
                 if Prompt then
                     Tween(Prompt.Position)
                 else
@@ -6612,7 +6612,7 @@ if game.PlaceId == 7449423635 then
                     fireproximityprompt(Mote.ProximityPrompt)
                 end
             until not Mote or not game.workspace:FindFirstChild("Mote") or not Settings.AutoRacev4Trial
-            local Prompt = game:GetService("Workspace").Map["Temple of Time"]:FindFirstChild("Prompt")
+            local Prompt = game.workspace.Map["Temple of Time"]:FindFirstChild("Prompt")
             if Prompt.ProximityPrompt.Enabled and Settings.AutoRacev4Trial then
                 repeat wait()
                     Tween(Prompt.Position)
@@ -7265,11 +7265,11 @@ function isnetworkowner2(p1)
     end
     return true
 end
-function getcenter(name)
+function GetCenter(name)
     local count = 0
     local vec
-    if string.find(game:GetService("Workspace")["_WorldOrigin"].EnemySpawns:GetChildren()[1].Name, "Lv.") then
-        for i, v in pairs(game:GetService("Workspace")["_WorldOrigin"].EnemySpawns:GetChildren()) do
+    if string.find(wOrigin.EnemySpawns:GetChildren()[1].Name, "Lv.") then
+        for i, v in pairs(wOrigin.EnemySpawns:GetChildren()) do
             if v.Name == name  then  
                 if vec == nil then
                     vec = v.Position
@@ -7292,7 +7292,7 @@ function getcenter(name)
             end
         end
     else
-        for i, v in pairs(game:GetService("Workspace")["_WorldOrigin"].EnemySpawns:GetChildren()) do 
+        for i, v in pairs(wOrigin.EnemySpawns:GetChildren()) do 
             if  v.Name == tostring(name:gsub(" %pLv. %d+%p", "")) then
                 if vec == nil then
                     vec = v.Position
@@ -7318,19 +7318,19 @@ function getcenter(name)
     vec = vec / count
     return CFrame.new(vec)
 end
-function DetectPartMobBring(name,a,b,c)
+function DetectPartMobBring(name, a, b, c)
     local Mob = {}
-    local name1 
+    local name1
     if string.find(name,"Lv.") then 
         name1 = name:gsub(" %pLv. %d+%p", "")
     end
-    for i, v in pairs(game:GetService("Workspace")["_WorldOrigin"].EnemySpawns:GetChildren()) do
+    for i, v in pairs(wOrigin.EnemySpawns:GetChildren()) do
         local stringgsub
         if string.find(v.Name, "Lv.") then 
             stringgsub = v.Name:gsub(" %pLv. %d+%p", "")
         end
-        if  v:IsA("Part") and ((stringgsub and stringgsub == name) or name == v.Name or (name1 and v.Name == name1)) then
-            table.insert(Mob,v)
+        if v:IsA("Part") and ((stringgsub and stringgsub == name) or name == v.Name or (name1 and v.Name == name1)) then
+            table.insert(Mob, v)
         end
     end
     for i, v in pairs(getnilinstances()) do
@@ -7339,14 +7339,14 @@ function DetectPartMobBring(name,a,b,c)
             stringgsub = v.Name:gsub(" %pLv. %d+%p", "")
         end
         if v:IsA("Part") and ((stringgsub and stringgsub == name) or name == v.Name or (name1 and v.Name == name1)) then
-            table.insert(Mob,v)
+            table.insert(Mob, v)
         end
     end
     if b then
         local dist = math.huge
         local Closest
-        for i,v in next,Mob do 
-            local conconcac = (a.HumanoidRootPart.Position-v.Position).Magnitude
+        for i, v in next, Mob do 
+            local conconcac = (a.HumanoidRootPart.Position - v.Position).Magnitude
             if dist > conconcac then 
                 dist = conconcac 
                 Closest = v 
@@ -7355,9 +7355,9 @@ function DetectPartMobBring(name,a,b,c)
         return Closest
     else
         local mob2 = {}
-        for i,v in next,Mob do 
-            if (c.Position-v.Position).Magnitude <= 300 then 
-                table.insert(mob2,v)
+        for i,v in next, Mob do 
+            if (c.Position - v.Position).Magnitude <= 300 then 
+                table.insert(mob2, v)
             end
         end
         if #mob2 < #Mob then 
@@ -7365,92 +7365,52 @@ function DetectPartMobBring(name,a,b,c)
         end
     end
 end
-
-local CenterMob
-local NameMobBring 
-local PosBring
-local PositionBring
-
-function DeleteIgnoredMob()
-    for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-        if v:IsA("Model") and v:FindFirstChild("Ignored")  then 
+local BringToMob 
+local BringPos
+function BM_RemoveIgnored()
+    for i, v in pairs(game.workspace.Enemies:GetChildren()) do
+        if v:IsA("Model") and v:FindFirstChild("Ignored") then 
             v.Ignored:Destroy()
         end
     end
 end
-function sizepart(v)
-    v.HumanoidRootPart.CanCollide = false
+function FreezeMob(v)
     if syn or Fluxus then
         v.Humanoid:ChangeState(11)
     else
-        for i,x in next,v:GetDescendants() do 
-            if (x:IsA("Part") or x:IsA("MeshPart")) and not string.find(v.Name,"Leg") and  x.CanCollide then 
+        for i, x in next, v:GetDescendants() do 
+            if (x:IsA("Part") or x:IsA("MeshPart")) and not string.find(v.Name, "Leg") and x.CanCollide then 
                 x.CanCollide = false 
             end
         end
     end
-    if not v.HumanoidRootPart:FindFirstChild("vando") then
-        local lock = Instance.new("BodyVelocity")
-        lock.Parent = v
-        lock.Name = "vando"
+    if not v.HumanoidRootPart:FindFirstChild("Froze") then
+        v.HumanoidRootPart.CanCollide = false
+        local lock = Instance.new("BodyVelocity", v)
+        lock.Name = "Froze"
         lock.MaxForce = Vector3.new(100000, 100000, 100000)
         lock.Velocity = Vector3.new(0, 0, 0)
     end
 end
 function BringMob(a)
-    --[[
-    if a and not NameMobBring then 
-        if (a.HumanoidRootPart.Position-getcenter(a.Name)).Magnitude < 250  then 
-            PosBring = getcenter(a.Name)
-        else
-            PosBring = a.HumanoidRootPart.Position
-        end
-        NameMobBring = a.Name 
-        return 
-    elseif NameMobBring ~= a.Name then 
-        if (a.HumanoidRootPart.Position-getcenter(a.Name)).Magnitude < 250  then 
-            PosBring = getcenter(a.Name)
-        else
-            PosBring = a.HumanoidRootPart.Position
-        end
-        NameMobBring = a.Name 
-        return 
+    if not a or string.find(a.Name, "Boss") or not IsMobAlive(a)
+    or plr:DistanceFromCharacter(a.HumanoidRootPart.Position) > 100 then
+        return
     end
-    if (plr.Character.HumanoidRootPart.Position-a.HumanoidRootPart.Position).Magnitude <= 100 then
-        for i,v in pairs(game.workspace.Enemies:GetChildren()) do
-            if v.Name == a.Name  and v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v.Humanoid.Health > 0 and isnetworkowner(v.HumanoidRootPart)  then 
-                if PosBring  and v.Name == "Chief Petty Officer [Lv. 120]" and (v.HumanoidRootPart.Position-a.HumanoidRootPart.Position).Magnitude <= 250 then
-                    v.HumanoidRootPart.CFrame = CFrame.new(a.HumanoidRootPart.Position)
-                    sizepart(v)
-                elseif (v.HumanoidRootPart.Position-PosBring).Magnitude <= 250 then
-                    v.HumanoidRootPart.CFrame = CFrame.new(PosBring)
-                    sizepart(v)
-                end
-            end
+    if BringToMob ~= a then
+        BringToMob = a
+        BringPos = GetCenter(a.Name)
+        if DetectPartMobBring(a.Name, a, false, BringPos) then
+            BringPos = DetectPartMobBring(a.Name, a, true).CFrame
         end
-    end]]
-    if string.find(a.Name, "Boss") then return end
-    if a and NameMobBring ~= a then
-        NameMobBring = a 
-        --PositionBring = DetectPartMobBring(a.Name,a).CFrame
-        PositionBring = getcenter(a.Name)
-        if DetectPartMobBring(a.Name,a,false,PositionBring) then
-            PositionBring = DetectPartMobBring(a.Name,a,true).CFrame
-        end
-        DeleteIgnoredMob()
+        BM_RemoveIgnored()
     end
-    if (plr.Character.HumanoidRootPart.Position-a.HumanoidRootPart.Position).Magnitude <= 100 then
-        for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-            if v.Name == a.Name and not v:FindFirstChild("Ignored") and v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v.Humanoid.Health > 0 and isnetworkowner(v.HumanoidRootPart) and isnetworkowner2(v.HumanoidRootPart) then 
-                if  (v.HumanoidRootPart.Position-PositionBring.Position).Magnitude <= 350 then
-                    v.HumanoidRootPart.CFrame = PositionBring 
-                    --  sizepart(v)
-                end
-            end
-        end
-        for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-            if v.Name == a.Name and not v:FindFirstChild("Ignored") and v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v.Humanoid.Health > 0 and isnetworkowner(v.HumanoidRootPart) and isnetworkowner2(v.HumanoidRootPart) then 
-                if  (v.HumanoidRootPart.Position-PositionBring.Position).Magnitude <= 350 then
+    for i, v in pairs(game.workspace.Enemies:GetChildren()) do
+        if v.Name == a.Name and not v:FindFirstChild("Ignored") and IsMobAlive(v) and isnetworkowner(v.HumanoidRootPart) and isnetworkowner2(v.HumanoidRootPart) then 
+            if (v.HumanoidRootPart.Position - BringPos.Position).Magnitude <= 350 then
+                v.HumanoidRootPart.CFrame = BringPos 
+                spawn(function()
+                    FreezeMob(v)
                     local oldhealthmob = v.Humanoid.Health
                     task.wait(3.5)
                     if v.Humanoid.Health == oldhealthmob then 
@@ -7458,7 +7418,7 @@ function BringMob(a)
                         Ignored.Name = "Ignored"
                         task.wait(0.3)
                     end
-                end
+                end)
             end
         end
     end
