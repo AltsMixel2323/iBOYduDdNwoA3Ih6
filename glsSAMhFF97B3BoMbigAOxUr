@@ -1,3 +1,50 @@
+getgenv().CuttayAccountFarm = {
+    ["Enable"] = true,
+    ["Raid if Maxed Blox Fruit"] = true,
+    ["Farm boss drops if maxed"] = false,
+    ["Farm boss drops while not maxed"] = false,
+    ["Farm Blox Fruit Mastery if maxed"] = true,
+    ["Farm method after maxed"] = "Raid Boss Farm - Cake Prince Farm",
+    ["Extra time Farm until unlock skills"] = true,
+    ["Ignore Hop Server Type"] = {
+        ["[Main] Server Hop"] = true,
+        ["[Farm] Server Hop if Player nearby"] = true,
+        ["[Sea 3 Quest] Server Hop for 1M+ Blox Fruit"] = true,
+    },
+    ["Hop Server Delay"] = 0,
+    ["Ignore Action"] = {
+        ["Get Godhuman"] = false,
+        ["Get Rengoku"] = false,
+        ["Get True Triple Katana"] = true,
+        ["Get Hallow Scythe"] = true,
+        ["Get Cursed Dual Katana"] = false,
+        ["Get Soul Guitar"] = false,
+        ["Awake Current Blox Fruit"] = false,
+    },
+    ["Buy Haki"] = {
+        ["Buy Enhancement"] = true,
+        ["Buy Skyjump"] = true,
+        ["Buy Flash Step"] = true,
+        ["Buy Observation"] = true,
+    },
+    ["Blox Fruit Sniper"] = {
+        "Light-Light",
+        "Magma-Magma",
+        "Quake-Quake",
+        "Human-Human: Buddha",
+        "Rumble-Rumble",
+        "Venom-Venom",
+        "Soul-Soul",
+        "Dragon-Dragon",
+        "Leopard-Leopard",
+        "Dough-Dough",
+        "Shadow-Shadow",
+        "String-String"
+    },
+    ["Main Blox Fruit"] = {"Dough-Dough"},
+    ["Eat Sniper Blox Fruits"] = true,
+    ["Account Panel"] = false,
+}
 if true then
     local LoadTimer = tick()
     repeat wait(1)
@@ -43,7 +90,7 @@ textLabel.BorderSizePixel = 0
 textLabel.Position = UDim2.new(0.5, 0, 0, 0)
 textLabel.Size = UDim2.new(0, 0, 1, 0)
 textLabel.Font = Enum.Font.SourceSansBold
-textLabel.Text = "Dit Blox Fruits - Them bulul qua"
+textLabel.Text = "Dit Blox Fruits - Make life easier\nAn re-design version of Sea Hub's Cuttay"
 textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 textLabel.TextSize = 20.000
 textLabel.TextTransparency = 1
@@ -64,9 +111,9 @@ image.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 image.BackgroundTransparency = 1.000
 image.BorderColor3 = Color3.fromRGB(0, 0, 0)
 image.BorderSizePixel = 0
-image.Position = UDim2.new(1, -25, 0, -25)
-image.Rotation = 30.000
-image.Size = UDim2.new(0, 50, 0, 50)
+image.AnchorPoint = Vector2.new(.5,0)
+image.Position = UDim2.new(.5, 0, 0, -22.5)
+image.Size = UDim2.new(0, 30, 0, 30)
 image.Image = "rbxassetid://6248942117"
 image.ImageTransparency = 1.000
 
@@ -89,8 +136,7 @@ strokeGradient.Parent = mainStroke
 
 delay(2,function()
 	textLabel.Changed:Connect(function(v)
-		print(textLabel.AbsoluteSize.X)
-		mainFrame.Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,50)
+		mainFrame.Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10, 50)
 		if textLabel.AbsoluteSize.X + 10 >= mainSizeConstraint.MaxSize.X then
 			textLabel.TextScaled = true
 		else
@@ -491,7 +537,7 @@ loadstring([[
             if game.Players.LocalPlayer.Character.Stun.Value == 0 then
                 if Settings.AttackAutoScale
                 and (not AttackingMob or IsMobAlive(AttackingMob) and (string.find(AttackingMob.Name, "Boss") or GetMobLevel(AttackingMob.Name) - plrLevel > 300))
-                and tick() - TimerAttack > 4 and not AttackCheck then 
+                and tick() - TimerAttack > 6 and not AttackCheck then 
                     getgenv().AttackCheck = true
                     getgenv().AntiLagSvKick = false
                     delay(2, function()
@@ -905,14 +951,7 @@ local Library = loadstring([[
 	Gui = Instance.new('ScreenGui')
 	Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	Gui.Name = 'Sea Hub GUI'
-	
-	getgenv().ReadyForGuiLoaded = false
-	spawn(function()
-		Gui.Enabled = false
-		repeat wait()
-		until getgenv().ReadyForGuiLoaded
-		Gui.Enabled = true
-	end)
+	Gui.Enabled = false
 	
 	NotiGui = Instance.new('ScreenGui')
 	NotiGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -1321,7 +1360,6 @@ local Library = loadstring([[
 		table.insert(UpdateCallBack["Background 3 Color"],function() 
 			MainContainer.BackgroundColor3 = getgenv().UIColor["Background 3 Color"]
 		end)
-		getgenv().ReadyForGuiLoaded = true
 		
 		MainCorner.CornerRadius = UDim.new(0, 4)
 		MainCorner.Name = "MainCorner"
@@ -8128,7 +8166,7 @@ function BuyFightingStyle(v, x, c, m)
             end
         end
         if not TemporaryAFS then
-            AutoFSSLabel.SetText(LabelTextAFS .. "Not have enough Beli to buy: " .. x)
+            AutoFSSLabel.SetText(LabelTextAFS .. "No having enough Beli to buy: " .. x)
         end
         return
     elseif Settings.Cuttay and c ~= 0 then
@@ -8137,7 +8175,7 @@ function BuyFightingStyle(v, x, c, m)
     if plr.Data.Fragments.Value < m then
         CT_AutoRaidForFrag()
         if not TemporaryAFS then
-            AutoFSSLabel.SetText(LabelTextAFS .. "Not have enough Fragments to buy: " .. x)
+            AutoFSSLabel.SetText(LabelTextAFS .. "No having enough Fragments to buy: " .. x)
         end
         return
     elseif Settings.Cuttay and m ~= 0 then
@@ -9137,7 +9175,7 @@ function AutoFarmFeatures()
                             if CommF:InvokeServer("Bones", "Buy", 1, 1) ~= 0 then
                                 repeat wait()
                                     if GetItemCount("Bones") < 50 then
-                                        AutoFSSLabel.SetText(LabelTextAFS ..  "Not have enough Bone to buy random (to get Fire Essence)")
+                                        AutoFSSLabel.SetText(LabelTextAFS ..  "No having enough Bone to buy random (to get Fire Essence)")
                                         AutoFarmLabel.SetText(LabelTextAF ..  "Farming Bone")
                                         FarmLocation({"Reborn Skeleton", "Living Zombie", "Demonic Soul", "Posessed Mummy"}, CFrame.new(-9500.9443359375, 172.10487365722656, 6167.43359375))
                                     end
@@ -9838,7 +9876,7 @@ function AutoFarmFeatures()
                             if CommF:InvokeServer("Bones", "Buy", 1, 1) ~= 0 then
                                 repeat wait()
                                     if GetItemCount("Bones") < 50 then
-                                        AutoFSSLabel.SetText(LabelTextAFS ..  "Not have enough Bone to buy random to get Hallow Essence (CDK Quest)")
+                                        AutoFSSLabel.SetText(LabelTextAFS ..  "No having enough Bone to buy random to get Hallow Essence (CDK Quest)")
                                         AutoFarmLabel.SetText(LabelTextAF ..  "Farming Bone")
                                         FarmLocation({"Reborn Skeleton", "Living Zombie", "Demonic Soul", "Posessed Mummy"}, CFrame.new(-9500.9443359375, 172.10487365722656, 6167.43359375))
                                     end
@@ -9934,7 +9972,7 @@ function AutoFarmFeatures()
                         FarmLocation({"Reborn Skeleton", "Living Zombie", "Demonic Soul", "Posessed Mummy"}, CFrame.new(-9500.9443359375, 172.10487365722656, 6167.43359375))
                         return
                     elseif plr.Data.Fragments.Value < 5000 then
-                        AutoFSSLabel.SetText(LabelTextAFS .. "Not have enough Fragments to buy: Soul Guitar")
+                        AutoFSSLabel.SetText(LabelTextAFS .. "No having enough Fragments to buy: Soul Guitar")
                         CT_AutoRaidForFrag()
                     else
                         local SGProgressCheck = CommF:InvokeServer("GuitarPuzzleProgress", "Check")
@@ -10667,7 +10705,7 @@ function AutoFarmFeatures()
                 wait(1)
                 return
             else
-                AutoFarmLabel.SetText(LabelTextAF ..  "Not have enough Fragments to buy: Order Raid Microchip")
+                AutoFarmLabel.SetText(LabelTextAF ..  "No having enough Fragments to buy: Order Raid Microchip")
             end
         end
     end
@@ -14032,7 +14070,7 @@ if true then
                         getgenv().AFSWeapon = nil
                         if not Settings.AutoTripleKatana and AutoTripleKatanaToggle then AutoTripleKatanaToggle.SetStage(true) end
                     else
-                        AutoFSSLabel.SetText(LabelTextAFS .. "Not have enough Beli to buy: True Triple Katana")
+                        AutoFSSLabel.SetText(LabelTextAFS .. "No having enough Beli to buy: True Triple Katana")
                         CT_DisableAutoRaid()
                         CT_EnableFarm()
                     end
@@ -15038,19 +15076,19 @@ if getgenv().Key == nil then
     end)
 end
 
-typeWrite(textLabel, [[Script is <font color="rgb(129,255,115)">Loaded</font>]], 0.05)
 repeat wait(3)
 until game.CoreGui:FindFirstChild("Sea Hub GUI")
+repeat wait(1) until game.CoreGui["Sea Hub GUI"].Main.MainContainer:FindFirstChild('Concacontainer')
+local page = game.PlaceId == 2753915549 and 'Page7' or 'Page8'
 local function GetScriptStatus()
     local ScriptStatus = {}
-    repeat wait(1) until game.CoreGui["Sea Hub GUI"].Main.MainContainer:FindFirstChild('Concacontainer')
     for i, v in ipairs(game.CoreGui["Sea Hub GUI"].Main.MainContainer.Concacontainer.Concacmain.MainPage[page].PageList["Script Status_Dot"]:GetChildren()) do
         if v.Name == "LabelFrame" then
             local a = "Auto Farm"
             local b = "Auto Fighting Style / Sword"
             local m = v.LabelBG.TextColor.Text
             local x = m:gsub(a, "")
-            x = x:split("\n")[2]
+            x = x:split("]")[2]
             x = x:gsub(": ", "")
             x = x:gsub("\n", "")
             if string.find(m, a) then
@@ -15062,9 +15100,10 @@ local function GetScriptStatus()
     end
     return ScriptStatus
 end
+typeWrite(textLabel, [[Script is <font color="rgb(129,255,115)">Loaded</font>]], 0.05)
 while wait() do
     local Status = GetScriptStatus()
     local S_AutoFarm, S_AutoFSS = Status["Auto Farm"], Status["Auto Fighting Style / Sword"]
-    changeText(textLabel, [[<font color="rgb(129,255,115)">Auto Farm:</font> ]] .. S_AutoFarm .. "\n" .. [[<font color="rgb(129,255,115)">Auto Item:</font> ]] .. S_AutoFSS, 0.05)
-    wait(1)
+    changeText([[<font color="rgb(129,255,115)">Auto Farm:</font> ]] .. S_AutoFarm .. "\n" .. [[<font color="rgb(129,255,115)">Auto Item:</font> ]] .. S_AutoFSS, 0.05)
+    wait(2)
 end
