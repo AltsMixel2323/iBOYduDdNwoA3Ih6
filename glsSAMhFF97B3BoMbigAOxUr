@@ -78,7 +78,7 @@ mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 mainFrame.BackgroundTransparency = 0.250
 mainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 mainFrame.BorderSizePixel = 0
-mainFrame.Position = UDim2.new(0.5, 0, 0, 60)
+mainFrame.Position = UDim2.new(0.5, 0, 0, 0)
 
 textLabel.Name = "textLabel"
 textLabel.Parent = mainFrame
@@ -90,7 +90,7 @@ textLabel.BorderSizePixel = 0
 textLabel.Position = UDim2.new(0.5, 0, 0, 0)
 textLabel.Size = UDim2.new(0, 0, 1, 0)
 textLabel.Font = Enum.Font.SourceSansBold
-textLabel.Text = "Dit Blox Fruits - Make life easier\nAn re-design version of Sea Hub's Cuttay"
+textLabel.Text = " \nDit Blox Fruits - Make life easier\nAn re-design version of Sea Hub's Cuttay"
 textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 textLabel.TextSize = 20.000
 textLabel.TextTransparency = 1
@@ -112,15 +112,15 @@ image.BackgroundTransparency = 1.000
 image.BorderColor3 = Color3.fromRGB(0, 0, 0)
 image.BorderSizePixel = 0
 image.AnchorPoint = Vector2.new(.5,0)
-image.Position = UDim2.new(.5, 0, 0, -22.5)
+image.Position = UDim2.new(.5, 0, 0, -17)
+image.Rotation = 30.000
 image.Size = UDim2.new(0, 30, 0, 30)
 image.Image = "rbxassetid://6248942117"
 image.ImageTransparency = 1.000
 
 mainSizeConstraint.Name = "mainSizeConstraint"
 mainSizeConstraint.Parent = mainFrame
-mainSizeConstraint.MaxSize = Vector2.new(965, 50)
-mainSizeConstraint.MinSize = Vector2.new(0, 50)
+mainSizeConstraint.MaxSize = Vector2.new(965, 9999)
 
 mainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 mainStroke.Color = Color3.fromRGB(255,255,255)
@@ -134,15 +134,13 @@ strokeGradient.Rotation = 45
 strokeGradient.Name = "labelGradient"
 strokeGradient.Parent = mainStroke
 
-delay(2,function()
-	textLabel.Changed:Connect(function(v)
-		mainFrame.Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10, 50)
-		if textLabel.AbsoluteSize.X + 10 >= mainSizeConstraint.MaxSize.X then
-			textLabel.TextScaled = true
-		else
-			textLabel.TextScaled = false
-		end
-	end)
+textLabel:GetPropertyChangedSignal("Text"):Connect(function()
+	game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.175),{Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,60)}):Play()
+	if textLabel.TextBounds.X + 10 >= mainSizeConstraint.MaxSize.X then
+		textLabel.TextScaled = true
+	else
+		textLabel.TextScaled = false
+	end
 end)
 
 function typeWrite(guiObject, text, delayBetweenChars)
@@ -166,9 +164,10 @@ function typeWrite(guiObject, text, delayBetweenChars)
 end
 
 function changeText(text)
-	game:GetService('TweenService'):Create(textLabel, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
+	textLabel.MaxVisibleGraphemes = utf8.len(text),
+	game:GetService('TweenService'):Create(textLabel, TweenInfo.new(0.25), {TextTransparency = 1}):Play()
 	wait(.25)
-	game:GetService('TweenService'):Create(textLabel, TweenInfo.new(0.5), {TextTransparency = 0}):Play()
+	game:GetService('TweenService'):Create(textLabel, TweenInfo.new(0.25), {TextTransparency = 0}):Play()
 	textLabel.Text = text
 end
 
