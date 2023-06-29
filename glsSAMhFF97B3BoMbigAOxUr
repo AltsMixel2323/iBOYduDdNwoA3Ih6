@@ -7413,7 +7413,7 @@ function BringMob(a)
                     FreezeMob(v)
                     local oldhealthmob = v.Humanoid.Health
                     task.wait(3.5)
-                    if v.Humanoid.Health == oldhealthmob then 
+                    if IsMobAlive(v) and v.Humanoid.Health == oldhealthmob then 
                         local Ignored = Instance.new("IntValue", v)
                         Ignored.Name = "Ignored"
                         task.wait(0.3)
