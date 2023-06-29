@@ -435,7 +435,7 @@ end)
 spawn(function()
     while wait(2) do
         if S_ClickM1 and tick() - CM1_LastCall > 4 then
-            getgenv().ClickM1 = false
+            getgenv().S_ClickM1 = false
         end
     end
 end)
