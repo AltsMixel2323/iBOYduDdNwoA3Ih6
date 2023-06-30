@@ -43,7 +43,7 @@ textLabel.BorderSizePixel = 0
 textLabel.Position = UDim2.new(0.5, 0, 0, 0)
 textLabel.Size = UDim2.new(0, 0, 1, 0)
 textLabel.Font = Enum.Font.SourceSansBold
-textLabel.Text = " \nDit Blox Fruits - Make life easier\nAn re-design version of Sea Hub's Cuttay"
+textLabel.Text = ""
 textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 textLabel.TextSize = 20.000
 textLabel.TextTransparency = 1
@@ -89,11 +89,13 @@ strokeGradient.Parent = mainStroke
 
 textLabel:GetPropertyChangedSignal("Text"):Connect(function()
 	game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.175),{Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,60)}):Play()
-	if textLabel.TextBounds.X + 10 >= mainSizeConstraint.MaxSize.X then
+	--[[
+    if textLabel.TextBounds.X + 10 >= mainSizeConstraint.MaxSize.X then
 		textLabel.TextScaled = true
 	else
 		textLabel.TextScaled = false
 	end
+    ]]
 end)
 
 function typeWrite(guiObject, text, delayBetweenChars)
@@ -124,16 +126,15 @@ function changeText(text)
 	textLabel.Text = text
 end
 
-spawn(function()
-    game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.25),{Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,50)}):Play()
-    task.wait(.25)
-    game:GetService('TweenService'):Create(mainStroke,TweenInfo.new(.25),{Transparency = 0 }):Play()
-    game:GetService('TweenService'):Create(image,TweenInfo.new(.25),{ImageTransparency = 0 }):Play()
-    task.wait(.175)
-    game:GetService('TweenService'):Create(textLabel,TweenInfo.new(.25),{TextTransparency = 0 }):Play()
-    task.wait(2)
-    typeWrite(textLabel, 'Loading...', 0.05)
-end)
+game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.25),{Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,50)}):Play()
+wait(.25)
+game:GetService('TweenService'):Create(mainStroke,TweenInfo.new(.25),{Transparency = 0 }):Play()
+game:GetService('TweenService'):Create(image,TweenInfo.new(.25),{ImageTransparency = 0 }):Play()
+wait(.175)
+game:GetService('TweenService'):Create(textLabel,TweenInfo.new(.25),{TextTransparency = 0 }):Play()
+changeText("Dit Blox Fruits - Make life easier\nAn re-design version of Sea Hub's Cuttay")
+wait(2)
+typeWrite(textLabel, 'Loading...', 0.05)
 
 getgenv().plr = game.Players.LocalPlayer
 CurCam = game.workspace.CurrentCamera
@@ -907,7 +908,7 @@ local Library = loadstring([[
 	Gui = Instance.new('ScreenGui')
 	Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	Gui.Name = 'Sea Hub GUI'
-	Gui.Enabled = false
+	Gui.Enabled = true
 	
 	NotiGui = Instance.new('ScreenGui')
 	NotiGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -8423,7 +8424,7 @@ end
 getgenv().DonePrefarmGodhuman = 400
 function PreFarmGodhuman(v)
     if v.Level.Value < DonePrefarmGodhuman then
-        local x = "Prefarming Godhuman while not having enough Beli / Fragment / Requirements to buy v2 Fighting Style"
+        local x = "Prefarming Godhuman while not having enough Beli / Fragment / Requirements to buy v2 Fighting Style or extra time farming Mastery"
         if DonePrefarmGodhuman == 400 then
             x = "Farming till have enough Beli / Fragment / Requirements to buy v2 Fighting Style"
         end
@@ -8458,6 +8459,8 @@ function PreFarmGodhuman(v)
         elseif v.Name == "Dragon Claw" then
             BuyFightingStyle("BuySuperhuman")
             getgenv().DonePrefarmGodhuman = 600
+        elseif DonePrefarmGodhuman ~= 600 then
+            BuyFightingStyle("BuySuperhuman")
         end
     end
 end
@@ -10526,6 +10529,9 @@ function AutoFarmFeatures()
                 repeat wait()
                     if GetItemCount("Bones") < 50 then
                         AutoFarmLabel.SetText(LabelTextAF ..  "Farming Bone for Hallow Essence")
+                        if true then
+                            PreFarmGodhuman(GetCurrentEquippedM1())
+                        end
                         FarmLocation({"Reborn Skeleton", "Living Zombie", "Demonic Soul", "Posessed Mummy"}, CFrame.new(-9500.9443359375, 172.10487365722656, 6167.43359375))
                     end
                 until CommF:InvokeServer("Bones", "Buy", 1, 1) ~= 0
