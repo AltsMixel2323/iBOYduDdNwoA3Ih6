@@ -555,8 +555,8 @@ function R_ClickM1()
     end
 end
 function ClickM1()
-    R_ClickM1()
-    --getgenv().S_ClickM1, getgenv().CM1_LastCall = true, tick()
+    --R_ClickM1()
+    getgenv().S_ClickM1, getgenv().CM1_LastCall = true, tick()
 end
 spawn(function()
     while task.wait() do
