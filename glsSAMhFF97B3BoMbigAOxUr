@@ -487,15 +487,18 @@ loadstring([[
     warpF2(function()
         getgenv().AttackM1 = function()
             if game.Players.LocalPlayer.Character.Stun.Value == 0 then
-                if Settings.AttackAutoScale
-                and (not AttackingMob or IsMobAlive(AttackingMob) and (string.find(AttackingMob.Name, "Boss") or GetMobLevel(AttackingMob.Name) - plrLevel > 300))
-                and tick() - TimerAttack > 6 and not AttackCheck then 
+                if Settings.AttackAutoScale and not AttackCheck
+                and (
+                    (not AttackingMob or IsMobAlive(AttackingMob) and (string.find(AttackingMob.Name, "Boss") or GetMobLevel(AttackingMob.Name) - plrLevel > 300) and tick() - TimerAttack > 4)
+                    or
+                    tick() - TimerAttack > 6
+                ) then 
                     getgenv().AttackCheck = true
-                    getgenv().AntiLagSvKick = false
-                    delay(2, function()
-                        getgenv().AttackCheck = false
-                        getgenv().AntiLagSvKick = true
+                    getgenv().AntiLagSvKick = true
+                    delay(4, function()
                         getgenv().TimerAttack = tick()
+                        getgenv().AttackCheck = false
+                        getgenv().AntiLagSvKick = false
                     end)
                 end
                 local p13 = ret.activeController
@@ -548,7 +551,8 @@ function R_ClickM1()
     end
 end
 function ClickM1()
-    getgenv().S_ClickM1, getgenv().CM1_LastCall = true, tick()
+    R_ClickM1()
+    --getgenv().S_ClickM1, getgenv().CM1_LastCall = true, tick()
 end
 spawn(function()
     while task.wait() do
@@ -5787,7 +5791,8 @@ function GetDroppedFruit()
             local FruitName = FruitNameToFF(v.Name)
             local x = v:FindFirstChild("TouchInterest", true)
             if x
-            and not table.find(StoredFruits, FruitName) then
+            and not table.find(StoredFruits, FruitName)
+            and x.Parent.Position.Y < 5000 then
                 local Mag = plr:DistanceFromCharacter(x.Parent.Position)
                 if Mag < Dist then
                     Dist = Mag
@@ -7288,10 +7293,10 @@ game.workspace.Enemies.DescendantAdded:Connect(function(v)
         getgenv().Doding = true
         getgenv().ReadyToDodge = true
         local Timer = tick()
-        repeat wait()
+        repeat task.wait(.1)
         until not v or not v.Parent or tick() - Timer > 14
         if Settings.HardDodge and tick() - Timer < 2 then
-            wait(.5)
+            task.wait(.5)
         end
         getgenv().Doding = false
         getgenv().ReadyToDodge = false
@@ -8512,6 +8517,17 @@ end
 function FarmLocation(Mobs, WaitPos, DisableHop)
     if DisableHop then
         HopIfNearFarmArea(WaitPos.Position)
+    end
+    if table.find(Mobs, "Posessed Mummy") and plrLevel >= 2050 then
+        if not plr.PlayerGui.Main.Quest.Visible or not string.find(plr.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text, "Posessed Mummy") then
+            local QPos = CFrame.new(-9514.73047, 172.230148, 6078.2959, 0.0317757577, -5.07692199e-08, 0.999495029, -1.06195586e-07, 1, 5.41710179e-08, -0.999495029, -1.07863279e-07, 0.0317757577)
+            Tween(QPos)
+            wait(.5)
+            if plr:DistanceFromCharacter(QPos.Position) < 5 then
+                CommF:InvokeServer("StartQuest", "HauntedQuest2", 2)
+                wait(.25)
+            end 
+        end
     end
     local v = GetMob(Mobs)
     if v then
@@ -13794,1038 +13810,1025 @@ if game.PlaceId ~= 2753915549 then
         end
     end)
 end
-local CT_Access
-if not Key then CT_Access = true end
-pcall(function()
-    CT_Access = DecryptJSONReps.IsPrivateServer 
-end)
---if CT_Access == true then
-if true then
-    Page9 = Title.CreatePage({Page_Name = 'Seller', Page_Title = 'Seller Tab 💸'})
-    Section91 = Page9.CreateSection('Cuttay Account Farm')
-    spawn(function()
-        while wait() do
-            if Settings.Cuttay and plr.Data.Points.Value ~= 0 then
-                if plr.Data.Stats.Melee.Level.Value < MaxLevel then
-                    CommF:InvokeServer("AddPoint", "Melee", plr.Data.Points.Value)
-                elseif plr.Data.Stats.Defense.Level.Value < MaxLevel then
-                    CommF:InvokeServer("AddPoint", "Defense", plr.Data.Points.Value)
-                else
-                    if Settings.CT_FarmBFMastery then
-                        if plr.Data.Stats.Sword.Level.Value > plr.Data.Stats["Demon Fruit"].Level.Value then
-                            CommF:InvokeServer("AddPoint", "Demon Fruit", 1)
-                        else
-                            CommF:InvokeServer("AddPoint", "Sword", 1)
-                        end
-                    else
-                        CommF:InvokeServer("AddPoint", "Sword", plr.Data.Points.Value)
-                    end
-                end           
+Page9 = Title.CreatePage({Page_Name = 'Seller', Page_Title = 'Seller Tab 💸'})
+Section91 = Page9.CreateSection('Cuttay Account Farm')
+spawn(function()
+    while wait() do
+        if Settings.Cuttay and plr.Data.Points.Value ~= 0 then
+            if plr.Data.Stats.Melee.Level.Value < MaxLevel then
+                CommF:InvokeServer("AddPoint", "Melee", plr.Data.Points.Value)
+            elseif plr.Data.Stats.Defense.Level.Value < MaxLevel then
+                CommF:InvokeServer("AddPoint", "Defense", plr.Data.Points.Value)
             else
-                wait(1)
+                if Settings.CT_FarmBFMastery then
+                    if plr.Data.Stats.Sword.Level.Value > plr.Data.Stats["Demon Fruit"].Level.Value then
+                        CommF:InvokeServer("AddPoint", "Demon Fruit", 1)
+                    else
+                        CommF:InvokeServer("AddPoint", "Sword", 1)
+                    end
+                else
+                    CommF:InvokeServer("AddPoint", "Sword", plr.Data.Points.Value)
+                end
+            end           
+        else
+            wait(1)
+        end
+    end
+end)
+function CheckFruitAwakeable()
+    local BF = GetM1WP("Blox Fruit")
+    if BF and (BF ~= "Dough-Dough" or CommF:InvokeServer("CakeScientist", "Check")) and BF ~= "Bird-Bird: Phoenix" then
+        BF = CheckPlrBackpack(BF)
+        if BF:FindFirstChild("AwakenedMoves") then
+            if BF.AwakenedMoves:FindFirstChild("V") then
+                if Settings.AutoAwake and AutoAwakeToggle then AutoAwakeToggle.SetStage(false) end
+                return
+            end
+            return true
+        end
+    end
+end
+function CheckFruitFullAwake()
+    local BF = GetM1WP("Blox Fruit")
+    if BF then
+        BF = CheckPlrBackpack(BF)
+        if BF:FindFirstChild("AwakenedMoves") and BF.AwakenedMoves:FindFirstChild("V") then
+            return true
+        end
+    end
+end
+function Cuttay()
+    local CusDelay = 1
+    if Hopping or QueueHopping then return end
+    if not Settings.AutoFixStandingStill and AutoFixStandingStillToggle then AutoFixStandingStillToggle.SetStage(true) end
+    if not Settings.AutoKickPing and AutoKickPingToggle then AutoKickPingToggle.SetStage(true) end
+    if not Settings.AutoKickPing_Ping or Settings.AutoKickPing_Ping ~= 5000 then Settings.AutoKickPing_Ping = 5000 end
+    if not Settings.AntiFP and AntiFPToggle then AntiFPToggle.SetStage(true) end
+    if Settings.AutoNextSea and AutoNextSeaToggle and CommF:InvokeServer("ZQuestProgress", "Check") == 1 then
+        AutoNextSeaToggle.SetStage(false)
+    else
+        if plrLevel >= 700 and not Settings.AutoNextSea
+        and game.PlaceId == 2753915549
+        and not CommF:InvokeServer("ZQuestProgress", "Check")
+        and AutoNextSeaToggle then
+            AutoNextSeaToggle.SetStage(true)
+        end
+        if plrLevel >= 1500 and not Settings.AutoNextSea
+        and CommF:InvokeServer("ZQuestProgress", "Check") ~= 1
+        and AutoNextSeaToggle then
+            AutoNextSeaToggle.SetStage(true)
+        end
+    end
+    if CuttayAccountFarm and CuttayAccountFarm["Blox Fruit Sniper"] and #CuttayAccountFarm["Blox Fruit Sniper"] ~= 0
+    and not table.find(SelectedSnipeBloxFruit, tostring(plr.Data.DevilFruit.Value)) 
+    and not Settings.BFDealerSniper and BFDealerSniperToggle then
+        BFDealerSniperToggle.SetStage(true)
+    end
+    if not Settings.AutoSave and AutoSaveToggle then AutoSaveToggle.SetStage(true) end
+    if not Settings.BoostFPS and BoostFPSToggle then BoostFPSToggle.SetStage(true) end
+    if not Settings.NoFog and NoFogToggle then NoFogToggle.SetStage(true) end
+    if not Settings.RemoveScreenShake and RemoveScreenShakeToggle then RemoveScreenShakeToggle.SetStage(true) end
+    if not Settings.IgnoreYTween and IgnoreYTweenToggle then IgnoreYTweenToggle.SetStage(true) end
+    if not Settings.AutoEnhancement and AutoEnhancementToggle then AutoEnhancementToggle.SetStage(true) end
+    if not Settings.AutoObservation and AutoObservationToggle then AutoObservationToggle.SetStage(true) end
+    if not TemporaryDisableAttackNoCD and not Settings.AttackNoCD and AttackNoCDToggle then AttackNoCDToggle.SetStage(true) end
+    if not Settings.AttackAutoScale and AttackAutoScaleToggle then AttackAutoScaleToggle.SetStage(true) end
+    if Settings.Distance ~= 40 then Settings.Distance = 40 end
+    if Settings.DefaultYLevel ~= 400 then Settings.DefaultYLevel = 400 end
+    if Settings.TweenSpeed ~= 300 then Settings.TweenSpeed = 300 end
+    if not Settings.TweenBF and TweenBFToggle then TweenBFToggle.SetStage(true) end
+    if not Settings.TweenNBF and TweenNBFToggle then TweenNBFToggle.SetStage(true) end
+    if game.PlaceId ~= 2753915549 and not Settings.AutoWorldEvent and AutoWorldEventToggle then AutoWorldEventToggle.SetStage(true) end
+    if not Settings.AutoStoreBF and AutoStoreBFToggle then AutoStoreBFToggle.SetStage(true) end
+    if plr.Data.Beli.Value >= 160000 and not Settings.AutoBFDC and AutoBFDCToggle then AutoBFDCToggle.SetStage(true) end
+    if game.PlaceId == 4442272183 and not Settings.AutoLSD and AutoLSDToggle
+    and (not IsHaveItem("Saddi") or not IsHaveItem("Shisui") or not IsHaveItem("Wando")) then
+        AutoLSDToggle.SetStage(true)
+    end
+    if not Settings.AFSTPSea3 and AFSTPSea3Toggle then AFSTPSea3Toggle.SetStage(true) end
+    if Settings.BTDFHopServer and BTDFHopServerToggle then BTDFHopServerToggle.SetStage(false) end
+    if not table.find(SelectedIgnoreHop, "[Main] Server Hop") then
+        if not Settings.AFSHopServer and AFSHopServerToggle then AFSHopServerToggle.SetStage(true) end
+        if not Settings.AutoRejoin and AutoRejoinToggle then AutoRejoinToggle.SetStage(true) end
+    else
+        if Settings.AFSHopServer and AFSHopServerToggle then AFSHopServerToggle.SetStage(false) end
+        if Settings.AutoRejoin and AutoRejoinToggle then AutoRejoinToggle.SetStage(false) end
+    end
+    if not table.find(SelectedIgnoreHop, "[Farm] Server Hop if Player nearby") then
+        if not Settings.MFHopServer and MFHopServerToggle then MFHopServerToggle.SetStage(true) end
+    elseif Settings.MFHopServer and MFHopServerToggle then
+        MFHopServerToggle.SetStage(false)
+    end
+    if Settings.CT_RaidIfMaxed then
+        if GetDropBF(plr.Character) or GetDropBF(plr.Backpack) then
+            Settings.RaidMap = GetRaidMapBF(GetM1WP("Blox Fruit"))
+            if not Settings.AutoRaid and AutoRaidToggle then AutoRaidToggle.SetStage(true) end
+            return
+        elseif AFSWeapon and (table.find(SelectedIgnoreAction, "Awake Current Blox Fruit") or CheckFruitFullAwake()) then
+            if Settings.AutoRaid and AutoRaidToggle then AutoRaidToggle.SetStage(false) end
+        end
+    end
+    if (table.find(SelectedIgnoreAction, "Awake Current Blox Fruit") or CheckFruitFullAwake()) and Settings.AutoAwake and AutoAwakeToggle then
+        AutoAwakeToggle.SetStage(false)
+    end
+    if table.find(SelectedIgnoreAction, "Get Godhuman") and Settings.AutoGodhuman and AutoGodhumanToggle then
+        AutoGodhumanToggle.SetStage(false)
+    end
+    if table.find(SelectedIgnoreAction, "Get Rengoku") and Settings.AutoRengoku and AutoRengokuToggle then
+        AutoRengokuToggle.SetStage(false)
+    end
+    if table.find(SelectedIgnoreAction, "Get True Triple Katana") then
+        if Settings.AutoTripleKatana and AutoTripleKatanaToggle then AutoTripleKatanaToggle.SetStage(false) end
+        if Settings.AMHopServer and AMHopServerToggle then AMHopServerToggle.SetStage(false) end
+    end
+    if (table.find(SelectedIgnoreAction, "Get Hallow Scythe") or IsHaveItem("Hallow Scythe")) and Settings.SoulReaperFarm and SoulReaperFarmToggle then
+        SoulReaperFarmToggle.SetStage(false)
+    end
+    if table.find(SelectedIgnoreAction, "Get Cursed Dual Katana") then
+        if Settings.AutoDualKatana and AutoDualKatanaToggle then AutoDualKatanaToggle.SetStage(false) end
+        if Settings.EPFHopServer and EPFHopServerToggle then EPFHopServerToggle.SetStage(false) end
+    end
+    if table.find(SelectedIgnoreAction, "Get Soul Guitar") and Settings.AutoSoulGuitar and AutoSoulGuitarToggle then
+        AutoSoulGuitarToggle.SetStage(false)
+    end
+    if game.PlaceId == 7449423635 then
+        if not IsHaveItem("Tushita") and not Settings.AutoTushita and AutoTushitaToggle then AutoTushitaToggle.SetStage(true) end
+        if not IsHaveItem("Yama") then
+            if not Settings.ElitePirateFarm and ElitePirateFarmToggle then ElitePirateFarmToggle.SetStage(true) end
+            if not Settings.AutoYama and AutoYamaToggle then AutoYamaToggle.SetStage(true) end
+        end
+        if not IsHaveItem("Hallow Scythe")
+        and not table.find(SelectedIgnoreAction, "Get Hallow Scythe") then
+            if not Settings.SoulReaperFarm and SoulReaperFarmToggle then SoulReaperFarmToggle.SetStage(true) end
+        end
+    end
+    if CommF:InvokeServer("BuyGodhuman", true) ~= 1
+    and not table.find(SelectedIgnoreAction, "Get Godhuman")
+    or CommF:InvokeServer("BuyDragonTalon", true) ~= 1 then
+        if not Settings.AutoSuperhuman and CommF:InvokeServer("BuySuperhuman", true) ~= 1 and AutoSuperhumanToggle then
+            AutoSuperhumanToggle.SetStage(true)
+        end
+        if CommF:InvokeServer("BuySuperhuman", true) == 1 then
+            if table.find(SelectedBuyHaki, "Buy Enhancement")
+            and plr.Data.Beli.Value >= 25000
+            and not game:GetService("CollectionService"):HasTag(game.Players.LocalPlayer.Character, "Buso") then
+                CommF:InvokeServer("BuyHaki", "Buso")
+            end
+            if table.find(SelectedBuyHaki, "Buy Skyjump")
+            and plr.Data.Beli.Value >= 10000
+            and not game:GetService("CollectionService"):HasTag(game.Players.LocalPlayer.Character, "Geppo") then
+                CommF:InvokeServer("BuyHaki", "Geppo")
+            end
+            if table.find(SelectedBuyHaki, "Buy Flash Step")
+            and plr.Data.Beli.Value >= 100000
+            and not game:GetService("CollectionService"):HasTag(game.Players.LocalPlayer.Character, "Soru") then
+                CommF:InvokeServer("BuyHaki", "Soru")
             end
         end
-    end)
-    function CheckFruitAwakeable()
-        local BF = GetM1WP("Blox Fruit")
-        if BF and (BF ~= "Dough-Dough" or CommF:InvokeServer("CakeScientist", "Check")) and BF ~= "Bird-Bird: Phoenix" then
-            BF = CheckPlrBackpack(BF)
-            if BF:FindFirstChild("AwakenedMoves") then
-                if BF.AwakenedMoves:FindFirstChild("V") then
-                    if Settings.AutoAwake and AutoAwakeToggle then AutoAwakeToggle.SetStage(false) end
+        if not Settings.AutoDeathStep and CommF:InvokeServer("BuyDeathStep", true) ~= 1 and AutoDeathStepToggle then
+            AutoDeathStepToggle.SetStage(true)
+        end
+        if not Settings.AutoSharkmanKarate and CommF:InvokeServer("BuySharkmanKarate", true) ~= 1 and AutoSharkmanKarateToggle then
+            AutoSharkmanKarateToggle.SetStage(true)
+        end
+        if not Settings.AutoElectricClaw and CommF:InvokeServer("BuyElectricClaw", true) ~= 1 and AutoElectricClawToggle then
+            AutoElectricClawToggle.SetStage(true)
+        end
+        if not Settings.AutoDragonTalon and CommF:InvokeServer("BuyDragonTalon", true) ~= 1 and AutoDragonTalonToggle then
+            AutoDragonTalonToggle.SetStage(true)
+        end
+        if not table.find(SelectedIgnoreAction, "Get Godhuman")
+        and not Settings.AutoGodhuman and CommF:InvokeServer("BuyGodhuman", true) ~= 1 and AutoGodhumanToggle then
+            AutoGodhumanToggle.SetStage(true)
+        end
+    else
+        if not IsHaveItem("Saber") then
+            if not Settings.AutoSaber and AutoSaberToggle then AutoSaberToggle.SetStage(true) end
+            return
+        elseif table.find(SelectedBuyHaki, "Buy Observation")
+        and plr.Data.Beli.Value >= 750000
+        and not game:GetService("CollectionService"):HasTag(game.Players.LocalPlayer.Character, "Ken") then
+            CommF:InvokeServer("KenTalk", "Buy")
+            return
+        end
+        if not table.find(SelectedIgnoreAction, "Get Rengoku")
+        and not IsHaveItem("Rengoku") then
+            if not Settings.AutoRengoku and AutoRengokuToggle then AutoRengokuToggle.SetStage(true) end
+            return
+        end
+        if not table.find(SelectedIgnoreAction, "Get True Triple Katana")
+        and not IsHaveItem("True Triple Katana") then
+            if IsHaveItem("Saddi")
+            and IsHaveItem("Shisui")
+            and IsHaveItem("Wando") then
+                if Settings.AMHopServer and AMHopServerToggle then AMHopServerToggle.SetStage(false) end
+                if game.PlaceId ~= 7449423635 then
+                    CommF:InvokeServer("TravelZou")
+                    wait(5)
                     return
                 end
-                return true
-            end
-        end
-    end
-    function CheckFruitFullAwake()
-        local BF = GetM1WP("Blox Fruit")
-        if BF then
-            BF = CheckPlrBackpack(BF)
-            if BF:FindFirstChild("AwakenedMoves") and BF.AwakenedMoves:FindFirstChild("V") then
-                return true
-            end
-        end
-    end
-    function Cuttay()
-        local CusDelay = 1
-        if Hopping or QueueHopping then return end
-        if not Settings.AutoFixStandingStill and AutoFixStandingStillToggle then AutoFixStandingStillToggle.SetStage(true) end
-        if not Settings.AutoKickPing and AutoKickPingToggle then AutoKickPingToggle.SetStage(true) end
-        if not Settings.AutoKickPing_Ping or Settings.AutoKickPing_Ping ~= 5000 then Settings.AutoKickPing_Ping = 5000 end
-        if not Settings.AntiFP and AntiFPToggle then AntiFPToggle.SetStage(true) end
-        if Settings.AutoNextSea and AutoNextSeaToggle and CommF:InvokeServer("ZQuestProgress", "Check") == 1 then
-            AutoNextSeaToggle.SetStage(false)
-        else
-            if plrLevel >= 700 and not Settings.AutoNextSea
-            and game.PlaceId == 2753915549
-            and not CommF:InvokeServer("ZQuestProgress", "Check")
-            and AutoNextSeaToggle then
-                AutoNextSeaToggle.SetStage(true)
-            end
-            if plrLevel >= 1500 and not Settings.AutoNextSea
-            and CommF:InvokeServer("ZQuestProgress", "Check") ~= 1
-            and AutoNextSeaToggle then
-                AutoNextSeaToggle.SetStage(true)
-            end
-        end
-        if CuttayAccountFarm and CuttayAccountFarm["Blox Fruit Sniper"] and #CuttayAccountFarm["Blox Fruit Sniper"] ~= 0
-        and not table.find(SelectedSnipeBloxFruit, tostring(plr.Data.DevilFruit.Value)) 
-        and not Settings.BFDealerSniper and BFDealerSniperToggle then
-            BFDealerSniperToggle.SetStage(true)
-        end
-        if not Settings.AutoSave and AutoSaveToggle then AutoSaveToggle.SetStage(true) end
-        if not Settings.BoostFPS and BoostFPSToggle then BoostFPSToggle.SetStage(true) end
-        if not Settings.NoFog and NoFogToggle then NoFogToggle.SetStage(true) end
-        if not Settings.RemoveScreenShake and RemoveScreenShakeToggle then RemoveScreenShakeToggle.SetStage(true) end
-        if not Settings.IgnoreYTween and IgnoreYTweenToggle then IgnoreYTweenToggle.SetStage(true) end
-        if not Settings.AutoEnhancement and AutoEnhancementToggle then AutoEnhancementToggle.SetStage(true) end
-        if not Settings.AutoObservation and AutoObservationToggle then AutoObservationToggle.SetStage(true) end
-        if not TemporaryDisableAttackNoCD and not Settings.AttackNoCD and AttackNoCDToggle then AttackNoCDToggle.SetStage(true) end
-        if not Settings.AttackAutoScale and AttackAutoScaleToggle then AttackAutoScaleToggle.SetStage(true) end
-        if Settings.Distance ~= 40 then Settings.Distance = 40 end
-        if Settings.DefaultYLevel ~= 400 then Settings.DefaultYLevel = 400 end
-        if Settings.TweenSpeed ~= 300 then Settings.TweenSpeed = 300 end
-        if not Settings.TweenBF and TweenBFToggle then TweenBFToggle.SetStage(true) end
-        if not Settings.TweenNBF and TweenNBFToggle then TweenNBFToggle.SetStage(true) end
-        if game.PlaceId ~= 2753915549 and not Settings.AutoWorldEvent and AutoWorldEventToggle then AutoWorldEventToggle.SetStage(true) end
-        if not Settings.AutoStoreBF and AutoStoreBFToggle then AutoStoreBFToggle.SetStage(true) end
-        if plr.Data.Beli.Value >= 160000 and not Settings.AutoBFDC and AutoBFDCToggle then AutoBFDCToggle.SetStage(true) end
-        if game.PlaceId == 4442272183 and not Settings.AutoLSD and AutoLSDToggle
-        and (not IsHaveItem("Saddi") or not IsHaveItem("Shisui") or not IsHaveItem("Wando")) then
-            AutoLSDToggle.SetStage(true)
-        end
-        if not Settings.AFSTPSea3 and AFSTPSea3Toggle then AFSTPSea3Toggle.SetStage(true) end
-        if Settings.BTDFHopServer and BTDFHopServerToggle then BTDFHopServerToggle.SetStage(false) end
-        if not table.find(SelectedIgnoreHop, "[Main] Server Hop") then
-            if not Settings.AFSHopServer and AFSHopServerToggle then AFSHopServerToggle.SetStage(true) end
-            if not Settings.AutoRejoin and AutoRejoinToggle then AutoRejoinToggle.SetStage(true) end
-        else
-            if Settings.AFSHopServer and AFSHopServerToggle then AFSHopServerToggle.SetStage(false) end
-            if Settings.AutoRejoin and AutoRejoinToggle then AutoRejoinToggle.SetStage(false) end
-        end
-        if not table.find(SelectedIgnoreHop, "[Farm] Server Hop if Player nearby") then
-            if not Settings.MFHopServer and MFHopServerToggle then MFHopServerToggle.SetStage(true) end
-        elseif Settings.MFHopServer and MFHopServerToggle then
-            MFHopServerToggle.SetStage(false)
-        end
-        if Settings.CT_RaidIfMaxed then
-            if GetDropBF(plr.Character) or GetDropBF(plr.Backpack) then
-                Settings.RaidMap = GetRaidMapBF(GetM1WP("Blox Fruit"))
-                if not Settings.AutoRaid and AutoRaidToggle then AutoRaidToggle.SetStage(true) end
-                return
-            elseif AFSWeapon and (table.find(SelectedIgnoreAction, "Awake Current Blox Fruit") or CheckFruitFullAwake()) then
-                if Settings.AutoRaid and AutoRaidToggle then AutoRaidToggle.SetStage(false) end
-            end
-        end
-        if (table.find(SelectedIgnoreAction, "Awake Current Blox Fruit") or CheckFruitFullAwake()) and Settings.AutoAwake and AutoAwakeToggle then
-            AutoAwakeToggle.SetStage(false)
-        end
-        if table.find(SelectedIgnoreAction, "Get Godhuman") and Settings.AutoGodhuman and AutoGodhumanToggle then
-            AutoGodhumanToggle.SetStage(false)
-        end
-        if table.find(SelectedIgnoreAction, "Get Rengoku") and Settings.AutoRengoku and AutoRengokuToggle then
-            AutoRengokuToggle.SetStage(false)
-        end
-        if table.find(SelectedIgnoreAction, "Get True Triple Katana") then
-            if Settings.AutoTripleKatana and AutoTripleKatanaToggle then AutoTripleKatanaToggle.SetStage(false) end
-            if Settings.AMHopServer and AMHopServerToggle then AMHopServerToggle.SetStage(false) end
-        end
-        if (table.find(SelectedIgnoreAction, "Get Hallow Scythe") or IsHaveItem("Hallow Scythe")) and Settings.SoulReaperFarm and SoulReaperFarmToggle then
-            SoulReaperFarmToggle.SetStage(false)
-        end
-        if table.find(SelectedIgnoreAction, "Get Cursed Dual Katana") then
-            if Settings.AutoDualKatana and AutoDualKatanaToggle then AutoDualKatanaToggle.SetStage(false) end
-            if Settings.EPFHopServer and EPFHopServerToggle then EPFHopServerToggle.SetStage(false) end
-        end
-        if table.find(SelectedIgnoreAction, "Get Soul Guitar") and Settings.AutoSoulGuitar and AutoSoulGuitarToggle then
-            AutoSoulGuitarToggle.SetStage(false)
-        end
-        if game.PlaceId == 7449423635 then
-            if not IsHaveItem("Tushita") and not Settings.AutoTushita and AutoTushitaToggle then AutoTushitaToggle.SetStage(true) end
-            if not IsHaveItem("Yama") then
-                if not Settings.ElitePirateFarm and ElitePirateFarmToggle then ElitePirateFarmToggle.SetStage(true) end
-                if not Settings.AutoYama and AutoYamaToggle then AutoYamaToggle.SetStage(true) end
-            end
-            if not IsHaveItem("Hallow Scythe")
-            and not table.find(SelectedIgnoreAction, "Get Hallow Scythe") then
-                if not Settings.SoulReaperFarm and SoulReaperFarmToggle then SoulReaperFarmToggle.SetStage(true) end
-            end
-        end
-        if CommF:InvokeServer("BuyGodhuman", true) ~= 1
-        and not table.find(SelectedIgnoreAction, "Get Godhuman")
-        or CommF:InvokeServer("BuyDragonTalon", true) ~= 1 then
-            if not Settings.AutoSuperhuman and CommF:InvokeServer("BuySuperhuman", true) ~= 1 and AutoSuperhumanToggle then
-                AutoSuperhumanToggle.SetStage(true)
-            end
-            if CommF:InvokeServer("BuySuperhuman", true) == 1 then
-                if table.find(SelectedBuyHaki, "Buy Enhancement")
-                and plr.Data.Beli.Value >= 25000
-                and not game:GetService("CollectionService"):HasTag(game.Players.LocalPlayer.Character, "Buso") then
-                    CommF:InvokeServer("BuyHaki", "Buso")
-                end
-                if table.find(SelectedBuyHaki, "Buy Skyjump")
-                and plr.Data.Beli.Value >= 10000
-                and not game:GetService("CollectionService"):HasTag(game.Players.LocalPlayer.Character, "Geppo") then
-                    CommF:InvokeServer("BuyHaki", "Geppo")
-                end
-                if table.find(SelectedBuyHaki, "Buy Flash Step")
-                and plr.Data.Beli.Value >= 100000
-                and not game:GetService("CollectionService"):HasTag(game.Players.LocalPlayer.Character, "Soru") then
-                    CommF:InvokeServer("BuyHaki", "Soru")
-                end
-            end
-            if not Settings.AutoDeathStep and CommF:InvokeServer("BuyDeathStep", true) ~= 1 and AutoDeathStepToggle then
-                AutoDeathStepToggle.SetStage(true)
-            end
-            if not Settings.AutoSharkmanKarate and CommF:InvokeServer("BuySharkmanKarate", true) ~= 1 and AutoSharkmanKarateToggle then
-                AutoSharkmanKarateToggle.SetStage(true)
-            end
-            if not Settings.AutoElectricClaw and CommF:InvokeServer("BuyElectricClaw", true) ~= 1 and AutoElectricClawToggle then
-                AutoElectricClawToggle.SetStage(true)
-            end
-            if not Settings.AutoDragonTalon and CommF:InvokeServer("BuyDragonTalon", true) ~= 1 and AutoDragonTalonToggle then
-                AutoDragonTalonToggle.SetStage(true)
-            end
-            if not table.find(SelectedIgnoreAction, "Get Godhuman")
-            and not Settings.AutoGodhuman and CommF:InvokeServer("BuyGodhuman", true) ~= 1 and AutoGodhumanToggle then
-                AutoGodhumanToggle.SetStage(true)
-            end
-        else
-            if not IsHaveItem("Saber") then
-                if not Settings.AutoSaber and AutoSaberToggle then AutoSaberToggle.SetStage(true) end
-                return
-            elseif table.find(SelectedBuyHaki, "Buy Observation")
-            and plr.Data.Beli.Value >= 750000
-            and not game:GetService("CollectionService"):HasTag(game.Players.LocalPlayer.Character, "Ken") then
-                CommF:InvokeServer("KenTalk", "Buy")
-                return
-            end
-            if not table.find(SelectedIgnoreAction, "Get Rengoku")
-            and not IsHaveItem("Rengoku") then
-                if not Settings.AutoRengoku and AutoRengokuToggle then AutoRengokuToggle.SetStage(true) end
-                return
-            end
-            if not table.find(SelectedIgnoreAction, "Get True Triple Katana")
-            and not IsHaveItem("True Triple Katana") then
-                if IsHaveItem("Saddi")
-                and IsHaveItem("Shisui")
-                and IsHaveItem("Wando") then
-                    if Settings.AMHopServer and AMHopServerToggle then AMHopServerToggle.SetStage(false) end
-                    if game.PlaceId ~= 7449423635 then
-                        CommF:InvokeServer("TravelZou")
-                        wait(5)
-                        return
-                    end
-                    if plr.Data.Beli.Value >= 2000000 then
-                        getgenv().AFSWeapon = nil
-                        if not Settings.AutoTripleKatana and AutoTripleKatanaToggle then AutoTripleKatanaToggle.SetStage(true) end
-                    else
-                        AutoFSSLabel.SetText(LabelTextAFS .. "No having enough Beli to buy: True Triple Katana")
-                        CT_DisableAutoRaid()
-                        CT_EnableFarm()
-                    end
-                elseif plr.Data.Beli.Value >= 2000000 then
-                    if game.PlaceId ~= 4442272183 then
-                        CommF:InvokeServer("TravelDressrosa")
-                        wait(5)
-                        return
-                    else
-                        if not table.find(SelectedIgnoreHop, "[Main] Server Hop") then
-                            if not NotiHopSv then
-                                getgenv().NotiHopSv = true
-                                Library.CreateNoti({Desc = 'Will Hop Server for 3 Legendary Swords\n(Auto True Triple Katana)', ShowTime = 20})
-                            end
-                            CT_DisableFarm()
-                            if not Settings.AMHopServer and AMHopServerToggle then AMHopServerToggle.SetStage(true) end
-                        else
-                            AutoFSSLabel.SetText(LabelTextAFS .. "Waiting for Legendary Sword Merchant Spawn (Auto True Triple Katana)")
-                            if Settings.AMHopServer and AMHopServerToggle then AMHopServerToggle.SetStage(false) end
-                            CT_DisableAutoRaid()
-                            CT_EnableFarm()
-                        end
-                    end
+                if plr.Data.Beli.Value >= 2000000 then
+                    getgenv().AFSWeapon = nil
+                    if not Settings.AutoTripleKatana and AutoTripleKatanaToggle then AutoTripleKatanaToggle.SetStage(true) end
                 else
-                    if not NotiHopSv then
-                        getgenv().NotiHopSv = true
-                        Library.CreateNoti({Desc = 'Not enough Beli to buy Legendary Swords\n(Auto True Triple Katana)', ShowTime = 20})
-                    end
-                    if Settings.AMHopServer and AMHopServerToggle then AMHopServerToggle.SetStage(false) end
-                    if game.PlaceId ~= 7449423635 then
-                        if Settings.AMHopServer and AMHopServerToggle then AMHopServerToggle.SetStage(false) end
-                        CommF:InvokeServer("TravelZou")
-                        wait(5)
-                        return
+                    AutoFSSLabel.SetText(LabelTextAFS .. "No having enough Beli to buy: True Triple Katana")
+                    CT_DisableAutoRaid()
+                    CT_EnableFarm()
+                end
+            elseif plr.Data.Beli.Value >= 2000000 then
+                if game.PlaceId ~= 4442272183 then
+                    CommF:InvokeServer("TravelDressrosa")
+                    wait(5)
+                    return
+                else
+                    if not table.find(SelectedIgnoreHop, "[Main] Server Hop") then
+                        if not NotiHopSv then
+                            getgenv().NotiHopSv = true
+                            Library.CreateNoti({Desc = 'Will Hop Server for 3 Legendary Swords\n(Auto True Triple Katana)', ShowTime = 20})
+                        end
+                        CT_DisableFarm()
+                        if not Settings.AMHopServer and AMHopServerToggle then AMHopServerToggle.SetStage(true) end
                     else
+                        AutoFSSLabel.SetText(LabelTextAFS .. "Waiting for Legendary Sword Merchant Spawn (Auto True Triple Katana)")
+                        if Settings.AMHopServer and AMHopServerToggle then AMHopServerToggle.SetStage(false) end
                         CT_DisableAutoRaid()
                         CT_EnableFarm()
                     end
                 end
-                return
-            end
-            if not table.find(SelectedIgnoreAction, "Get Cursed Dual Katana")
-            and not IsHaveItem("Cursed Dual Katana") then
+            else
+                if not NotiHopSv then
+                    getgenv().NotiHopSv = true
+                    Library.CreateNoti({Desc = 'Not enough Beli to buy Legendary Swords\n(Auto True Triple Katana)', ShowTime = 20})
+                end
+                if Settings.AMHopServer and AMHopServerToggle then AMHopServerToggle.SetStage(false) end
                 if game.PlaceId ~= 7449423635 then
                     if Settings.AMHopServer and AMHopServerToggle then AMHopServerToggle.SetStage(false) end
                     CommF:InvokeServer("TravelZou")
                     wait(5)
                     return
                 else
-                    if not IsHaveItem("Yama") then
-                        if not table.find(SelectedIgnoreHop, "[Main] Server Hop") then
-                            if not Settings.EPFHopServer and EPFHopServerToggle then EPFHopServerToggle.SetStage(true) end
-                        else
-                            if Settings.EPFHopServer and EPFHopServerToggle then EPFHopServerToggle.SetStage(false) end
-                            CT_EnableFarm()
-                        end
+                    CT_DisableAutoRaid()
+                    CT_EnableFarm()
+                end
+            end
+            return
+        end
+        if not table.find(SelectedIgnoreAction, "Get Cursed Dual Katana")
+        and not IsHaveItem("Cursed Dual Katana") then
+            if game.PlaceId ~= 7449423635 then
+                if Settings.AMHopServer and AMHopServerToggle then AMHopServerToggle.SetStage(false) end
+                CommF:InvokeServer("TravelZou")
+                wait(5)
+                return
+            else
+                if not IsHaveItem("Yama") then
+                    if not table.find(SelectedIgnoreHop, "[Main] Server Hop") then
+                        if not Settings.EPFHopServer and EPFHopServerToggle then EPFHopServerToggle.SetStage(true) end
                     else
                         if Settings.EPFHopServer and EPFHopServerToggle then EPFHopServerToggle.SetStage(false) end
-                        if plrLevel >= 2200 and IsHaveItem("Tushita") then
-                            if not Settings.AutoDualKatana and AutoDualKatanaToggle then AutoDualKatanaToggle.SetStage(true) end
-                            if not NotiHopSv and Settings.AFSHopServer then
-                                getgenv().NotiHopSv = true
-                                Library.CreateNoti({Desc = 'Will Hop Server for Raid Pirate / Soul Reaper\n(Auto Cursed Dual Katana)', ShowTime = 20})
-                            end
-                        else
-                            CT_EnableFarm()
-                        end
+                        CT_EnableFarm()
                     end
-                end
-                return
-            end
-            if not table.find(SelectedIgnoreAction, "Get Soul Guitar")
-            and not IsHaveItem("Soul Guitar") then
-                if not Settings.AutoSoulGuitar and AutoSoulGuitarToggle then AutoSoulGuitarToggle.SetStage(true) end
-                return
-            end
-            if not table.find(SelectedIgnoreAction, "Awake Current Blox Fruit") then
-                if plr.Data.DevilFruit.Value == "Dough-Dough" and CommF:InvokeServer("CakeScientist", "Check") and not DisableFarmForDoughKing then
-                    if Settings.ElitePirateFarm and ElitePirateFarmToggle then ElitePirateFarmToggle.SetStage(false) end
-                    if Settings.CakePrinceFarm and CakePrinceFarmToggle then CakePrinceFarmToggle.SetStage(false) end
-                    if Settings.SpawnDoughKing and SpawnDoughKingToggle then SpawnDoughKingToggle.SetStage(false) end
+                else
                     if Settings.EPFHopServer and EPFHopServerToggle then EPFHopServerToggle.SetStage(false) end
-                    getgenv().DisableFarmForDoughKing = true
-                    getgenv().TemporaryDisableHopIfPlrNearby = false
-                    return
-                end
-                if CheckFruitAwakeable() then
-                    if not CheckFruitFullAwake() then
-                        if plr.Data.Fragments.Value >= 8000 and not Settings.AutoAwake and AutoAwakeToggle then
-                            AutoAwakeToggle.SetStage(true)
-                        elseif Settings.AutoAwake and AutoAwakeToggle then
-                            AutoAwakeToggle.SetStage(false)
+                    if plrLevel >= 2200 and IsHaveItem("Tushita") then
+                        if not Settings.AutoDualKatana and AutoDualKatanaToggle then AutoDualKatanaToggle.SetStage(true) end
+                        if not NotiHopSv and Settings.AFSHopServer then
+                            getgenv().NotiHopSv = true
+                            Library.CreateNoti({Desc = 'Will Hop Server for Raid Pirate / Soul Reaper\n(Auto Cursed Dual Katana)', ShowTime = 20})
                         end
-                        Settings.RaidMap = GetRaidMapBF(GetM1WP("Blox Fruit"))
-                        if not Settings.AutoRaid and AutoRaidToggle then AutoRaidToggle.SetStage(true) end
+                    else
+                        CT_EnableFarm()
                     end
-                    if not Settings.AutoRaidAU and AutoRaidAUToggle then AutoRaidAUToggle.SetStage(true) end
+                end
+            end
+            return
+        end
+        if not table.find(SelectedIgnoreAction, "Get Soul Guitar")
+        and not IsHaveItem("Soul Guitar") then
+            if not Settings.AutoSoulGuitar and AutoSoulGuitarToggle then AutoSoulGuitarToggle.SetStage(true) end
+            return
+        end
+        if not table.find(SelectedIgnoreAction, "Awake Current Blox Fruit") then
+            if plr.Data.DevilFruit.Value == "Dough-Dough" and CommF:InvokeServer("CakeScientist", "Check") and not DisableFarmForDoughKing then
+                if Settings.ElitePirateFarm and ElitePirateFarmToggle then ElitePirateFarmToggle.SetStage(false) end
+                if Settings.CakePrinceFarm and CakePrinceFarmToggle then CakePrinceFarmToggle.SetStage(false) end
+                if Settings.SpawnDoughKing and SpawnDoughKingToggle then SpawnDoughKingToggle.SetStage(false) end
+                if Settings.EPFHopServer and EPFHopServerToggle then EPFHopServerToggle.SetStage(false) end
+                getgenv().DisableFarmForDoughKing = true
+                getgenv().TemporaryDisableHopIfPlrNearby = false
+                return
+            end
+            if CheckFruitAwakeable() then
+                if not CheckFruitFullAwake() then
+                    if plr.Data.Fragments.Value >= 8000 and not Settings.AutoAwake and AutoAwakeToggle then
+                        AutoAwakeToggle.SetStage(true)
+                    elseif Settings.AutoAwake and AutoAwakeToggle then
+                        AutoAwakeToggle.SetStage(false)
+                    end
+                    Settings.RaidMap = GetRaidMapBF(GetM1WP("Blox Fruit"))
+                    if not Settings.AutoRaid and AutoRaidToggle then AutoRaidToggle.SetStage(true) end
+                end
+                if not Settings.AutoRaidAU and AutoRaidAUToggle then AutoRaidAUToggle.SetStage(true) end
+                if not table.find(SelectedIgnoreHop, "[Main] Server Hop") then
+                    if not NotiHopSv then
+                        getgenv().NotiHopSv = true
+                        Library.CreateNoti({Desc = 'Will Hop Server for Blox Fruit to go Raid\n(Auto Awake Current Blox Fruit)', ShowTime = 20})
+                    end
+                    if not Settings.BTDFHopServer and BTDFHopServerToggle then BTDFHopServerToggle.SetStage(true) end
+                else
+                    if Settings.BTDFHopServer and BTDFHopServerToggle then BTDFHopServerToggle.SetStage(false) end
+                    CT_EnableFarm()
+                end
+                return
+            elseif plr.Data.DevilFruit.Value == "Dough-Dough" then
+                if CommF:InvokeServer("CakeScientist", "Check") then
+                    if Settings.EPFHopServer and EPFHopServerToggle then EPFHopServerToggle.SetStage(false) end
+                    CT_EnableFarm()
+                    getgenv().TemporaryDisableFarmBossDrop = true
+                else
+                    getgenv().TemporaryDisableHopIfPlrNearby = true
+                    if not Settings.ElitePirateFarm and ElitePirateFarmToggle then ElitePirateFarmToggle.SetStage(true) end
+                    if not Settings.CakePrinceFarm and CakePrinceFarmToggle then CakePrinceFarmToggle.SetStage(true) end
+                    if not Settings.SpawnDoughKing and SpawnDoughKingToggle then SpawnDoughKingToggle.SetStage(true) end
                     if not table.find(SelectedIgnoreHop, "[Main] Server Hop") then
                         if not NotiHopSv then
                             getgenv().NotiHopSv = true
-                            Library.CreateNoti({Desc = 'Will Hop Server for Blox Fruit to go Raid\n(Auto Awake Current Blox Fruit)', ShowTime = 20})
+                            Library.CreateNoti({Desc = 'Will Hop Server for Elite Pirate to awake Dough-Dough\n(Auto Awake Current Blox Fruit)', ShowTime = 20})
                         end
-                        if not Settings.BTDFHopServer and BTDFHopServerToggle then BTDFHopServerToggle.SetStage(true) end
+                        if not Settings.EPFHopServer and EPFHopServerToggle then EPFHopServerToggle.SetStage(true) end
                     else
-                        if Settings.BTDFHopServer and BTDFHopServerToggle then BTDFHopServerToggle.SetStage(false) end
+                        if Settings.EPFHopServer and EPFHopServerToggle then EPFHopServerToggle.SetStage(false) end
                         CT_EnableFarm()
                     end
                     return
-                elseif plr.Data.DevilFruit.Value == "Dough-Dough" then
-                    if CommF:InvokeServer("CakeScientist", "Check") then
-                        if Settings.EPFHopServer and EPFHopServerToggle then EPFHopServerToggle.SetStage(false) end
-                        CT_EnableFarm()
-                        getgenv().TemporaryDisableFarmBossDrop = true
-                    else
-                        getgenv().TemporaryDisableHopIfPlrNearby = true
-                        if not Settings.ElitePirateFarm and ElitePirateFarmToggle then ElitePirateFarmToggle.SetStage(true) end
-                        if not Settings.CakePrinceFarm and CakePrinceFarmToggle then CakePrinceFarmToggle.SetStage(true) end
-                        if not Settings.SpawnDoughKing and SpawnDoughKingToggle then SpawnDoughKingToggle.SetStage(true) end
-                        if not table.find(SelectedIgnoreHop, "[Main] Server Hop") then
-                            if not NotiHopSv then
-                                getgenv().NotiHopSv = true
-                                Library.CreateNoti({Desc = 'Will Hop Server for Elite Pirate to awake Dough-Dough\n(Auto Awake Current Blox Fruit)', ShowTime = 20})
-                            end
-                            if not Settings.EPFHopServer and EPFHopServerToggle then EPFHopServerToggle.SetStage(true) end
-                        else
-                            if Settings.EPFHopServer and EPFHopServerToggle then EPFHopServerToggle.SetStage(false) end
-                            CT_EnableFarm()
-                        end
-                        return
-                    end
-                end
-                if TemporaryDisableFarmBossDrop and CheckFruitFullAwake() then
-                    getgenv().TemporaryDisableFarmBossDrop = false
                 end
             end
-            if table.find(SelectedIgnoreHop, "[Main] Server Hop") and Settings.BTDFHopServer and BTDFHopServerToggle then BTDFHopServerToggle.SetStage(false) end
-            getgenv().CT_DoneGetStuffs = true
+            if TemporaryDisableFarmBossDrop and CheckFruitFullAwake() then
+                getgenv().TemporaryDisableFarmBossDrop = false
+            end
         end
-        if AFSWeapon or ASWeapon or Settings.SelectMasteryWP then
-            CT_DisableAutoRaid()
-            CT_EnableFarm()
-        end
-        if CT_DoneGetStuffs
-        and not ASWeapon then
-            if Settings.CT_FarmBossDrop and not GotBelowSeaItems and not TemporaryDisableFarmBossDrop then
-                if FarmBossDrop then
-                    if not NotiHopSv then
-                        getgenv().NotiHopSv = true
-                        Library.CreateNoti({Desc = 'Will Hop Server for Bosses\n(Farm boss drops if maxed)', ShowTime = 20})
+        if table.find(SelectedIgnoreHop, "[Main] Server Hop") and Settings.BTDFHopServer and BTDFHopServerToggle then BTDFHopServerToggle.SetStage(false) end
+        getgenv().CT_DoneGetStuffs = true
+    end
+    if AFSWeapon or ASWeapon or Settings.SelectMasteryWP then
+        CT_DisableAutoRaid()
+        CT_EnableFarm()
+    end
+    if CT_DoneGetStuffs
+    and not ASWeapon then
+        if Settings.CT_FarmBossDrop and not GotBelowSeaItems and not TemporaryDisableFarmBossDrop then
+            if FarmBossDrop then
+                if not NotiHopSv then
+                    getgenv().NotiHopSv = true
+                    Library.CreateNoti({Desc = 'Will Hop Server for Bosses\n(Farm boss drops if maxed)', ShowTime = 20})
+                end
+                if FarmBossDrop == "Sea 1" then
+                    if game.PlaceId ~= 2753915549 then
+                        CommF:InvokeServer("TravelMain")
+                        wait(5)
+                    else
+                        CT_DisableFarm()
+                        if not Settings.BFHopServer and BFHopServerToggle then BFHopServerToggle.SetStage(true) end
+                    end 
+                elseif FarmBossDrop == "Sea 2" then
+                    if game.PlaceId ~= 4442272183 then
+                        CommF:InvokeServer("TravelDressrosa")
+                        wait(5)
+                    else
+                        CT_DisableFarm()
+                        if not Settings.BFHopServer and BFHopServerToggle then BFHopServerToggle.SetStage(true) end
+                    end 
+                end
+            else
+                for i, v in pairs(BossDrops[2753915549]) do
+                    if not table.find(RaidBoss, v) then
+                        if not IsHaveItem(i) then
+                            getgenv().FarmBossDrop = "Sea 1"
+                        end
                     end
-                    if FarmBossDrop == "Sea 1" then
-                        if game.PlaceId ~= 2753915549 then
-                            CommF:InvokeServer("TravelMain")
-                            wait(5)
-                        else
-                            CT_DisableFarm()
-                            if not Settings.BFHopServer and BFHopServerToggle then BFHopServerToggle.SetStage(true) end
-                        end 
-                    elseif FarmBossDrop == "Sea 2" then
-                        if game.PlaceId ~= 4442272183 then
-                            CommF:InvokeServer("TravelDressrosa")
-                            wait(5)
-                        else
-                            CT_DisableFarm()
-                            if not Settings.BFHopServer and BFHopServerToggle then BFHopServerToggle.SetStage(true) end
-                        end 
-                    end
-                else
-                    for i, v in pairs(BossDrops[2753915549]) do
+                end
+                if not FarmBossDrop then
+                    for i, v in pairs(BossDrops[4442272183]) do
                         if not table.find(RaidBoss, v) then
                             if not IsHaveItem(i) then
-                                getgenv().FarmBossDrop = "Sea 1"
+                                getgenv().FarmBossDrop = "Sea 2"
                             end
                         end
                     end
                     if not FarmBossDrop then
-                        for i, v in pairs(BossDrops[4442272183]) do
-                            if not table.find(RaidBoss, v) then
-                                if not IsHaveItem(i) then
-                                    getgenv().FarmBossDrop = "Sea 2"
-                                end
-                            end
+                        if game.PlaceId ~= 7449423635 then
+                            CommF:InvokeServer("TravelZou")
                         end
-                        if not FarmBossDrop then
-                            if game.PlaceId ~= 7449423635 then
-                                CommF:InvokeServer("TravelZou")
-                            end
-                            if Settings.BFHopServer and BFHopServerToggle then BFHopServerToggle.SetStage(false) end
-                            getgenv().GotBelowSeaItems = true
-                        end
+                        if Settings.BFHopServer and BFHopServerToggle then BFHopServerToggle.SetStage(false) end
+                        getgenv().GotBelowSeaItems = true
                     end
                 end
-            else
-                if game.PlaceId ~= 7449423635 then
-                    CommF:InvokeServer("TravelZou")
-                    wait(5)
-                    return
-                end
-                if DoneFightingStyle then
-                    if not Settings.CT_FarmBFMastery or DoneBloxFruit or plr.Data.DevilFruit.Value == "" then
-                        local x = "until unlocked all skills"
-                        if not Settings.CT_FarmUntilUnlock or DoneFarmUntilUnlock then
-                            Settings.RequireMastery = 600
-                            x = "until 600 Mastery"
-                        end
-                        AutoFSSLabel.SetText(LabelTextAFS .. "Farming all Legendary / Mythic rarity swords " .. x .. " (extra time)")
-                        wait(1)
-                        if not Settings.AutoSwitchSword and AutoSwitchSwordToggle then
-                            AutoSwitchSwordToggle.SetStage(true)
-                            if not table.find(SelectedIgnoreRarity2, 0) then
-                                table.insert(getgenv().SelectedIgnoreRarity2, 0)
-                            end
-                            if not table.find(SelectedIgnoreRarity2, 1) then
-                                table.insert(getgenv().SelectedIgnoreRarity2, 1)
-                            end
-                            if not table.find(SelectedIgnoreRarity2, 2) then
-                                table.insert(getgenv().SelectedIgnoreRarity2, 2)
-                            end
-                        end
-                    else
-                        local v = GetM1WP("Blox Fruit")
-                        if not v then getgenv().DoneBloxFruit = true end
-                        if not Settings.SelectMasteryWP then Settings.SelectMasteryWP = v end
-                        if not table.find(SelectedAutoSkill, "Z") then table.insert(getgenv().SelectedAutoSkill, "Z") end
-                        if not table.find(SelectedAutoSkill, "X") then table.insert(getgenv().SelectedAutoSkill, "X") end
-                        if not table.find(SelectedAutoSkill, "C") then table.insert(getgenv().SelectedAutoSkill, "C") end
-                        if Settings.AttackNoCD and AttackNoCDToggle then AttackNoCDToggle.SetStage(false) getgenv().TemporaryDisableAttackNoCD = true end
-                        local v = CheckPlrBackpack(v)
-                        local HighestMas = 600
-                        if not DoneFarmUntilUnlock and Settings.CT_FarmUntilUnlock then
-                            HighestMas = 0
-                            for i, v in pairs(require(v.Data).Lvl) do
-                                if v > HighestMas then
-                                    HighestMas = v
-                                end
-                            end
-                        end
-                        if v.Level.Value < HighestMas then
-                            AutoFSSLabel.SetText(LabelTextAFS .. "Farming " .. v.Name .. " to hit " .. HighestMas .. " Mastery (extra time)")
-                        else
-                            getgenv().TemporaryDisableAttackNoCD = false
-                            getgenv().DoneBloxFruit = true
-                        end
-                        if not Settings.MasteryFarm and MasteryFarmToggle then MasteryFarmToggle.SetStage(true) end
-                    end
-                else
-                    local v = GetCurrentEquippedM1()
-                    if v.Name == "Godhuman" then
-                        if v.Level.Value < ExtraTimeMasteryFarm["Godhuman"] then
-                            AutoFSSLabel.SetText(LabelTextAFS .. "Farming " .. v.Name .. " to hit " .. ExtraTimeMasteryFarm["Godhuman"] .. " Mastery (extra time)")
-                            getgenv().AFSWeapon = v.Name
-                        else
-                            BuyFightingStyle("BuyDragonTalon")
-                        end
-                        CusDelay = 0
-                    elseif v.Name == "Dragon Talon" then
-                        if v.Level.Value < ExtraTimeMasteryFarm["Dragon Talon"] then
-                            AutoFSSLabel.SetText(LabelTextAFS .. "Farming " .. v.Name .. " to hit " .. ExtraTimeMasteryFarm["Dragon Talon"] .. " Mastery (extra time)")
-                            getgenv().AFSWeapon = v.Name
-                        else
-                            BuyFightingStyle("BuySharkmanKarate")
-                        end
-                        CusDelay = 0
-                    elseif v.Name == "Sharkman Karate" then
-                        if v.Level.Value < ExtraTimeMasteryFarm["Sharkman Karate"] then
-                            AutoFSSLabel.SetText(LabelTextAFS .. "Farming " .. v.Name .. " to hit " .. ExtraTimeMasteryFarm["Sharkman Karate"] .. " Mastery (extra time)")
-                            getgenv().AFSWeapon = v.Name
-                        else
-                            BuyFightingStyle("BuyElectricClaw")
-                        end
-                        CusDelay = 0
-                    elseif v.Name == "Electric Claw" then
-                        if v.Level.Value < ExtraTimeMasteryFarm["Electric Claw"] then
-                            AutoFSSLabel.SetText(LabelTextAFS .. "Farming " .. v.Name .. " to hit " .. ExtraTimeMasteryFarm["Electric Claw"] .. " Mastery (extra time)")
-                            getgenv().AFSWeapon = v.Name
-                        else
-                            BuyFightingStyle("BuyDeathStep")
-                        end
-                        CusDelay = 0
-                    elseif v.Name == "Death Step" then
-                        if v.Level.Value < ExtraTimeMasteryFarm["Death Step"] then
-                            AutoFSSLabel.SetText(LabelTextAFS .. "Farming " .. v.Name .. " to hit " .. ExtraTimeMasteryFarm["Death Step"] .. " Mastery (extra time)")
-                            getgenv().AFSWeapon = v.Name
-                        else
-                            BuyFightingStyle("BuySuperhuman")
-                        end
-                        CusDelay = 0
-                    elseif v.Name == "Superhuman" then
-                        if v.Level.Value < ExtraTimeMasteryFarm["Superhuman"] then
-                            AutoFSSLabel.SetText(LabelTextAFS .. "Farming " .. v.Name .. " to hit " .. ExtraTimeMasteryFarm["Superhuman"] .. " Mastery (extra time)")
-                            getgenv().AFSWeapon = v.Name
-                        else
-                            if not CheckGodhuman then
-                                getgenv().CheckGodhuman = true
-                                if CommF:InvokeServer("BuyGodhuman", true) == 1 then
-                                    BuyFightingStyle("BuyGodhuman")
-                                else
-                                    BuyFightingStyle("BuyDragonTalon")
-                                end
-                            else
-                                getgenv().DoneFightingStyle = true
-                            end
-                        end
-                        CusDelay = 0
-                    end
-                end
-            end
-        end
-        wait(CusDelay)
-    end
-    spawn(function()
-        wait(1)
-        while wait() do
-            pcall(function()
-                if Settings.Cuttay then
-                    Cuttay()
-                end
-            end)
-        end
-    end)
-    if not CuttayAccountFarm then getgenv().CuttayAccountFarm = {} end
-    Section91.CreateToggle({Title = "Cuttay Account Farm 🚫✋", Desc = "Aka: 1 Click Auto Farm, Kaiton\n* Please only enable on acc haven't got Godhuman\n* Also if you using this, please do not enable anything else while this enable, make sure everything is disabled before enabling this\n* Check out #cuttay-info channel on Discord for more informations", Default = Settings.Cuttay or CuttayAccountFarm["Enable"]}, function(v)
-        if v and not Settings.Cuttay then
-            for i, v in pairs(Codes) do
-                game.ReplicatedStorage.Remotes.Redeem:InvokeServer(v)
-            end
-        elseif not v and Settings.Cuttay then
-            wait(1)
-            CT_DisableAutoRaid()
-            CT_DisableFarm()
-            AFSHopServerToggle.SetStage(false)
-        end
-        Settings.Cuttay = v
-    end)
-    Section91.CreateToggle({Title = "Raid if Maxed Blox Fruit", Desc = "Will go Raid if maxed stored Blox Fruit amount\n(work same as Drop if Maxed but go Raid instead)", Default = Settings.CT_RaidIfMaxed or CuttayAccountFarm["Raid if Maxed Blox Fruit"]}, function(v)
-        Settings.CT_RaidIfMaxed = v
-    end)
-    Section91.CreateToggle({Title = "Farm boss drops while not maxed", Desc = "While farming for stuff / level if boss spawned and you dont have their drop it will go kill them", Default = Settings.CT_FarmBossDrop2 or CuttayAccountFarm["Farm boss drops while not maxed"]}, function(v)
-        Settings.CT_FarmBossDrop2 = v
-    end)
-    Section91.CreateToggle({Title = "Farm Blox Fruit Mastery if maxed", Desc = "Will farm Blox Fruit's mastery (if got) when maxed\nExtra Time farm prioritize: Fighting Style -> Blox Fruit -> Swords (Mythic / Legendary)\n* Please only enable on accounts that have 0 Sword stat or an brand new one or just refund stat", Default = Settings.CT_FarmBFMastery or CuttayAccountFarm["Farm Blox Fruit Mastery if maxed"]}, function(v)
-        Settings.CT_FarmBFMastery = v
-    end)
-    Section91.CreateDropdown({Title = "Select Farm method after maxed", List = {
-        "Mob Farm - Level Path",
-        "Raid Boss Farm - Cake Prince Farm",
-        "Mob Aura - Haunted Castle",
-        "Mob Aura - Sea of Treats 4"
-    }, Default = Settings.CT_FarmMethod or CuttayAccountFarm["Farm method after maxed"]}, function(v) 
-        Settings.CT_FarmMethod = v
-    end)
-    getgenv().O_ExtraTimeMasteryFarm = {
-        ["Godhuman"] = 350,
-        ["Dragon Talon"] = 350,
-        ["Sharkman Karate"] = 300,
-        ["Electric Claw"] = 330,
-        ["Death Step"] = 400,
-        ["Superhuman"] = 330
-    }
-    getgenv().ExtraTimeMasteryFarm = {}
-    Section91.CreateToggle({Title = "Extra time Farm until unlock skills", Desc = 'After maxed and do "Farm method after maxed" it will farm Fighting Styles / Weapons until unlocked all it skill and switch to another (instead of farming until 600 Mastery then switch)', Default = Settings.CT_FarmUntilUnlock or CuttayAccountFarm["Extra time Farm until unlock skills"]}, function(v)
-        Settings.CT_FarmUntilUnlock = v
-        if v then
-            for i, v in pairs(O_ExtraTimeMasteryFarm) do
-                getgenv().ExtraTimeMasteryFarm[i] = v
             end
         else
-            for i, v in pairs(O_ExtraTimeMasteryFarm) do
-                getgenv().ExtraTimeMasteryFarm[i] = 600
-            end
-        end
-    end)
-    local HopList = {
-        "[Main] Server Hop",
-        "[Farm] Server Hop if Player nearby",
-        "[Sea 3 Quest] Server Hop for 1M+ Blox Fruit",
-    }
-    getgenv().SelectedIgnoreHop = {}
-    if not Settings.CT_IgnoreHop then
-        Settings.CT_IgnoreHop = {}
-        for i, v in pairs(HopList) do
-            Settings.CT_IgnoreHop[v] = false
-        end
-        if CuttayAccountFarm["Ignore Hop Server Type"] then
-            for i, v in pairs(CuttayAccountFarm["Ignore Hop Server Type"]) do
-                if v then
-                    Settings.CT_IgnoreHop[i] = true
-                    table.insert(getgenv().SelectedIgnoreHop, i)
-                end    
-            end
-        end
-    else
-        local HopLCheck = {}
-        for i, v in pairs(Settings.CT_IgnoreHop) do
-            if v then
-                table.insert(getgenv().SelectedIgnoreHop, i)
-            end
-            table.insert(HopLCheck, i)
-        end
-        for i, v in pairs(HopList) do
-            if not table.find(HopLCheck, v) then
-                Settings.CT_IgnoreHop[v] = false
-            end
-        end
-    end
-    Section91.CreateDropdown({Title = "Select Ignore Hop Server Type", List = Settings.CT_IgnoreHop, Selected = true}, function(i, v) 
-        if i then
-            Settings.CT_IgnoreHop[i] = v
-            if v then
-                table.insert(getgenv().SelectedIgnoreHop, i)
-            elseif table.find(SelectedIgnoreHop, i) then
-                table.remove(getgenv().SelectedIgnoreHop, table.find(SelectedIgnoreHop, i))
-            end
-        end
-    end)
-    if CuttayAccountFarm["Hop Server Delay"] then
-        if CuttayAccountFarm["Hop Server Delay"] > 30 then
-            CuttayAccountFarm["Hop Server Delay"] = 30
-        elseif CuttayAccountFarm["Hop Server Delay"] < 0 then
-            CuttayAccountFarm["Hop Server Delay"] = 1
-        end
-    end
-    Section91.CreateSlider({Title = 'Hop Server Delay (minute)', Min = 0, Max = 30, Default = Settings.CT_HopServerDelay or CuttayAccountFarm["Hop Server Delay"]}, function(v)
-        Settings.CT_HopServerDelay = v
-    end)
-    Section91.CreateLabel({Title = "For Hop Server Type, prevent 268 issue happening"})
-    local ActionList = {
-        "Get Godhuman",
-        "Get Rengoku",
-        "Get True Triple Katana",
-        "Get Cursed Dual Katana",
-        "Get Soul Guitar",
-        "Get Hallow Scythe",
-        "Awake Current Blox Fruit",
-    }
-    getgenv().SelectedIgnoreAction = {}
-    if not Settings.CT_IgnoreAction then
-        Settings.CT_IgnoreAction = {}
-        for i, v in pairs(ActionList) do
-            Settings.CT_IgnoreAction[v] = false
-        end
-        if CuttayAccountFarm["Ignore Action"] then
-            for i, v in pairs(CuttayAccountFarm["Ignore Action"]) do
-                if v then
-                    Settings.CT_IgnoreAction[i] = true
-                    table.insert(getgenv().SelectedIgnoreAction, i)
-                end    
-            end
-        end
-    else
-        local ActionLCheck = {}
-        for i, v in pairs(Settings.CT_IgnoreAction) do
-            if v then
-                table.insert(getgenv().SelectedIgnoreAction, i)
-            end
-            table.insert(ActionLCheck, i)
-        end
-        for i, v in pairs(ActionList) do
-            if not table.find(ActionLCheck, v) then
-                Settings.CT_IgnoreAction[v] = false
-            end
-        end
-    end
-    Section91.CreateDropdown({Title = "Select Ignore Cuttay Action", List = Settings.CT_IgnoreAction, Selected = true}, function(i, v) 
-        if i then
-            Settings.CT_IgnoreAction[i] = v
-            if v then
-                table.insert(getgenv().SelectedIgnoreAction, i)
-            elseif table.find(SelectedIgnoreAction, i) then
-                table.remove(getgenv().SelectedIgnoreAction, table.find(SelectedIgnoreAction, i))
-            end
-        end
-    end)
-    local BuyHakiList = {
-        "Buy Enhancement",
-        "Buy Skyjump",
-        "Buy Flash Step",
-        "Buy Observation",
-    }
-    getgenv().SelectedBuyHaki = {}
-    if not Settings.CT_BuyHaki then
-        Settings.CT_BuyHaki = {}
-        for i, v in pairs(BuyHakiList) do
-            Settings.CT_BuyHaki[v] = false
-        end
-        if CuttayAccountFarm["Buy Haki"] then
-            for i, v in pairs(CuttayAccountFarm["Buy Haki"]) do
-                if v then
-                    Settings.CT_BuyHaki[i] = true
-                    table.insert(getgenv().SelectedBuyHaki, i)
-                end    
-            end
-        end
-    else
-        local ActionLCheck = {}
-        for i, v in pairs(Settings.CT_BuyHaki) do
-            if v then
-                table.insert(getgenv().SelectedBuyHaki, i)
-            end
-            table.insert(ActionLCheck, i)
-        end
-        for i, v in pairs(BuyHakiList) do
-            if not table.find(ActionLCheck, v) then
-                Settings.CT_BuyHaki[v] = false
-            end
-        end
-    end
-    Section91.CreateDropdown({Title = "Select Buy Haki", List = Settings.CT_BuyHaki, Selected = true}, function(i, v) 
-        if i then
-            Settings.CT_BuyHaki[i] = v
-            if v then
-                table.insert(getgenv().SelectedBuyHaki, i)
-            elseif table.find(SelectedBuyHaki, i) then
-                table.remove(getgenv().SelectedBuyHaki, table.find(SelectedBuyHaki, i))
-            end
-        end
-    end)
-    local Worlds = {
-        [2753915549] = "Sea 1",
-        [4442272183] = "Sea 2",
-        [7449423635] = "Sea 3",
-    }
-    local SeaHubGUI = "Page8"
-    if game.PlaceId == 2753915549 then
-        SeaHubGUI = "Page7"
-    end
-    local FightingStyleRemotes = {
-        "BuySuperhuman",
-        "BuyDeathStep",
-        "BuySharkmanKarate",
-        "BuyElectricClaw",
-        "BuyDragonTalon",
-        "BuyGodhuman"
-    }
-    local RarityList = {
-        ["Mythical"] = 4,
-        ["Legendary"] = 3,
-        ["Rare"] = 2,
-        ["Uncommon"] = 1,
-        ["Common"] = 0
-    }
-    
-    function formatNumber(v)
-        return tostring(v):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")
-    end
-    function GetData(v)
-        return formatNumber(plr.Data[v].Value)
-    end
-    function GetScriptStatus()
-        local ScriptStatus = {}
-        for i, v in ipairs(game.CoreGui["Sea Hub GUI"].Main.MainContainer.Concacontainer.Concacmain.MainPage[SeaHubGUI].PageList["Script Status_Dot"]:GetChildren()) do
-            if v.Name == "LabelFrame" then
-                local a = "Auto Farm"
-                local b = "Auto Fighting Style / Sword"
-                local m = v.LabelBG.TextColor.Text
-                local x = m:gsub(a, "")
-                x = x:split("\]")[2]
-                x = x:gsub("\n", "")
-                if string.find(m, a) then
-                    x = x:gsub(a .. ": ", "")
-                    ScriptStatus[a] = x
-                else
-                    x = x:gsub(b .. ": ", "")
-                    ScriptStatus[b] = x
-                end
-            end
-        end
-        return ScriptStatus
-    end
-    function SplitStringByCapitalLetters(v)
-        return string.sub(string.gsub(v, "(%u)", " %1"), 2, -1)
-    end
-    function GetOwnFS()
-        local FightingStyle = {}
-        for i, v in pairs(FightingStyleRemotes) do
-            if CommF:InvokeServer(v, true) == 1 then
-                table.insert(FightingStyle, SplitStringByCapitalLetters(v:gsub("Buy", "")))
-            end
-        end
-        return FightingStyle
-    end
-    
-    function AP_Request()
-        local OwnedFS = GetOwnFS()
-        local I_Sword = {}
-        local I_BloxFruit = {}
-        local I_Material = {}
-        for i, v in pairs(getupvalue(require(plr.PlayerGui.Main.UIController.Inventory).UpdateRender, 4)) do
-            for k, x in pairs(RarityList) do
-                if v.details.Rarity == x then
-                    if not I_Sword[k] then I_Sword[k] = {} end
-                    if not I_BloxFruit[k] then I_BloxFruit[k] = {} end
-                    if not I_Material[k] then I_Material[k] = {} end
-                    if v.details.Type == "Sword" then
-                        table.insert(I_Sword[k], v.details.Name)
-                    elseif v.details.Type == "Blox Fruit" then
-                        table.insert(I_BloxFruit[k], v.details.Name)
-                    elseif v.details.Type == "Material" then
-                        table.insert(I_Material[k], v.details.Name)
-                    end
-                end
-            end
-        end
-        if IsHaveItem("Soul Guitar") then
-            k = "Mythical"
-            if not I_Sword[k] then I_Sword[k] = {} end
-            table.insert(I_Sword[k], "Soul Guitar")
-        end
-        for k, x in pairs(RarityList) do
-            if not I_Sword[k] then I_Sword[k] = {} end
-            if not I_BloxFruit[k] then I_BloxFruit[k] = {} end
-            if not I_Material[k] then I_Material[k] = {} end
-        end
-        function GetBloxFruitChild(x)
-            for i, v in ipairs(x:GetChildren()) do
-                if v:IsA("Tool") and string.find(v.Name, "-") then
-                    return v
-                end
-            end
-        end
-        local BloxFruitChild = GetBloxFruitChild(plr.Backpack) or GetBloxFruitChild(plr.Character)
-        function GetAwakenedMove(x)
-            if not x then return end
-            local m = x:FindFirstChild("AwakenedMoves")
-            if not m then
+            if game.PlaceId ~= 7449423635 then
+                CommF:InvokeServer("TravelZou")
+                wait(5)
                 return
             end
-            local AwakenedMove = {}
-            for i, v in ipairs(m:GetChildren()) do
-                AwakenedMove[v.Name] = true
-            end
-            return AwakenedMove
-        end
-        local BF_AM = GetAwakenedMove(BloxFruitChild)
-        if not BF_AM then BF_AM = {} end
-
-        local Body = game:GetService("HttpService"):JSONEncode({
-            Name = plr.Name,
-            [plr.Name] = {
-                Name = plr.Name,
-                Level = GetData("Level"),
-                Fragments = GetData("Fragments"),
-                Beli = GetData("Beli"),
-                Race = GetData("Race"),
-                DevilFruit = GetData("DevilFruit"),
-                World = Worlds[game.PlaceId],
-                ScriptStatus = GetScriptStatus(),
-                Status = 'Online',
-                Inventory = {
-                    FightingStyle = OwnedFS,
-                    Mythical = {
-                        Sword = I_Sword["Mythical"],
-                        BloxFruit = I_BloxFruit["Mythical"],
-                        Material = I_Material["Mythical"]
-                    },
-                    Legendary = {
-                        Sword = I_Sword["Legendary"],
-                        BloxFruit = I_BloxFruit["Legendary"],
-                        Material = I_Material["Legendary"]
-                    },
-                    Rare = {
-                        Sword = I_Sword["Rare"],
-                        BloxFruit = I_BloxFruit["Rare"],
-                        Material = I_Material["Rare"]
-                    },
-                    Uncommon = {
-                        Sword = I_Sword["Uncommon"],
-                        BloxFruit = I_BloxFruit["Uncommon"],
-                        Material = I_Material["Uncommon"]
-                    },
-                    Common = {
-                        Sword = I_Sword["Common"],
-                        BloxFruit = I_BloxFruit["Common"],
-                        Material = I_Material["Common"]
-                    },
-                },
-                AwakenedMove = {
-                    Z = BF_AM["Z"],
-                    X = BF_AM["X"],
-                    C = BF_AM["C"],
-                    V = BF_AM["V"],
-                    F = BF_AM["F"],
-                    TAP = BF_AM["TAP"],
-                },
-            },
-        })
-
-        http_request({
-            Url = 'https://panel.ego-d.xyz/post/' .. getgenv().Key,
-            Method = 'POST',
-            Headers = {
-                ["Content-Type"] = "application/json"
-            },
-            Body = Body
-        })
-    end
-    spawn(function()
-        wait(1)
-        while wait() do
-            pcall(function()
-                if Settings.CT_AccountPanel and getgenv().Key then
-                    if not AP_RequestDelay or tick() - AP_RequestDelay >= 300 then
-                        getgenv().AP_RequestDelay = tick()
-                        AP_Request() 
+            if DoneFightingStyle then
+                if not Settings.CT_FarmBFMastery or DoneBloxFruit or plr.Data.DevilFruit.Value == "" then
+                    local x = "until unlocked all skills"
+                    if not Settings.CT_FarmUntilUnlock or DoneFarmUntilUnlock then
+                        Settings.RequireMastery = 600
+                        x = "until 600 Mastery"
                     end
-                end
-            end)
-            wait(5)
-        end
-    end)
-    function GetEatFruit(x)
-        if not x then return end
-        local Fruits = {}
-        for i, v in pairs(getupvalue(require(plr.PlayerGui.Main.UIController.Inventory).UpdateRender, 4)) do
-            if v.details.Type == "Blox Fruit" then
-                if table.find(x, v.details.Name) then
-                    Fruits[v.details.Value] = v.details.Name
-                end
-            end
-        end
-        local Highest = 0
-        local Fruit
-        for i, v in pairs(Fruits) do
-            if i > Highest then
-                Highest = i
-                Fruit = v
-            end
-        end
-        return Fruit
-    end
-    function CT_EatFruit(EatFruit)
-        if plr.PlayerGui.Main.Dialogue.Visible
-        and plr.PlayerGui.Main.Dialogue.Title.Text == "Quest" then
-            FireButton(plr.PlayerGui.Main.Dialogue.Cancel)
-        end
-        getgenv().DisableEquipItem, getgenv().DisableAutoStore = true, true
-        CommF:InvokeServer("LoadFruit", EatFruit)
-        wait(.25)
-        repeat wait()
-            getgenv().DisableEquipItem, getgenv().DisableAutoStore = true, true
-            EquipItem(FFToFruitName(EatFruit), true)
-            wait(.1)
-            game:GetService("VirtualUser"):Button1Down(Vector2.new(50, 50))
-            wait(.25)
-        until plr.PlayerGui.Main.Dialogue.Visible and plr.PlayerGui.Main.Dialogue.Option1.TextLabel.Text == "Eat"
-        or not Settings.CT_EatSniperBF
-        if Settings.CT_EatSniperBF then
-            wait(1)
-            FireButton(plr.PlayerGui.Main.Dialogue.Option1)
-            wait(3)
-            game:GetService("VirtualUser"):Button1Down(Vector2.new(50, 50))
-        end
-        getgenv().DisableEquipItem, getgenv().DisableAutoStore = false, false
-    end
-    spawn(function()
-        while wait(2) do
-            if Settings.CT_EatSniperBF
-            and CuttayAccountFarm and CuttayAccountFarm["Blox Fruit Sniper"] and #CuttayAccountFarm["Blox Fruit Sniper"] ~= 0
-            and plr.Data.DevilFruit.Value == "" then
-                local EatFruit = GetEatFruit(CuttayAccountFarm["Blox Fruit Sniper"])
-                if EatFruit then
-                    CT_EatFruit(EatFruit)
-                end
-            end
-        end
-    end)
-    spawn(function()
-        while wait(2) do
-            if CuttayAccountFarm and CuttayAccountFarm["Main Blox Fruit"] and #CuttayAccountFarm["Main Blox Fruit"] ~= 0 and not table.find(CuttayAccountFarm["Main Blox Fruit"], plr.Data.DevilFruit.Value) then
-                local FruitPrio = CommF:InvokeServer("GetFruits")
-                table.sort(FruitPrio, function(a, b)
-                    return a.Price > b.Price
-                end)
-                for i, v in pairs(FruitPrio) do
-                    if v.OnSale
-                    and table.find(CuttayAccountFarm["Main Blox Fruit"], v.Name)
-                    and not table.find(CuttayAccountFarm["Main Blox Fruit"], plr.Data.DevilFruit.Value) then
-                        CommF:InvokeServer("GetFruits")
-                        CommF:InvokeServer("PurchaseRawFruit", v.Name)
-                        wait(2)
+                    AutoFSSLabel.SetText(LabelTextAFS .. "Farming all Legendary / Mythic rarity swords " .. x .. " (extra time)")
+                    wait(1)
+                    if not Settings.AutoSwitchSword and AutoSwitchSwordToggle then
+                        AutoSwitchSwordToggle.SetStage(true)
+                        if not table.find(SelectedIgnoreRarity2, 0) then
+                            table.insert(getgenv().SelectedIgnoreRarity2, 0)
+                        end
+                        if not table.find(SelectedIgnoreRarity2, 1) then
+                            table.insert(getgenv().SelectedIgnoreRarity2, 1)
+                        end
+                        if not table.find(SelectedIgnoreRarity2, 2) then
+                            table.insert(getgenv().SelectedIgnoreRarity2, 2)
+                        end
                     end
+                else
+                    local v = GetM1WP("Blox Fruit")
+                    if not v then getgenv().DoneBloxFruit = true end
+                    if not Settings.SelectMasteryWP then Settings.SelectMasteryWP = v end
+                    if not table.find(SelectedAutoSkill, "Z") then table.insert(getgenv().SelectedAutoSkill, "Z") end
+                    if not table.find(SelectedAutoSkill, "X") then table.insert(getgenv().SelectedAutoSkill, "X") end
+                    if not table.find(SelectedAutoSkill, "C") then table.insert(getgenv().SelectedAutoSkill, "C") end
+                    if Settings.AttackNoCD and AttackNoCDToggle then AttackNoCDToggle.SetStage(false) getgenv().TemporaryDisableAttackNoCD = true end
+                    local v = CheckPlrBackpack(v)
+                    local HighestMas = 600
+                    if not DoneFarmUntilUnlock and Settings.CT_FarmUntilUnlock then
+                        HighestMas = 0
+                        for i, v in pairs(require(v.Data).Lvl) do
+                            if v > HighestMas then
+                                HighestMas = v
+                            end
+                        end
+                    end
+                    if v.Level.Value < HighestMas then
+                        AutoFSSLabel.SetText(LabelTextAFS .. "Farming " .. v.Name .. " to hit " .. HighestMas .. " Mastery (extra time)")
+                    else
+                        getgenv().TemporaryDisableAttackNoCD = false
+                        getgenv().DoneBloxFruit = true
+                    end
+                    if not Settings.MasteryFarm and MasteryFarmToggle then MasteryFarmToggle.SetStage(true) end
                 end
-                local EatFruit = GetEatFruit(CuttayAccountFarm["Main Blox Fruit"])
-                if EatFruit and not table.find(CuttayAccountFarm["Main Blox Fruit"], plr.Data.DevilFruit.Value) then
-                    CT_EatFruit(EatFruit)
+            else
+                local v = GetCurrentEquippedM1()
+                if v.Name == "Godhuman" then
+                    if v.Level.Value < ExtraTimeMasteryFarm["Godhuman"] then
+                        AutoFSSLabel.SetText(LabelTextAFS .. "Farming " .. v.Name .. " to hit " .. ExtraTimeMasteryFarm["Godhuman"] .. " Mastery (extra time)")
+                        getgenv().AFSWeapon = v.Name
+                    else
+                        BuyFightingStyle("BuyDragonTalon")
+                    end
+                    CusDelay = 0
+                elseif v.Name == "Dragon Talon" then
+                    if v.Level.Value < ExtraTimeMasteryFarm["Dragon Talon"] then
+                        AutoFSSLabel.SetText(LabelTextAFS .. "Farming " .. v.Name .. " to hit " .. ExtraTimeMasteryFarm["Dragon Talon"] .. " Mastery (extra time)")
+                        getgenv().AFSWeapon = v.Name
+                    else
+                        BuyFightingStyle("BuySharkmanKarate")
+                    end
+                    CusDelay = 0
+                elseif v.Name == "Sharkman Karate" then
+                    if v.Level.Value < ExtraTimeMasteryFarm["Sharkman Karate"] then
+                        AutoFSSLabel.SetText(LabelTextAFS .. "Farming " .. v.Name .. " to hit " .. ExtraTimeMasteryFarm["Sharkman Karate"] .. " Mastery (extra time)")
+                        getgenv().AFSWeapon = v.Name
+                    else
+                        BuyFightingStyle("BuyElectricClaw")
+                    end
+                    CusDelay = 0
+                elseif v.Name == "Electric Claw" then
+                    if v.Level.Value < ExtraTimeMasteryFarm["Electric Claw"] then
+                        AutoFSSLabel.SetText(LabelTextAFS .. "Farming " .. v.Name .. " to hit " .. ExtraTimeMasteryFarm["Electric Claw"] .. " Mastery (extra time)")
+                        getgenv().AFSWeapon = v.Name
+                    else
+                        BuyFightingStyle("BuyDeathStep")
+                    end
+                    CusDelay = 0
+                elseif v.Name == "Death Step" then
+                    if v.Level.Value < ExtraTimeMasteryFarm["Death Step"] then
+                        AutoFSSLabel.SetText(LabelTextAFS .. "Farming " .. v.Name .. " to hit " .. ExtraTimeMasteryFarm["Death Step"] .. " Mastery (extra time)")
+                        getgenv().AFSWeapon = v.Name
+                    else
+                        BuyFightingStyle("BuySuperhuman")
+                    end
+                    CusDelay = 0
+                elseif v.Name == "Superhuman" then
+                    if v.Level.Value < ExtraTimeMasteryFarm["Superhuman"] then
+                        AutoFSSLabel.SetText(LabelTextAFS .. "Farming " .. v.Name .. " to hit " .. ExtraTimeMasteryFarm["Superhuman"] .. " Mastery (extra time)")
+                        getgenv().AFSWeapon = v.Name
+                    else
+                        if not CheckGodhuman then
+                            getgenv().CheckGodhuman = true
+                            if CommF:InvokeServer("BuyGodhuman", true) == 1 then
+                                BuyFightingStyle("BuyGodhuman")
+                            else
+                                BuyFightingStyle("BuyDragonTalon")
+                            end
+                        else
+                            getgenv().DoneFightingStyle = true
+                        end
+                    end
+                    CusDelay = 0
                 end
             end
         end
-    end)
-    Section91.CreateToggle({Title = "Eat Sniper Blox Fruits", Desc = "Will eat Blox Fruit Sniper/Main Blox Fruit in the list if you got one of them in Inventory, will eat the most expensive one, only eat if you're Fruitless\nCheck #script-config to configure Blox Fruit Sniper list", Default = Settings.CT_EatSniperBF or CuttayAccountFarm["Eat Sniper Blox Fruits"]}, function(v)
-        Settings.CT_EatSniperBF = v
-    end)
-    Section91.CreateToggle({Title = "Account Panel", Desc = "Will add current account to Account Panel list, limit: 50 accounts, data will be update every 5 minutes\nAccount Panel Website: panel.ego-d.xyz", Default = Settings.CT_AccountPanel or CuttayAccountFarm["Account Panel"]}, function(v)
-        Settings.CT_AccountPanel = v
-    end)
-    Section91.CreateLabel({Title = "* Extra info:\n- You don't need todo anything, just enable the feature and other optinal options and you're good to go\n(just afk with Acc Manager Auto Relaunch)\n- Make sure to delete Sea Hub folder in Synapse workspace folder (leave Roblox first) everytime you enable or disable Cuttay Account Farm"})
-else
-    Settings.Cuttay = nil
-    Settings.CT_RaidIfMaxed = nil
-    Settings.CT_FarmBossDrop = nil
-    Settings.CT_FarmMethod = nil
-    Settings.CT_IgnoreAction = nil
+    end
+    wait(CusDelay)
 end
+spawn(function()
+    wait(1)
+    while wait() do
+        local _, e = pcall(function()
+            if Settings.Cuttay then
+                Cuttay()
+            end
+        end)
+        if e then print(e) end
+    end
+end)
+if not CuttayAccountFarm then getgenv().CuttayAccountFarm = {} end
+Section91.CreateToggle({Title = "Cuttay Account Farm 🚫✋", Desc = "Aka: 1 Click Auto Farm, Kaiton\n* Please only enable on acc haven't got Godhuman\n* Also if you using this, please do not enable anything else while this enable, make sure everything is disabled before enabling this\n* Check out #cuttay-info channel on Discord for more informations", Default = Settings.Cuttay or CuttayAccountFarm["Enable"]}, function(v)
+    if v and not Settings.Cuttay then
+        for i, v in pairs(Codes) do
+            game.ReplicatedStorage.Remotes.Redeem:InvokeServer(v)
+        end
+    elseif not v and Settings.Cuttay then
+        wait(1)
+        CT_DisableAutoRaid()
+        CT_DisableFarm()
+        AFSHopServerToggle.SetStage(false)
+    end
+    Settings.Cuttay = v
+end)
+Section91.CreateToggle({Title = "Raid if Maxed Blox Fruit", Desc = "Will go Raid if maxed stored Blox Fruit amount\n(work same as Drop if Maxed but go Raid instead)", Default = Settings.CT_RaidIfMaxed or CuttayAccountFarm["Raid if Maxed Blox Fruit"]}, function(v)
+    Settings.CT_RaidIfMaxed = v
+end)
+Section91.CreateToggle({Title = "Farm boss drops while not maxed", Desc = "While farming for stuff / level if boss spawned and you dont have their drop it will go kill them", Default = Settings.CT_FarmBossDrop2 or CuttayAccountFarm["Farm boss drops while not maxed"]}, function(v)
+    Settings.CT_FarmBossDrop2 = v
+end)
+Section91.CreateToggle({Title = "Farm Blox Fruit Mastery if maxed", Desc = "Will farm Blox Fruit's mastery (if got) when maxed\nExtra Time farm prioritize: Fighting Style -> Blox Fruit -> Swords (Mythic / Legendary)\n* Please only enable on accounts that have 0 Sword stat or an brand new one or just refund stat", Default = Settings.CT_FarmBFMastery or CuttayAccountFarm["Farm Blox Fruit Mastery if maxed"]}, function(v)
+    Settings.CT_FarmBFMastery = v
+end)
+Section91.CreateDropdown({Title = "Select Farm method after maxed", List = {
+    "Mob Farm - Level Path",
+    "Raid Boss Farm - Cake Prince Farm",
+    "Mob Aura - Haunted Castle",
+    "Mob Aura - Sea of Treats 4"
+}, Default = Settings.CT_FarmMethod or CuttayAccountFarm["Farm method after maxed"]}, function(v) 
+    Settings.CT_FarmMethod = v
+end)
+getgenv().O_ExtraTimeMasteryFarm = {
+    ["Godhuman"] = 350,
+    ["Dragon Talon"] = 350,
+    ["Sharkman Karate"] = 300,
+    ["Electric Claw"] = 330,
+    ["Death Step"] = 400,
+    ["Superhuman"] = 330
+}
+getgenv().ExtraTimeMasteryFarm = {}
+Section91.CreateToggle({Title = "Extra time Farm until unlock skills", Desc = 'After maxed and do "Farm method after maxed" it will farm Fighting Styles / Weapons until unlocked all it skill and switch to another (instead of farming until 600 Mastery then switch)', Default = Settings.CT_FarmUntilUnlock or CuttayAccountFarm["Extra time Farm until unlock skills"]}, function(v)
+    Settings.CT_FarmUntilUnlock = v
+    if v then
+        for i, v in pairs(O_ExtraTimeMasteryFarm) do
+            getgenv().ExtraTimeMasteryFarm[i] = v
+        end
+    else
+        for i, v in pairs(O_ExtraTimeMasteryFarm) do
+            getgenv().ExtraTimeMasteryFarm[i] = 600
+        end
+    end
+end)
+local HopList = {
+    "[Main] Server Hop",
+    "[Farm] Server Hop if Player nearby",
+    "[Sea 3 Quest] Server Hop for 1M+ Blox Fruit",
+}
+getgenv().SelectedIgnoreHop = {}
+if not Settings.CT_IgnoreHop then
+    Settings.CT_IgnoreHop = {}
+    for i, v in pairs(HopList) do
+        Settings.CT_IgnoreHop[v] = false
+    end
+    if CuttayAccountFarm["Ignore Hop Server Type"] then
+        for i, v in pairs(CuttayAccountFarm["Ignore Hop Server Type"]) do
+            if v then
+                Settings.CT_IgnoreHop[i] = true
+                table.insert(getgenv().SelectedIgnoreHop, i)
+            end    
+        end
+    end
+else
+    local HopLCheck = {}
+    for i, v in pairs(Settings.CT_IgnoreHop) do
+        if v then
+            table.insert(getgenv().SelectedIgnoreHop, i)
+        end
+        table.insert(HopLCheck, i)
+    end
+    for i, v in pairs(HopList) do
+        if not table.find(HopLCheck, v) then
+            Settings.CT_IgnoreHop[v] = false
+        end
+    end
+end
+Section91.CreateDropdown({Title = "Select Ignore Hop Server Type", List = Settings.CT_IgnoreHop, Selected = true}, function(i, v) 
+    if i then
+        Settings.CT_IgnoreHop[i] = v
+        if v then
+            table.insert(getgenv().SelectedIgnoreHop, i)
+        elseif table.find(SelectedIgnoreHop, i) then
+            table.remove(getgenv().SelectedIgnoreHop, table.find(SelectedIgnoreHop, i))
+        end
+    end
+end)
+if CuttayAccountFarm["Hop Server Delay"] then
+    if CuttayAccountFarm["Hop Server Delay"] > 30 then
+        CuttayAccountFarm["Hop Server Delay"] = 30
+    elseif CuttayAccountFarm["Hop Server Delay"] < 0 then
+        CuttayAccountFarm["Hop Server Delay"] = 1
+    end
+end
+Section91.CreateSlider({Title = 'Hop Server Delay (minute)', Min = 0, Max = 30, Default = Settings.CT_HopServerDelay or CuttayAccountFarm["Hop Server Delay"]}, function(v)
+    Settings.CT_HopServerDelay = v
+end)
+Section91.CreateLabel({Title = "For Hop Server Type, prevent 268 issue happening"})
+local ActionList = {
+    "Get Godhuman",
+    "Get Rengoku",
+    "Get True Triple Katana",
+    "Get Cursed Dual Katana",
+    "Get Soul Guitar",
+    "Get Hallow Scythe",
+    "Awake Current Blox Fruit",
+}
+getgenv().SelectedIgnoreAction = {}
+if not Settings.CT_IgnoreAction then
+    Settings.CT_IgnoreAction = {}
+    for i, v in pairs(ActionList) do
+        Settings.CT_IgnoreAction[v] = false
+    end
+    if CuttayAccountFarm["Ignore Action"] then
+        for i, v in pairs(CuttayAccountFarm["Ignore Action"]) do
+            if v then
+                Settings.CT_IgnoreAction[i] = true
+                table.insert(getgenv().SelectedIgnoreAction, i)
+            end    
+        end
+    end
+else
+    local ActionLCheck = {}
+    for i, v in pairs(Settings.CT_IgnoreAction) do
+        if v then
+            table.insert(getgenv().SelectedIgnoreAction, i)
+        end
+        table.insert(ActionLCheck, i)
+    end
+    for i, v in pairs(ActionList) do
+        if not table.find(ActionLCheck, v) then
+            Settings.CT_IgnoreAction[v] = false
+        end
+    end
+end
+Section91.CreateDropdown({Title = "Select Ignore Cuttay Action", List = Settings.CT_IgnoreAction, Selected = true}, function(i, v) 
+    if i then
+        Settings.CT_IgnoreAction[i] = v
+        if v then
+            table.insert(getgenv().SelectedIgnoreAction, i)
+        elseif table.find(SelectedIgnoreAction, i) then
+            table.remove(getgenv().SelectedIgnoreAction, table.find(SelectedIgnoreAction, i))
+        end
+    end
+end)
+local BuyHakiList = {
+    "Buy Enhancement",
+    "Buy Skyjump",
+    "Buy Flash Step",
+    "Buy Observation",
+}
+getgenv().SelectedBuyHaki = {}
+if not Settings.CT_BuyHaki then
+    Settings.CT_BuyHaki = {}
+    for i, v in pairs(BuyHakiList) do
+        Settings.CT_BuyHaki[v] = false
+    end
+    if CuttayAccountFarm["Buy Haki"] then
+        for i, v in pairs(CuttayAccountFarm["Buy Haki"]) do
+            if v then
+                Settings.CT_BuyHaki[i] = true
+                table.insert(getgenv().SelectedBuyHaki, i)
+            end    
+        end
+    end
+else
+    local ActionLCheck = {}
+    for i, v in pairs(Settings.CT_BuyHaki) do
+        if v then
+            table.insert(getgenv().SelectedBuyHaki, i)
+        end
+        table.insert(ActionLCheck, i)
+    end
+    for i, v in pairs(BuyHakiList) do
+        if not table.find(ActionLCheck, v) then
+            Settings.CT_BuyHaki[v] = false
+        end
+    end
+end
+Section91.CreateDropdown({Title = "Select Buy Haki", List = Settings.CT_BuyHaki, Selected = true}, function(i, v) 
+    if i then
+        Settings.CT_BuyHaki[i] = v
+        if v then
+            table.insert(getgenv().SelectedBuyHaki, i)
+        elseif table.find(SelectedBuyHaki, i) then
+            table.remove(getgenv().SelectedBuyHaki, table.find(SelectedBuyHaki, i))
+        end
+    end
+end)
+local Worlds = {
+    [2753915549] = "Sea 1",
+    [4442272183] = "Sea 2",
+    [7449423635] = "Sea 3",
+}
+local SeaHubGUI = "Page8"
+if game.PlaceId == 2753915549 then
+    SeaHubGUI = "Page7"
+end
+local FightingStyleRemotes = {
+    "BuySuperhuman",
+    "BuyDeathStep",
+    "BuySharkmanKarate",
+    "BuyElectricClaw",
+    "BuyDragonTalon",
+    "BuyGodhuman"
+}
+local RarityList = {
+    ["Mythical"] = 4,
+    ["Legendary"] = 3,
+    ["Rare"] = 2,
+    ["Uncommon"] = 1,
+    ["Common"] = 0
+}
+
+function formatNumber(v)
+    return tostring(v):reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")
+end
+function GetData(v)
+    return formatNumber(plr.Data[v].Value)
+end
+function GetScriptStatus()
+    local ScriptStatus = {}
+    for i, v in ipairs(game.CoreGui["Sea Hub GUI"].Main.MainContainer.Concacontainer.Concacmain.MainPage[SeaHubGUI].PageList["Script Status_Dot"]:GetChildren()) do
+        if v.Name == "LabelFrame" then
+            local a = "Auto Farm"
+            local b = "Auto Fighting Style / Sword"
+            local m = v.LabelBG.TextColor.Text
+            local x = m:gsub(a, "")
+            x = x:split("\]")[2]
+            x = x:gsub("\n", "")
+            if string.find(m, a) then
+                x = x:gsub(a .. ": ", "")
+                ScriptStatus[a] = x
+            else
+                x = x:gsub(b .. ": ", "")
+                ScriptStatus[b] = x
+            end
+        end
+    end
+    return ScriptStatus
+end
+function SplitStringByCapitalLetters(v)
+    return string.sub(string.gsub(v, "(%u)", " %1"), 2, -1)
+end
+function GetOwnFS()
+    local FightingStyle = {}
+    for i, v in pairs(FightingStyleRemotes) do
+        if CommF:InvokeServer(v, true) == 1 then
+            table.insert(FightingStyle, SplitStringByCapitalLetters(v:gsub("Buy", "")))
+        end
+    end
+    return FightingStyle
+end
+
+function AP_Request()
+    local OwnedFS = GetOwnFS()
+    local I_Sword = {}
+    local I_BloxFruit = {}
+    local I_Material = {}
+    for i, v in pairs(getupvalue(require(plr.PlayerGui.Main.UIController.Inventory).UpdateRender, 4)) do
+        for k, x in pairs(RarityList) do
+            if v.details.Rarity == x then
+                if not I_Sword[k] then I_Sword[k] = {} end
+                if not I_BloxFruit[k] then I_BloxFruit[k] = {} end
+                if not I_Material[k] then I_Material[k] = {} end
+                if v.details.Type == "Sword" then
+                    table.insert(I_Sword[k], v.details.Name)
+                elseif v.details.Type == "Blox Fruit" then
+                    table.insert(I_BloxFruit[k], v.details.Name)
+                elseif v.details.Type == "Material" then
+                    table.insert(I_Material[k], v.details.Name)
+                end
+            end
+        end
+    end
+    if IsHaveItem("Soul Guitar") then
+        k = "Mythical"
+        if not I_Sword[k] then I_Sword[k] = {} end
+        table.insert(I_Sword[k], "Soul Guitar")
+    end
+    for k, x in pairs(RarityList) do
+        if not I_Sword[k] then I_Sword[k] = {} end
+        if not I_BloxFruit[k] then I_BloxFruit[k] = {} end
+        if not I_Material[k] then I_Material[k] = {} end
+    end
+    function GetBloxFruitChild(x)
+        for i, v in ipairs(x:GetChildren()) do
+            if v:IsA("Tool") and string.find(v.Name, "-") then
+                return v
+            end
+        end
+    end
+    local BloxFruitChild = GetBloxFruitChild(plr.Backpack) or GetBloxFruitChild(plr.Character)
+    function GetAwakenedMove(x)
+        if not x then return end
+        local m = x:FindFirstChild("AwakenedMoves")
+        if not m then
+            return
+        end
+        local AwakenedMove = {}
+        for i, v in ipairs(m:GetChildren()) do
+            AwakenedMove[v.Name] = true
+        end
+        return AwakenedMove
+    end
+    local BF_AM = GetAwakenedMove(BloxFruitChild)
+    if not BF_AM then BF_AM = {} end
+
+    local Body = game:GetService("HttpService"):JSONEncode({
+        Name = plr.Name,
+        [plr.Name] = {
+            Name = plr.Name,
+            Level = GetData("Level"),
+            Fragments = GetData("Fragments"),
+            Beli = GetData("Beli"),
+            Race = GetData("Race"),
+            DevilFruit = GetData("DevilFruit"),
+            World = Worlds[game.PlaceId],
+            ScriptStatus = GetScriptStatus(),
+            Status = 'Online',
+            Inventory = {
+                FightingStyle = OwnedFS,
+                Mythical = {
+                    Sword = I_Sword["Mythical"],
+                    BloxFruit = I_BloxFruit["Mythical"],
+                    Material = I_Material["Mythical"]
+                },
+                Legendary = {
+                    Sword = I_Sword["Legendary"],
+                    BloxFruit = I_BloxFruit["Legendary"],
+                    Material = I_Material["Legendary"]
+                },
+                Rare = {
+                    Sword = I_Sword["Rare"],
+                    BloxFruit = I_BloxFruit["Rare"],
+                    Material = I_Material["Rare"]
+                },
+                Uncommon = {
+                    Sword = I_Sword["Uncommon"],
+                    BloxFruit = I_BloxFruit["Uncommon"],
+                    Material = I_Material["Uncommon"]
+                },
+                Common = {
+                    Sword = I_Sword["Common"],
+                    BloxFruit = I_BloxFruit["Common"],
+                    Material = I_Material["Common"]
+                },
+            },
+            AwakenedMove = {
+                Z = BF_AM["Z"],
+                X = BF_AM["X"],
+                C = BF_AM["C"],
+                V = BF_AM["V"],
+                F = BF_AM["F"],
+                TAP = BF_AM["TAP"],
+            },
+        },
+    })
+
+    http_request({
+        Url = 'https://panel.ego-d.xyz/post/' .. getgenv().Key,
+        Method = 'POST',
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = Body
+    })
+end
+spawn(function()
+    wait(1)
+    while wait() do
+        pcall(function()
+            if Settings.CT_AccountPanel and getgenv().Key then
+                if not AP_RequestDelay or tick() - AP_RequestDelay >= 300 then
+                    getgenv().AP_RequestDelay = tick()
+                    AP_Request() 
+                end
+            end
+        end)
+        wait(5)
+    end
+end)
+function GetEatFruit(x)
+    if not x then return end
+    local Fruits = {}
+    for i, v in pairs(getupvalue(require(plr.PlayerGui.Main.UIController.Inventory).UpdateRender, 4)) do
+        if v.details.Type == "Blox Fruit" then
+            if table.find(x, v.details.Name) then
+                Fruits[v.details.Value] = v.details.Name
+            end
+        end
+    end
+    local Highest = 0
+    local Fruit
+    for i, v in pairs(Fruits) do
+        if i > Highest then
+            Highest = i
+            Fruit = v
+        end
+    end
+    return Fruit
+end
+function CT_EatFruit(EatFruit)
+    if plr.PlayerGui.Main.Dialogue.Visible
+    and plr.PlayerGui.Main.Dialogue.Title.Text == "Quest" then
+        FireButton(plr.PlayerGui.Main.Dialogue.Cancel)
+    end
+    getgenv().DisableEquipItem, getgenv().DisableAutoStore = true, true
+    CommF:InvokeServer("LoadFruit", EatFruit)
+    wait(.25)
+    repeat wait()
+        getgenv().DisableEquipItem, getgenv().DisableAutoStore = true, true
+        EquipItem(FFToFruitName(EatFruit), true)
+        wait(.1)
+        game:GetService("VirtualUser"):Button1Down(Vector2.new(50, 50))
+        wait(.25)
+    until plr.PlayerGui.Main.Dialogue.Visible and plr.PlayerGui.Main.Dialogue.Option1.TextLabel.Text == "Eat"
+    or not Settings.CT_EatSniperBF
+    if Settings.CT_EatSniperBF then
+        wait(1)
+        FireButton(plr.PlayerGui.Main.Dialogue.Option1)
+        wait(3)
+        game:GetService("VirtualUser"):Button1Down(Vector2.new(50, 50))
+    end
+    getgenv().DisableEquipItem, getgenv().DisableAutoStore = false, false
+end
+spawn(function()
+    while wait(2) do
+        if Settings.CT_EatSniperBF
+        and CuttayAccountFarm and CuttayAccountFarm["Blox Fruit Sniper"] and #CuttayAccountFarm["Blox Fruit Sniper"] ~= 0
+        and plr.Data.DevilFruit.Value == "" then
+            local EatFruit = GetEatFruit(CuttayAccountFarm["Blox Fruit Sniper"])
+            if EatFruit then
+                CT_EatFruit(EatFruit)
+            end
+        end
+    end
+end)
+spawn(function()
+    while wait(2) do
+        if CuttayAccountFarm and CuttayAccountFarm["Main Blox Fruit"] and #CuttayAccountFarm["Main Blox Fruit"] ~= 0 and not table.find(CuttayAccountFarm["Main Blox Fruit"], plr.Data.DevilFruit.Value) then
+            local FruitPrio = CommF:InvokeServer("GetFruits")
+            table.sort(FruitPrio, function(a, b)
+                return a.Price > b.Price
+            end)
+            for i, v in pairs(FruitPrio) do
+                if v.OnSale
+                and table.find(CuttayAccountFarm["Main Blox Fruit"], v.Name)
+                and not table.find(CuttayAccountFarm["Main Blox Fruit"], plr.Data.DevilFruit.Value) then
+                    CommF:InvokeServer("GetFruits")
+                    CommF:InvokeServer("PurchaseRawFruit", v.Name)
+                    wait(2)
+                end
+            end
+            local EatFruit = GetEatFruit(CuttayAccountFarm["Main Blox Fruit"])
+            if EatFruit and not table.find(CuttayAccountFarm["Main Blox Fruit"], plr.Data.DevilFruit.Value) then
+                CT_EatFruit(EatFruit)
+            end
+        end
+    end
+end)
+Section91.CreateToggle({Title = "Eat Sniper Blox Fruits", Desc = "Will eat Blox Fruit Sniper/Main Blox Fruit in the list if you got one of them in Inventory, will eat the most expensive one, only eat if you're Fruitless\nCheck #script-config to configure Blox Fruit Sniper list", Default = Settings.CT_EatSniperBF or CuttayAccountFarm["Eat Sniper Blox Fruits"]}, function(v)
+    Settings.CT_EatSniperBF = v
+end)
+Section91.CreateToggle({Title = "Account Panel", Desc = "Will add current account to Account Panel list, limit: 50 accounts, data will be update every 5 minutes\nAccount Panel Website: panel.ego-d.xyz", Default = Settings.CT_AccountPanel or CuttayAccountFarm["Account Panel"]}, function(v)
+    Settings.CT_AccountPanel = v
+end)
+Section91.CreateLabel({Title = "* Extra info:\n- You don't need todo anything, just enable the feature and other optinal options and you're good to go\n(just afk with Acc Manager Auto Relaunch)\n- Make sure to delete Sea Hub folder in Synapse workspace folder (leave Roblox first) everytime you enable or disable Cuttay Account Farm"})
 
 SettingPage = Title.CreatePage({Page_Name = 'Setting', Page_Title = 'Setting Tab'})
 MFSSection = SettingPage.CreateSection('Mastery Farm Skill')
