@@ -112,7 +112,7 @@ function typeWrite(guiObject, text, delayBetweenChars)
 	for first, last in utf8.graphemes(displayText) do
 		index = index + 1
 		guiObject.MaxVisibleGraphemes = index
-		wait(delayBetweenChars)
+		task.wait(delayBetweenChars)
 	end
 end
 
@@ -126,12 +126,12 @@ end
 
 spawn(function()
     game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.25),{Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,50)}):Play()
-    wait(.25)
+    task.wait(.25)
     game:GetService('TweenService'):Create(mainStroke,TweenInfo.new(.25),{Transparency = 0 }):Play()
     game:GetService('TweenService'):Create(image,TweenInfo.new(.25),{ImageTransparency = 0 }):Play()
-    wait(.175)
+    task.wait(.175)
     game:GetService('TweenService'):Create(textLabel,TweenInfo.new(.25),{TextTransparency = 0 }):Play()
-    wait(2)
+    task.wait(2)
     typeWrite(textLabel, 'Loading...', 0.05)
 end)
 
@@ -15053,9 +15053,12 @@ local function GetScriptStatus()
     return ScriptStatus
 end
 typeWrite(textLabel, [[Script is <font color="rgb(129,255,115)">Loaded</font>]], 0.05)
-while wait() do
+while true do
     local Status = GetScriptStatus()
     local S_AutoFarm, S_AutoFSS = Status["Auto Farm"], Status["Auto Fighting Style / Sword"]
-    changeText([[<font color="rgb(129,255,115)">Auto Farm:</font> ]] .. S_AutoFarm .. "\n" .. [[<font color="rgb(129,255,115)">Auto Item:</font> ]] .. S_AutoFSS, 0.05)
-    wait(2)
+    if not Old_SAutoFarm or (Old_SAutoFarm ~=  S_AutoFarm or Old_SAutoFSS ~= S_AutoFSS) then
+        changeText([[<font color="rgb(129,255,115)">Auto Farm:</font> ]] .. S_AutoFarm .. "\n" .. [[<font color="rgb(129,255,115)">Auto Item:</font> ]] .. S_AutoFSS, 0.05)
+        getgenv().Old_SAutoFarm, getgenv().Old_SAutoFSS = S_AutoFarm, S_AutoFSS
+    end
+    task.wait(2)
 end
