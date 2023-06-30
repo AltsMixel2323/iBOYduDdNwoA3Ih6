@@ -35,15 +35,15 @@ mainFrame.Position = UDim2.new(0.5, 0, 0, 0)
 
 textLabel.Name = "textLabel"
 textLabel.Parent = mainFrame
-textLabel.AnchorPoint = Vector2.new(0.5, 0)
+textLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 textLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 textLabel.BackgroundTransparency = 1.000
 textLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 textLabel.BorderSizePixel = 0
-textLabel.Position = UDim2.new(0.5, 0, 0, 0)
+textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 textLabel.Size = UDim2.new(0, 0, 1, 0)
 textLabel.Font = Enum.Font.SourceSansBold
-textLabel.Text = ""
+textLabel.Text = "Dit Blox Fruits - Make life easier\nAn re-design version of Sea Hub's Cuttay"
 textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 textLabel.TextSize = 20.000
 textLabel.TextTransparency = 1
@@ -88,14 +88,17 @@ strokeGradient.Name = "labelGradient"
 strokeGradient.Parent = mainStroke
 
 textLabel:GetPropertyChangedSignal("Text"):Connect(function()
-	game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.175),{Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,60)}):Play()
-	--[[
-    if textLabel.TextBounds.X + 10 >= mainSizeConstraint.MaxSize.X then
-		textLabel.TextScaled = true
+	if textLabel.TextBounds.X + 10 >= mainSizeConstraint.MaxSize.X then
+		textLabel.TextWrapped = true
+		textLabel.Size = UDim2.new(0, mainSizeConstraint.MaxSize.X, 0, 0)
+		textLabel.AutomaticSize = Enum.AutomaticSize.Y
+		game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.175),{Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,textLabel.AbsoluteSize.Y + 20)}):Play()
 	else
-		textLabel.TextScaled = false
+		textLabel.TextWrapped = false
+		textLabel.Size = UDim2.new(0, 0, 1, 0)
+		textLabel.AutomaticSize = Enum.AutomaticSize.X
+		game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.175),{Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,60)}):Play()
 	end
-    ]]
 end)
 
 function typeWrite(guiObject, text, delayBetweenChars)
@@ -114,7 +117,7 @@ function typeWrite(guiObject, text, delayBetweenChars)
 	for first, last in utf8.graphemes(displayText) do
 		index = index + 1
 		guiObject.MaxVisibleGraphemes = index
-		task.wait(delayBetweenChars)
+		wait(delayBetweenChars)
 	end
 end
 
@@ -126,7 +129,7 @@ function changeText(text)
 	textLabel.Text = text
 end
 
-game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.25),{Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,50)}):Play()
+game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.25),{Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,80)}):Play()
 wait(.25)
 game:GetService('TweenService'):Create(mainStroke,TweenInfo.new(.25),{Transparency = 0 }):Play()
 game:GetService('TweenService'):Create(image,TweenInfo.new(.25),{ImageTransparency = 0 }):Play()
@@ -908,7 +911,7 @@ local Library = loadstring([[
 	Gui = Instance.new('ScreenGui')
 	Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	Gui.Name = 'Sea Hub GUI'
-	Gui.Enabled = true
+	Gui.Enabled = false
 	
 	NotiGui = Instance.new('ScreenGui')
 	NotiGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
