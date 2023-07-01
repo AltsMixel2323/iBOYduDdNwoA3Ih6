@@ -510,7 +510,7 @@ loadstring([[
                     p13.timeToNextAttack = 0
                     p13.attacking = false
                     p13.increment = 3
-                    game:GetService("VirtualUser"):Button1Down(Vector2.new(50, 50))
+                    game:GetService("VirtualUser"):Button1Down(Vector2.new(0, 0))
                 end
             end
         end
@@ -10377,6 +10377,7 @@ function AutoFarmFeatures()
                                 if v.Particles.Main.Enabled then
                                     TorchCounter = TorchCounter + 1
                                 end
+                                wait(1)
                             end
                         end
                     until TorchCounter == 6
@@ -10827,6 +10828,7 @@ function AutoFarmFeatures()
                 if CheckPlrBackpack("Special Microchip") then
                     AutoFarmLabel.SetText(LabelTextAF ..  "Joining Raid")
                     if RaidSummon.MainRaid.Color.Color == RaidColor then
+                        --[[
                         local Timer = tick()
                         repeat wait()
                             if CheckPlrBackpack("Special Microchip") and not TweenPath then
@@ -10835,6 +10837,7 @@ function AutoFarmFeatures()
                             end
                         until plr.PlayerGui.Main.Timer.Visible or not Settings.AutoRaid and not Settings.Cuttay or tick() - Timer > 30
                         return
+                        ]]
                     else
                         Library.CreateNoti({Desc = 'There is a Raid are starting, waiting ...', ShowTime = 5})
                         wait(2)
@@ -14564,10 +14567,6 @@ local Worlds = {
     [4442272183] = "Sea 2",
     [7449423635] = "Sea 3",
 }
-local SeaHubGUI = "Page8"
-if game.PlaceId == 2753915549 then
-    SeaHubGUI = "Page7"
-end
 local FightingStyleRemotes = {
     "BuySuperhuman",
     "BuyDeathStep",
@@ -14590,21 +14589,21 @@ end
 function GetData(v)
     return formatNumber(plr.Data[v].Value)
 end
-function GetScriptStatus()
+local page = game.PlaceId == 2753915549 and 'Page7' or 'Page8'
+local function GetScriptStatus()
     local ScriptStatus = {}
-    for i, v in ipairs(game.CoreGui["Sea Hub GUI"].Main.MainContainer.Concacontainer.Concacmain.MainPage[SeaHubGUI].PageList["Script Status_Dot"]:GetChildren()) do
+    for i, v in ipairs(game.CoreGui["Sea Hub GUI"].Main.MainContainer.Concacontainer.Concacmain.MainPage[page].PageList["Script Status_Dot"]:GetChildren()) do
         if v.Name == "LabelFrame" then
             local a = "Auto Farm"
             local b = "Auto Fighting Style / Sword"
             local m = v.LabelBG.TextColor.Text
             local x = m:gsub(a, "")
-            x = x:split("\]")[2]
+            x = x:split("]")[2]
+            x = x:gsub(": ", "")
             x = x:gsub("\n", "")
             if string.find(m, a) then
-                x = x:gsub(a .. ": ", "")
                 ScriptStatus[a] = x
             else
-                x = x:gsub(b .. ": ", "")
                 ScriptStatus[b] = x
             end
         end
@@ -15043,27 +15042,6 @@ end
 repeat wait(3)
 until game.CoreGui:FindFirstChild("Sea Hub GUI")
 repeat wait(1) until game.CoreGui["Sea Hub GUI"].Main.MainContainer:FindFirstChild('Concacontainer')
-local page = game.PlaceId == 2753915549 and 'Page7' or 'Page8'
-local function GetScriptStatus()
-    local ScriptStatus = {}
-    for i, v in ipairs(game.CoreGui["Sea Hub GUI"].Main.MainContainer.Concacontainer.Concacmain.MainPage[page].PageList["Script Status_Dot"]:GetChildren()) do
-        if v.Name == "LabelFrame" then
-            local a = "Auto Farm"
-            local b = "Auto Fighting Style / Sword"
-            local m = v.LabelBG.TextColor.Text
-            local x = m:gsub(a, "")
-            x = x:split("]")[2]
-            x = x:gsub(": ", "")
-            x = x:gsub("\n", "")
-            if string.find(m, a) then
-                ScriptStatus[a] = x
-            else
-                ScriptStatus[b] = x
-            end
-        end
-    end
-    return ScriptStatus
-end
 typeWrite(textLabel, [[Script is <font color="rgb(129,255,115)">Loaded</font>]], 0.05)
 while true do
     local Status = GetScriptStatus()
