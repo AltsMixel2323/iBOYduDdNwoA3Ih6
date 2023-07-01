@@ -507,10 +507,11 @@ loadstring([[
                 end
                 local p13 = ret.activeController
                 if p13 and p13.timeToNextAttack then
+                    p13:Attack()
                     p13.timeToNextAttack = 0
                     p13.attacking = false
                     p13.increment = 3
-                    game:GetService("VirtualUser"):Button1Down(Vector2.new(0, 0))
+                    --game:GetService("VirtualUser"):Button1Down(Vector2.new(0, 0))
                 end
             end
         end
