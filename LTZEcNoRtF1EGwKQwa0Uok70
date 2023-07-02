@@ -431,6 +431,7 @@ local UpgradeList = {
     "Pet Storage"
 }
 function AutoOverlord()
+    --[[
     if not LastRewardCheck or tick() - LastRewardCheck > 120 then
         local CurrentArea, CurrentWorld = GetNearestArea(), Library.WorldCmds.Get() 
         if VIPOwned and IsRewardReady(14400, F_Lib.Save.Get().VIPCooldown) then
@@ -470,6 +471,7 @@ function AutoOverlord()
         end
         getgenv().LastRewardCheck = tick()
     end
+    ]]
     if DitPSX["Auto Daycare"] and (not LastCheckDaycare or tick() - LastCheckDaycare > 120) then
         local CurrentArea, CurrentWorld = GetNearestArea(), Library.WorldCmds.Get() 
         getgenv().LastCheckDaycare = tick()
