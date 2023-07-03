@@ -14139,6 +14139,7 @@ function Cuttay()
     if not Settings.NoFog and NoFogToggle then NoFogToggle.SetStage(true) end
     if not Settings.RemoveScreenShake and RemoveScreenShakeToggle then RemoveScreenShakeToggle.SetStage(true) end
     if not Settings.IgnoreYTween and IgnoreYTweenToggle then IgnoreYTweenToggle.SetStage(true) end
+    if not Settings.WaterWalker and WaterWalkerToggle then WaterWalkerToggle.SetStage(true) end
     if not Settings.AutoEnhancement and AutoEnhancementToggle then AutoEnhancementToggle.SetStage(true) end
     if not Settings.AutoObservation and AutoObservationToggle then AutoObservationToggle.SetStage(true) end
     if not TemporaryDisableAttackNoCD and not Settings.AttackNoCD and AttackNoCDToggle then AttackNoCDToggle.SetStage(true) end
