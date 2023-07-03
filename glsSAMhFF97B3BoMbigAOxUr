@@ -329,7 +329,7 @@ textLabel:GetPropertyChangedSignal("Text"):Connect(function()
 		textLabel.TextWrapped = true
 		textLabel.Size = UDim2.new(0, mainSizeConstraint.MaxSize.X, 0, 0)
 		textLabel.AutomaticSize = Enum.AutomaticSize.Y
-		game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.175),{Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,textLabel.AbsoluteSize.Y + 20)}):Play()
+		game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.175),{Size = UDim2.fromOffset(mainSizeConstraint.MaxSize.X + 10 ,textLabel.AbsoluteSize.Y + 20)}):Play()
 	else
 		textLabel.TextWrapped = false
 		textLabel.Size = UDim2.new(0, 0, 1, 0)
