@@ -264,7 +264,7 @@ mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 mainFrame.BackgroundTransparency = 0.250
 mainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 mainFrame.BorderSizePixel = 0
-mainFrame.Position = UDim2.new(0.5, 0, 0, 0)
+mainFrame.Position = UDim2.new(0.5, 0, 0, 10)
 
 textLabel.Name = "textLabel"
 textLabel.Parent = mainFrame
@@ -276,7 +276,7 @@ textLabel.BorderSizePixel = 0
 textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 textLabel.Size = UDim2.new(0, 0, 1, 0)
 textLabel.Font = Enum.Font.SourceSansBold
-textLabel.Text = ""
+textLabel.Text = "Dit Blox Fruits - Make life easier\nAn re-design version of Sea Hub's Cuttay"
 textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 textLabel.TextSize = 20.000
 textLabel.TextTransparency = 1
@@ -306,7 +306,11 @@ image.ImageTransparency = 1.000
 
 mainSizeConstraint.Name = "mainSizeConstraint"
 mainSizeConstraint.Parent = mainFrame
-mainSizeConstraint.MaxSize = Vector2.new(965, 9999)
+if game:GetService("UserInputService").TouchEnabled and game:GetService("UserInputService").KeyboardEnabled == false then
+	mainSizeConstraint.MaxSize = Vector2.new(700, 9999)
+else
+	mainSizeConstraint.MaxSize = Vector2.new(965, 9999)
+end
 
 mainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 mainStroke.Color = Color3.fromRGB(255,255,255)
@@ -362,13 +366,13 @@ function changeText(text)
 	textLabel.Text = text
 end
 
-game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.25),{Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,80)}):Play()
-wait(.25)
-game:GetService('TweenService'):Create(mainStroke,TweenInfo.new(.25),{Transparency = 0 }):Play()
-game:GetService('TweenService'):Create(image,TweenInfo.new(.25),{ImageTransparency = 0 }):Play()
-wait(.175)
-game:GetService('TweenService'):Create(textLabel,TweenInfo.new(.25),{TextTransparency = 0 }):Play()
-wait(2)
+loadSize = game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.25),{Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,80)})
+loadSize:Play()
+loadSize.Completed:Connect(function()
+	game:GetService('TweenService'):Create(mainStroke,TweenInfo.new(.25),{Transparency = 0 }):Play()
+	game:GetService('TweenService'):Create(image,TweenInfo.new(.25),{ImageTransparency = 0 }):Play()
+	game:GetService('TweenService'):Create(textLabel,TweenInfo.new(.25),{TextTransparency = 0 }):Play()
+end)
 changeText("Dit Blox Fruits - Make life easier\nAn re-design version of Sea Hub's Cuttay")
 wait(2)
 typeWrite(textLabel, 'Loading...', 0.05)
