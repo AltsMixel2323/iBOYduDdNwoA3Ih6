@@ -234,7 +234,7 @@ end
 if true then
     local LoadTimer = tick()
     repeat wait(1)
-        if CuttayAccountFarm and tick() - LoadTimer > 60 then
+        if DitBF and tick() - LoadTimer > 60 then
             game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
         end
     until game:IsLoaded()
@@ -423,8 +423,8 @@ if not getgenv().NoclipRun then
 end
 
 HttpService = game:GetService("HttpService")
-SaveFileName = plr.Name .. "_BloxFruits.json"
-if CuttayAccountFarm then
+SaveFileName = plr.Name .. ".json"
+if DitBF then
     local tabletostring = function(node)
         if type(node) ~= "table" then return node end
         local cache, stack, output = {},{},{}
@@ -488,21 +488,21 @@ if CuttayAccountFarm then
         end
         table.insert(output,output_str)
         output_str = table.concat(output)
-        return "getgenv().CuttayAccountFarm = " .. output_str
+        return "getgenv().DitBF = " .. output_str
     end
-    if not isfolder("Sea Hub") then
-        makefolder("Sea Hub")
+    if not isfolder("DitBloxFruit") then
+        makefolder("DitBloxFruit")
     end
-    local CuttayConfigText = tabletostring(CuttayAccountFarm)
-    local CTFileName = plr.Name .. "_CTConfig_BloxFruits.txt"
-    if not isfile("Sea Hub/" .. CTFileName) then
-        writefile("Sea Hub/" .. CTFileName, CuttayConfigText)
+    local CuttayConfigText = tabletostring(DitBF)
+    local CTFileName = plr.Name .. "_Config.txt"
+    if not isfile("DitBloxFruit/" .. CTFileName) then
+        writefile("DitBloxFruit/" .. CTFileName, CuttayConfigText)
     else
-        if readfile("Sea Hub/" .. CTFileName) ~= CuttayConfigText then
-            warn("Detected new Cuttay config for " .. plr.Name)
-            writefile("Sea Hub/" .. CTFileName, CuttayConfigText)
-            if isfile("Sea Hub/" .. SaveFileName) then
-                delfile("Sea Hub/" .. SaveFileName)
+        if readfile("DitBloxFruit/" .. CTFileName) ~= CuttayConfigText then
+            warn("Detected new config for " .. plr.Name)
+            writefile("DitBloxFruit/" .. CTFileName, CuttayConfigText)
+            if isfile("DitBloxFruit/" .. SaveFileName) then
+                delfile("DitBloxFruit/" .. SaveFileName)
             end
         end
     end
@@ -541,17 +541,17 @@ function DeseriSetting(sett)
     return allsett
 end
 function SaveSettings()
-    if not isfolder("Sea Hub") then
-        makefolder("Sea Hub")
+    if not isfolder("DitBloxFruit") then
+        makefolder("DitBloxFruit")
     end
-    writefile("Sea Hub/" .. SaveFileName, HttpService:JSONEncode(Conv2Save(Settings)))
+    writefile("DitBloxFruit/" .. SaveFileName, HttpService:JSONEncode(Conv2Save(Settings)))
 end
 function ReadSetting() 
     local s,e = pcall(function() 
-        if not isfolder("Sea Hub") then
-            makefolder("Sea Hub")
+        if not isfolder("DitBloxFruit") then
+            makefolder("DitBloxFruit")
         end
-        return DeseriSetting(HttpService:JSONDecode(readfile("Sea Hub/" .. SaveFileName)))
+        return DeseriSetting(HttpService:JSONDecode(readfile("DitBloxFruit/" .. SaveFileName)))
     end)
     if s then return e 
     else
@@ -663,7 +663,7 @@ if not plr.Backpack:FindFirstChildOfClass("Tool")
 and not plr.Character:FindFirstChildOfClass("Tool") then
     local LoadTimer = tick()
     repeat wait()
-        if CuttayAccountFarm and tick() - LoadTimer > 60 then
+        if DitBF and tick() - LoadTimer > 60 then
             game:GetService("TeleportService"):Teleport(game.PlaceId, plr)
         end
         if not plr.PlayerGui:FindFirstChild("Main") then
@@ -1024,19 +1024,19 @@ local Library = loadstring([[
 	
 	function SaveCustomUISettings()
 		local HttpService = game:GetService("HttpService")
-		if not isfolder("Sea Hub") then
-			makefolder("Sea Hub")
+		if not isfolder("DitBloxFruit") then
+			makefolder("DitBloxFruit")
 		end
-		writefile("Sea Hub/" .. SaveCustomFileName, HttpService:JSONEncode(CorrectTable(SettingsRac)))
+		writefile("DitBloxFruit/" .. SaveCustomFileName, HttpService:JSONEncode(CorrectTable(SettingsRac)))
 	end
 	
 	function ReadCustomUISetting() 
 		local s,e = pcall(function() 
 			local HttpService = game:GetService("HttpService")
-			if not isfolder("Sea Hub") then
-				makefolder("Sea Hub")
+			if not isfolder("DitBloxFruit") then
+				makefolder("DitBloxFruit")
 			end
-			return HttpService:JSONDecode(readfile("Sea Hub/" .. SaveCustomFileName))
+			return HttpService:JSONDecode(readfile("DitBloxFruit/" .. SaveCustomFileName))
 		end)
 		if s then return e 
 		else
@@ -5717,8 +5717,8 @@ else
         end
     end
 end
-if CuttayAccountFarm and CuttayAccountFarm["Blox Fruit Sniper"] then
-    for i, v in pairs(CuttayAccountFarm["Blox Fruit Sniper"]) do
+if DitBF and DitBF["Blox Fruit Sniper"] then
+    for i, v in pairs(DitBF["Blox Fruit Sniper"]) do
         if table.find(BloxFruitList, v) then
             Settings.SnipeBloxFruit[v] = true
             table.insert(getgenv().SelectedSnipeBloxFruit, i)
@@ -14129,7 +14129,7 @@ function Cuttay()
             AutoNextSeaToggle.SetStage(true)
         end
     end
-    if CuttayAccountFarm and CuttayAccountFarm["Blox Fruit Sniper"] and #CuttayAccountFarm["Blox Fruit Sniper"] ~= 0
+    if DitBF and DitBF["Blox Fruit Sniper"] and #DitBF["Blox Fruit Sniper"] ~= 0
     and not table.find(SelectedSnipeBloxFruit, tostring(plr.Data.DevilFruit.Value)) 
     and not Settings.BFDealerSniper and BFDealerSniperToggle then
         BFDealerSniperToggle.SetStage(true)
@@ -14603,8 +14603,8 @@ spawn(function()
         if e then print(e) end
     end
 end)
-if not CuttayAccountFarm then getgenv().CuttayAccountFarm = {} end
-Section91.CreateToggle({Title = "Cuttay Account Farm 🚫✋", Desc = "Aka: 1 Click Auto Farm, Kaiton\n* Please only enable on acc haven't got Godhuman\n* Also if you using this, please do not enable anything else while this enable, make sure everything is disabled before enabling this\n* Check out #cuttay-info channel on Discord for more informations", Default = Settings.Cuttay or CuttayAccountFarm["Enable"]}, function(v)
+if not DitBF then getgenv().DitBF = {} end
+Section91.CreateToggle({Title = "Cuttay Account Farm 🚫✋", Desc = "Aka: 1 Click Auto Farm, Kaiton\n* Please only enable on acc haven't got Godhuman\n* Also if you using this, please do not enable anything else while this enable, make sure everything is disabled before enabling this\n* Check out #cuttay-info channel on Discord for more informations", Default = Settings.Cuttay or DitBF["Enable"]}, function(v)
     if v and not Settings.Cuttay then
         for i, v in pairs(Codes) do
             game.ReplicatedStorage.Remotes.Redeem:InvokeServer(v)
@@ -14617,13 +14617,13 @@ Section91.CreateToggle({Title = "Cuttay Account Farm 🚫✋", Desc = "Aka: 1 Cl
     end
     Settings.Cuttay = v
 end)
-Section91.CreateToggle({Title = "Raid if Maxed Blox Fruit", Desc = "Will go Raid if maxed stored Blox Fruit amount\n(work same as Drop if Maxed but go Raid instead)", Default = Settings.CT_RaidIfMaxed or CuttayAccountFarm["Raid if Maxed Blox Fruit"]}, function(v)
+Section91.CreateToggle({Title = "Raid if Maxed Blox Fruit", Desc = "Will go Raid if maxed stored Blox Fruit amount\n(work same as Drop if Maxed but go Raid instead)", Default = Settings.CT_RaidIfMaxed or DitBF["Raid if Maxed Blox Fruit"]}, function(v)
     Settings.CT_RaidIfMaxed = v
 end)
-Section91.CreateToggle({Title = "Farm boss drops while not maxed", Desc = "While farming for stuff / level if boss spawned and you dont have their drop it will go kill them", Default = Settings.CT_FarmBossDrop2 or CuttayAccountFarm["Farm boss drops while not maxed"]}, function(v)
+Section91.CreateToggle({Title = "Farm boss drops while not maxed", Desc = "While farming for stuff / level if boss spawned and you dont have their drop it will go kill them", Default = Settings.CT_FarmBossDrop2 or DitBF["Farm boss drops while not maxed"]}, function(v)
     Settings.CT_FarmBossDrop2 = v
 end)
-Section91.CreateToggle({Title = "Farm Blox Fruit Mastery if maxed", Desc = "Will farm Blox Fruit's mastery (if got) when maxed\nExtra Time farm prioritize: Fighting Style -> Blox Fruit -> Swords (Mythic / Legendary)\n* Please only enable on accounts that have 0 Sword stat or an brand new one or just refund stat", Default = Settings.CT_FarmBFMastery or CuttayAccountFarm["Farm Blox Fruit Mastery if maxed"]}, function(v)
+Section91.CreateToggle({Title = "Farm Blox Fruit Mastery if maxed", Desc = "Will farm Blox Fruit's mastery (if got) when maxed\nExtra Time farm prioritize: Fighting Style -> Blox Fruit -> Swords (Mythic / Legendary)\n* Please only enable on accounts that have 0 Sword stat or an brand new one or just refund stat", Default = Settings.CT_FarmBFMastery or DitBF["Farm Blox Fruit Mastery if maxed"]}, function(v)
     Settings.CT_FarmBFMastery = v
 end)
 Section91.CreateDropdown({Title = "Select Farm method after maxed", List = {
@@ -14631,7 +14631,7 @@ Section91.CreateDropdown({Title = "Select Farm method after maxed", List = {
     "Raid Boss Farm - Cake Prince Farm",
     "Mob Aura - Haunted Castle",
     "Mob Aura - Sea of Treats 4"
-}, Default = Settings.CT_FarmMethod or CuttayAccountFarm["Farm method after maxed"]}, function(v) 
+}, Default = Settings.CT_FarmMethod or DitBF["Farm method after maxed"]}, function(v) 
     Settings.CT_FarmMethod = v
 end)
 getgenv().O_ExtraTimeMasteryFarm = {
@@ -14643,7 +14643,7 @@ getgenv().O_ExtraTimeMasteryFarm = {
     ["Superhuman"] = 330
 }
 getgenv().ExtraTimeMasteryFarm = {}
-Section91.CreateToggle({Title = "Extra time Farm until unlock skills", Desc = 'After maxed and do "Farm method after maxed" it will farm Fighting Styles / Weapons until unlocked all it skill and switch to another (instead of farming until 600 Mastery then switch)', Default = Settings.CT_FarmUntilUnlock or CuttayAccountFarm["Extra time Farm until unlock skills"]}, function(v)
+Section91.CreateToggle({Title = "Extra time Farm until unlock skills", Desc = 'After maxed and do "Farm method after maxed" it will farm Fighting Styles / Weapons until unlocked all it skill and switch to another (instead of farming until 600 Mastery then switch)', Default = Settings.CT_FarmUntilUnlock or DitBF["Extra time Farm until unlock skills"]}, function(v)
     Settings.CT_FarmUntilUnlock = v
     if v then
         for i, v in pairs(O_ExtraTimeMasteryFarm) do
@@ -14666,8 +14666,8 @@ if not Settings.CT_IgnoreHop then
     for i, v in pairs(HopList) do
         Settings.CT_IgnoreHop[v] = false
     end
-    if CuttayAccountFarm["Ignore Hop Server Type"] then
-        for i, v in pairs(CuttayAccountFarm["Ignore Hop Server Type"]) do
+    if DitBF["Ignore Hop Server Type"] then
+        for i, v in pairs(DitBF["Ignore Hop Server Type"]) do
             if v then
                 Settings.CT_IgnoreHop[i] = true
                 table.insert(getgenv().SelectedIgnoreHop, i)
@@ -14698,14 +14698,14 @@ Section91.CreateDropdown({Title = "Select Ignore Hop Server Type", List = Settin
         end
     end
 end)
-if CuttayAccountFarm["Hop Server Delay"] then
-    if CuttayAccountFarm["Hop Server Delay"] > 30 then
-        CuttayAccountFarm["Hop Server Delay"] = 30
-    elseif CuttayAccountFarm["Hop Server Delay"] < 0 then
-        CuttayAccountFarm["Hop Server Delay"] = 1
+if DitBF["Hop Server Delay"] then
+    if DitBF["Hop Server Delay"] > 30 then
+        DitBF["Hop Server Delay"] = 30
+    elseif DitBF["Hop Server Delay"] < 0 then
+        DitBF["Hop Server Delay"] = 1
     end
 end
-Section91.CreateSlider({Title = 'Hop Server Delay (minute)', Min = 0, Max = 30, Default = Settings.CT_HopServerDelay or CuttayAccountFarm["Hop Server Delay"]}, function(v)
+Section91.CreateSlider({Title = 'Hop Server Delay (minute)', Min = 0, Max = 30, Default = Settings.CT_HopServerDelay or DitBF["Hop Server Delay"]}, function(v)
     Settings.CT_HopServerDelay = v
 end)
 Section91.CreateLabel({Title = "For Hop Server Type, prevent 268 issue happening"})
@@ -14724,8 +14724,8 @@ if not Settings.CT_IgnoreAction then
     for i, v in pairs(ActionList) do
         Settings.CT_IgnoreAction[v] = false
     end
-    if CuttayAccountFarm["Ignore Action"] then
-        for i, v in pairs(CuttayAccountFarm["Ignore Action"]) do
+    if DitBF["Ignore Action"] then
+        for i, v in pairs(DitBF["Ignore Action"]) do
             if v then
                 Settings.CT_IgnoreAction[i] = true
                 table.insert(getgenv().SelectedIgnoreAction, i)
@@ -14768,8 +14768,8 @@ if not Settings.CT_BuyHaki then
     for i, v in pairs(BuyHakiList) do
         Settings.CT_BuyHaki[v] = false
     end
-    if CuttayAccountFarm["Buy Haki"] then
-        for i, v in pairs(CuttayAccountFarm["Buy Haki"]) do
+    if DitBF["Buy Haki"] then
+        for i, v in pairs(DitBF["Buy Haki"]) do
             if v then
                 Settings.CT_BuyHaki[i] = true
                 table.insert(getgenv().SelectedBuyHaki, i)
@@ -15036,9 +15036,9 @@ end
 spawn(function()
     while wait(2) do
         if Settings.CT_EatSniperBF
-        and CuttayAccountFarm and CuttayAccountFarm["Blox Fruit Sniper"] and #CuttayAccountFarm["Blox Fruit Sniper"] ~= 0
+        and DitBF and DitBF["Blox Fruit Sniper"] and #DitBF["Blox Fruit Sniper"] ~= 0
         and plr.Data.DevilFruit.Value == "" then
-            local EatFruit = GetEatFruit(CuttayAccountFarm["Blox Fruit Sniper"])
+            local EatFruit = GetEatFruit(DitBF["Blox Fruit Sniper"])
             if EatFruit then
                 CT_EatFruit(EatFruit)
             end
@@ -15047,31 +15047,31 @@ spawn(function()
 end)
 spawn(function()
     while wait(2) do
-        if CuttayAccountFarm and CuttayAccountFarm["Main Blox Fruit"] and #CuttayAccountFarm["Main Blox Fruit"] ~= 0 and not table.find(CuttayAccountFarm["Main Blox Fruit"], plr.Data.DevilFruit.Value) then
+        if DitBF and DitBF["Main Blox Fruit"] and #DitBF["Main Blox Fruit"] ~= 0 and not table.find(DitBF["Main Blox Fruit"], plr.Data.DevilFruit.Value) then
             local FruitPrio = CommF:InvokeServer("GetFruits")
             table.sort(FruitPrio, function(a, b)
                 return a.Price > b.Price
             end)
             for i, v in pairs(FruitPrio) do
                 if v.OnSale
-                and table.find(CuttayAccountFarm["Main Blox Fruit"], v.Name)
-                and not table.find(CuttayAccountFarm["Main Blox Fruit"], plr.Data.DevilFruit.Value) then
+                and table.find(DitBF["Main Blox Fruit"], v.Name)
+                and not table.find(DitBF["Main Blox Fruit"], plr.Data.DevilFruit.Value) then
                     CommF:InvokeServer("GetFruits")
                     CommF:InvokeServer("PurchaseRawFruit", v.Name)
                     wait(2)
                 end
             end
-            local EatFruit = GetEatFruit(CuttayAccountFarm["Main Blox Fruit"])
-            if EatFruit and not table.find(CuttayAccountFarm["Main Blox Fruit"], plr.Data.DevilFruit.Value) then
+            local EatFruit = GetEatFruit(DitBF["Main Blox Fruit"])
+            if EatFruit and not table.find(DitBF["Main Blox Fruit"], plr.Data.DevilFruit.Value) then
                 CT_EatFruit(EatFruit)
             end
         end
     end
 end)
-Section91.CreateToggle({Title = "Eat Sniper Blox Fruits", Desc = "Will eat Blox Fruit Sniper/Main Blox Fruit in the list if you got one of them in Inventory, will eat the most expensive one, only eat if you're Fruitless\nCheck #script-config to configure Blox Fruit Sniper list", Default = Settings.CT_EatSniperBF or CuttayAccountFarm["Eat Sniper Blox Fruits"]}, function(v)
+Section91.CreateToggle({Title = "Eat Sniper Blox Fruits", Desc = "Will eat Blox Fruit Sniper/Main Blox Fruit in the list if you got one of them in Inventory, will eat the most expensive one, only eat if you're Fruitless\nCheck #script-config to configure Blox Fruit Sniper list", Default = Settings.CT_EatSniperBF or DitBF["Eat Sniper Blox Fruits"]}, function(v)
     Settings.CT_EatSniperBF = v
 end)
-Section91.CreateToggle({Title = "Account Panel", Desc = "Will add current account to Account Panel list, limit: 50 accounts, data will be update every 5 minutes\nAccount Panel Website: panel.ego-d.xyz", Default = Settings.CT_AccountPanel or CuttayAccountFarm["Account Panel"]}, function(v)
+Section91.CreateToggle({Title = "Account Panel", Desc = "Will add current account to Account Panel list, limit: 50 accounts, data will be update every 5 minutes\nAccount Panel Website: panel.ego-d.xyz", Default = Settings.CT_AccountPanel or DitBF["Account Panel"]}, function(v)
     Settings.CT_AccountPanel = v
 end)
 Section91.CreateLabel({Title = "* Extra info:\n- You don't need todo anything, just enable the feature and other optinal options and you're good to go\n(just afk with Acc Manager Auto Relaunch)\n- Make sure to delete Sea Hub folder in Synapse workspace folder (leave Roblox first) everytime you enable or disable Cuttay Account Farm"})
