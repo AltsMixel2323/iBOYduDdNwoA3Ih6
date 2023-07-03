@@ -14150,7 +14150,7 @@ function Cuttay()
     if not Settings.AttackAutoScale and AttackAutoScaleToggle then AttackAutoScaleToggle.SetStage(true) end
     if Settings.Distance ~= 40 then Settings.Distance = 40 end
     if Settings.DefaultYLevel ~= 400 then Settings.DefaultYLevel = 400 end
-    if Settings.TweenSpeed ~= 300 then Settings.TweenSpeed = 300 end
+    if Settings.TweenSpeed ~= 250 then Settings.TweenSpeed = 250 end
     if not Settings.TweenBF and TweenBFToggle then TweenBFToggle.SetStage(true) end
     if not Settings.TweenNBF and TweenNBFToggle then TweenNBFToggle.SetStage(true) end
     if game.PlaceId ~= 2753915549 and not Settings.AutoWorldEvent and AutoWorldEventToggle then AutoWorldEventToggle.SetStage(true) end
