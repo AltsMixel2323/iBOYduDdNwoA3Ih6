@@ -362,14 +362,14 @@ function changeText(text)
 	textLabel.Text = text
 end
 
-changeText("Dit Blox Fruits - Make life easier\nAn re-design version of Sea Hub's Cuttay")
-wait(2)
 game:GetService('TweenService'):Create(mainFrame,TweenInfo.new(.25),{Size = UDim2.fromOffset(textLabel.AbsoluteSize.X + 10,80)}):Play()
 wait(.25)
 game:GetService('TweenService'):Create(mainStroke,TweenInfo.new(.25),{Transparency = 0 }):Play()
 game:GetService('TweenService'):Create(image,TweenInfo.new(.25),{ImageTransparency = 0 }):Play()
 wait(.175)
 game:GetService('TweenService'):Create(textLabel,TweenInfo.new(.25),{TextTransparency = 0 }):Play()
+wait(2)
+changeText("Dit Blox Fruits - Make life easier\nAn re-design version of Sea Hub's Cuttay")
 wait(2)
 typeWrite(textLabel, 'Loading...', 0.05)
 
