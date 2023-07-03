@@ -5265,8 +5265,8 @@ function CheckMoon()
                     },
                 },
                 ["footer"] = {
-                    ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
-                    ["text"] = "Sea Hub - Moon Finder"
+                    ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
+                    ["text"] = "Dit BF - Moon Finder"
                 }
             }}
         }, "https://discord.com/api/webhooks/1075721391971770378/kTYu4xbIAqAtcPIOfRlVJ0nUDfilbkwA3JF0o3im6hWBNqKxR7bS9-jQxR4SclsDvXFT")
@@ -5318,8 +5318,8 @@ function CheckMirage()
                     },
                 },
                 ["footer"] = {
-                    ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
-                    ["text"] = "Sea Hub - Mirage Finder"
+                    ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
+                    ["text"] = "Dit BF - Mirage Finder"
                 }
             }}
         }, "https://discord.com/api/webhooks/1075721480182177802/S86T1MZXEB3y4gW5Z6jPaMgVF5FpJ03OnNlalsZAd_AP_AhYfRERV6WajvoEw2mL6Mo6")
@@ -5366,8 +5366,8 @@ function CheckAura()
                         },
                     },
                     ["footer"] = {
-                        ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
-                        ["text"] = "Sea Hub - Aura Finder"
+                        ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
+                        ["text"] = "Dit BF - Aura Finder"
                     }
                 }}
             }, "https://discord.com/api/webhooks/1077011976460443658/hyQPK3mG2VSaaMxZsePTAAIYpZI7o11ZGqWt-Z4cjxbW1-vegXMP5_KvnqxCCrWpZkBj")
@@ -5412,8 +5412,8 @@ function CheckLegSword()
                     },
                 },
                 ["footer"] = {
-                    ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
-                    ["text"] = "Sea Hub - Legend Sword Finder"
+                    ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
+                    ["text"] = "Dit BF - Legend Sword Finder"
                 }
             }}
         }, "https://discord.com/api/webhooks/1075752048122929222/ctTdJe-ePmWBaDfV5Gu_Xsw-RiMy7teFtPef4V5dB3CftLB0KNp5nWS0zaQe2RZpiBYS")
@@ -5818,7 +5818,7 @@ spawn(function()
                                             }
                                         },
                                         ["footer"] = {
-                                            ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                                            ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                                             ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                                         }
                                     }}
@@ -5917,7 +5917,7 @@ spawn(function()
                                             }
                                         },
                                         ["footer"] = {
-                                            ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                                            ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                                             ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                                         }
                                     }}
@@ -5970,7 +5970,7 @@ spawn(function()
                                                     }
                                                 },
                                                 ["footer"] = {
-                                                    ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                                                    ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                                                     ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                                                 }
                                             }}
@@ -8994,7 +8994,7 @@ function AutoFarmFeatures()
                                 }
                             },
                             ["footer"] = {
-                                ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                                ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                                 ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                             }
                         }}
@@ -10672,7 +10672,7 @@ function AutoFarmFeatures()
                                 }
                             },
                             ["footer"] = {
-                                ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                                ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                                 ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                             }
                         }}
@@ -10748,7 +10748,7 @@ function AutoFarmFeatures()
                                 }
                             },
                             ["footer"] = {
-                                ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                                ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                                 ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                             }
                         }}
@@ -10830,7 +10830,7 @@ function AutoFarmFeatures()
                                 }
                             },
                             ["footer"] = {
-                                ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                                ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                                 ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                             }
                         }}
@@ -10898,7 +10898,7 @@ function AutoFarmFeatures()
                                 }
                             },
                             ["footer"] = {
-                                ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                                ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                                 ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                             }
                         }}
@@ -10981,7 +10981,7 @@ function AutoFarmFeatures()
                             }
                         },
                         ["footer"] = {
-                            ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                            ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                             ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                         }
                     }}
@@ -11153,7 +11153,7 @@ function AutoFarmFeatures()
                                 }
                             },
                             ["footer"] = {
-                                ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                                ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                                 ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                             }
                         }}
@@ -11385,7 +11385,7 @@ function AutoFarmFeatures()
                                 }
                             },
                             ["footer"] = {
-                                ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                                ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                                 ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                             }
                         }}
@@ -11503,7 +11503,7 @@ function AutoFarmFeatures()
                                 }
                             },
                             ["footer"] = {
-                                ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                                ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                                 ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                             }
                         }}
@@ -13433,7 +13433,7 @@ function BountyFarm()
                                 }
                             },
                             ["footer"] = {
-                                ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                                ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                                 ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                             }
                         }}
@@ -13811,7 +13811,7 @@ spawn(function()
                                             }
                                         },
                                         ["footer"] = {
-                                            ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                                            ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                                             ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                                         }
                                     }}
@@ -13872,7 +13872,7 @@ spawn(function()
                                         }
                                     },
                                     ["footer"] = {
-                                        ["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+                                        ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
                                         ["text"] = "Sea Hub (" .. os.date("%X") .. ")"
                                     }
                                 }}
@@ -13979,7 +13979,7 @@ Section71.CreateButton({Title = 'Test Webhook'}, function()
 				},
 			},
 			["footer"] = {
-				["icon_url"] = "https://cdn.discordapp.com/attachments/832985237638086660/843786018892939284/turtle.png",
+				["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
 				["text"] = "Sea Hub (" .. os.date("%X") .. ")"
 			}
 		}}
