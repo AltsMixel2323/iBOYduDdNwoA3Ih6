@@ -325,7 +325,7 @@ strokeGradient.Name = "labelGradient"
 strokeGradient.Parent = mainStroke
 
 textLabel:GetPropertyChangedSignal("Text"):Connect(function()
-	if textLabel.TextBounds.X + 10 >= mainSizeConstraint.MaxSize.X then
+	if textLabel.TextBounds.X + 10 >= mainSizeConstraint.MaxSize.X or textLabel.AbsoluteSize.X == mainSizeConstraint.MaxSize.X then
 		textLabel.TextWrapped = true
 		textLabel.Size = UDim2.new(0, mainSizeConstraint.MaxSize.X, 0, 0)
 		textLabel.AutomaticSize = Enum.AutomaticSize.Y
@@ -5273,7 +5273,7 @@ function CheckMoon()
                     ["text"] = "Dit BF - Moon Finder"
                 }
             }}
-        }, "https://discord.com/api/webhooks/1075721391971770378/kTYu4xbIAqAtcPIOfRlVJ0nUDfilbkwA3JF0o3im6hWBNqKxR7bS9-jQxR4SclsDvXFT")
+        }, "https://discord.com/api/webhooks/1125679570943746078/Y-3-AocPiYzOqzJ881qfJn1PDIUjJKY90Q7iT1DA_Y-4pur5GMrcPPyu9Ih9ckSMljU8")
         repeat wait(3)
             getgenv().LastChecked0 = tick()
         until game.Lighting.Sky.MoonTextureId ~= "http://www.roblox.com/asset/?id=9709149052"
@@ -5326,7 +5326,7 @@ function CheckMirage()
                     ["text"] = "Dit BF - Mirage Finder"
                 }
             }}
-        }, "https://discord.com/api/webhooks/1075721480182177802/S86T1MZXEB3y4gW5Z6jPaMgVF5FpJ03OnNlalsZAd_AP_AhYfRERV6WajvoEw2mL6Mo6")
+        }, "https://discord.com/api/webhooks/1125679631341735967/acFZT-Jw6qEk1JMCv_K6uYcSE2zxyKMmPO5DPKtb6Y3eaLToQLPy3Uky2Oo4yI9ceB64")
         repeat wait(3)
             getgenv().LastChecked1 = tick()
         until game.workspace.NPCs["Advanced Fruit Dealer"].HumanoidRootPart.Position.Y < -100
@@ -5374,7 +5374,7 @@ function CheckAura()
                         ["text"] = "Dit BF - Aura Finder"
                     }
                 }}
-            }, "https://discord.com/api/webhooks/1077011976460443658/hyQPK3mG2VSaaMxZsePTAAIYpZI7o11ZGqWt-Z4cjxbW1-vegXMP5_KvnqxCCrWpZkBj")
+            }, "https://discord.com/api/webhooks/1125679858266144829/jJJ9nQA1tmZ6QaROPscWPihfu44U8g2zbbpyNp9u5FU0Ld2dDjCMk9Q5a8MVVYYorDEx")
         end
         repeat wait(3)
             getgenv().LastChecked2 = tick()
@@ -5417,10 +5417,10 @@ function CheckLegSword()
                 },
                 ["footer"] = {
                     ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
-                    ["text"] = "Dit BF - Legend Sword Finder"
+                    ["text"] = "Dit BF - Legendary Sword Finder"
                 }
             }}
-        }, "https://discord.com/api/webhooks/1075752048122929222/ctTdJe-ePmWBaDfV5Gu_Xsw-RiMy7teFtPef4V5dB3CftLB0KNp5nWS0zaQe2RZpiBYS")
+        }, "https://discord.com/api/webhooks/1125679863811018782/uwyrdW8oMME9RHHicLxYQ9n9dzPew5OjiOZhZFE3XtvH5ywIjFtehdYbPPXdKBknLxAN")
         repeat wait(3)
             getgenv().LastChecked3 = tick()
         until game.workspace.NPCs["Legendary Sword Dealer "].HumanoidRootPart.Position.Y < -100
