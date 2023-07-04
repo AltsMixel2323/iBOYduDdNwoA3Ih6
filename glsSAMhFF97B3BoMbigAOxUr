@@ -248,7 +248,9 @@ if true then
             end
         until game.Players.LocalPlayer:FindFirstChild("Backpack")
         and game.Players.LocalPlayer:FindFirstChild("DataLoaded")
-        local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+        repeat wait(5)
+        until SCGUI
+        local ScreenGui = SCGUI
         local BlackScreen = Instance.new("ImageLabel", ScreenGui)
         BlackScreen.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
         BlackScreen.Position = UDim2.new(0, 0, 0, -50)
@@ -291,6 +293,7 @@ if true then
 end
 
 local a = Instance.new("ScreenGui")
+getgenv().SCGUI = a
 local mainFrame = Instance.new("Frame")
 local textLabel = Instance.new("TextLabel")
 local labelGradient = Instance.new("UIGradient")
@@ -783,11 +786,11 @@ loadstring([[
                     tick() - TimerAttack > 6
                 ) then 
                     getgenv().AttackCheck = true
-                    getgenv().AntiLagSvKick = true
-                    delay(2, function()
+                    getgenv().AntiLagSvKick = false
+                    delay(4, function()
                         getgenv().TimerAttack = tick()
                         getgenv().AttackCheck = false
-                        getgenv().AntiLagSvKick = false
+                        getgenv().AntiLagSvKick = true
                     end)
                 end
                 local p13 = ret.activeController
@@ -10077,9 +10080,10 @@ function AutoFarmFeatures()
                         or IsPlayerDead()
                         if IsPlayerDead() then
                             getgenv().DisableKen = false
+                            ForceStopTween()
                             repeat wait()
                             until not IsPlayerDead()
-                            wait(3)
+                            wait(5)
                         end
                     else
                         Tween(CFrame.new(-13271.83203125, 350.2919006347656, -7754.43408203125))
@@ -14905,8 +14909,8 @@ local function GetScriptStatus()
             local m = v.LabelBG.TextColor.Text
             local x = m:gsub(a, "")
             x = x:split("]")[2]
-            x = x:gsub(": ", "")
-            x = x:gsub("\n", "")
+            x = x:sub(2)
+            --x = x:gsub("\n", " ")
             if string.find(m, a) then
                 ScriptStatus[a] = x
             else
