@@ -793,9 +793,15 @@ function R_ClickM1()
         end)
     end
 end
+if game:GetService("UserInputService").TouchEnabled and game:GetService("UserInputService").KeyboardEnabled == false then
+    getgenv().Mobile = true
+end
 function ClickM1()
-    --R_ClickM1()
-    getgenv().S_ClickM1, getgenv().CM1_LastCall = true, tick()
+    if Mobile then
+        R_ClickM1()
+    else
+        getgenv().S_ClickM1, getgenv().CM1_LastCall = true, tick()
+    end
 end
 spawn(function()
     while task.wait() do
