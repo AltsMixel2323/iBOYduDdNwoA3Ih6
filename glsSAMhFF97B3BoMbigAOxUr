@@ -5253,7 +5253,7 @@ function CheckMoon()
         local JoinScript = 'game:GetService("TeleportService"):TeleportToPlaceInstance(' .. game.PlaceId .. ',"' .. game.JobId .. '",game.Players.LocalPlayer)'
         SendWebHook({
             ["embeds"] = {{
-                ["title"] = "Blox Fruits",
+                ["title"] = "Moon Finder",
                 ["type"] = "rich",
                 ["color"] = tonumber(0xbdce44),
                 ["fields"] = {
@@ -5270,7 +5270,7 @@ function CheckMoon()
                 },
                 ["footer"] = {
                     ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
-                    ["text"] = "Dit BF - Moon Finder"
+                    ["text"] = "Dit BF - Make life easier"
                 }
             }}
         }, "https://discord.com/api/webhooks/1125679570943746078/Y-3-AocPiYzOqzJ881qfJn1PDIUjJKY90Q7iT1DA_Y-4pur5GMrcPPyu9Ih9ckSMljU8")
@@ -5306,7 +5306,7 @@ function CheckMirage()
         local JoinScript = 'game:GetService("TeleportService"):TeleportToPlaceInstance(' .. game.PlaceId .. ',"' .. game.JobId .. '",game.Players.LocalPlayer)'
         SendWebHook({
             ["embeds"] = {{
-                ["title"] = "Blox Fruits",
+                ["title"] = "Mirage Finder",
                 ["type"] = "rich",
                 ["color"] = tonumber(0xbdce44),
                 ["fields"] = {
@@ -5323,7 +5323,7 @@ function CheckMirage()
                 },
                 ["footer"] = {
                     ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
-                    ["text"] = "Dit BF - Mirage Finder"
+                    ["text"] = "Dit BF - Make life easier"
                 }
             }}
         }, "https://discord.com/api/webhooks/1125679631341735967/acFZT-Jw6qEk1JMCv_K6uYcSE2zxyKMmPO5DPKtb6Y3eaLToQLPy3Uky2Oo4yI9ceB64")
@@ -5354,7 +5354,7 @@ function CheckAura()
             local JoinScript = 'game:GetService("TeleportService"):TeleportToPlaceInstance(' .. game.PlaceId .. ',"' .. game.JobId .. '",game.Players.LocalPlayer)'
             SendWebHook({
                 ["embeds"] = {{
-                    ["title"] = "Blox Fruits",
+                    ["title"] = "Aura Finder",
                     ["type"] = "rich",
                     ["color"] = tonumber(0xbdce44),
                     ["fields"] = {
@@ -5371,7 +5371,7 @@ function CheckAura()
                     },
                     ["footer"] = {
                         ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
-                        ["text"] = "Dit BF - Aura Finder"
+                        ["text"] = "Dit BF - Make life easier"
                     }
                 }}
             }, "https://discord.com/api/webhooks/1125679858266144829/jJJ9nQA1tmZ6QaROPscWPihfu44U8g2zbbpyNp9u5FU0Ld2dDjCMk9Q5a8MVVYYorDEx")
@@ -5400,7 +5400,7 @@ function CheckLegSword()
         local JoinScript = 'game:GetService("TeleportService"):TeleportToPlaceInstance(' .. game.PlaceId .. ',"' .. game.JobId .. '",game.Players.LocalPlayer)'
         SendWebHook({
             ["embeds"] = {{
-                ["title"] = "Blox Fruits",
+                ["title"] = "Legendary Sword Finder",
                 ["type"] = "rich",
                 ["color"] = tonumber(0xbdce44),
                 ["fields"] = {
@@ -5417,7 +5417,7 @@ function CheckLegSword()
                 },
                 ["footer"] = {
                     ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
-                    ["text"] = "Dit BF - Legendary Sword Finder"
+                    ["text"] = "Dit BF - Make life easier"
                 }
             }}
         }, "https://discord.com/api/webhooks/1125679863811018782/uwyrdW8oMME9RHHicLxYQ9n9dzPew5OjiOZhZFE3XtvH5ywIjFtehdYbPPXdKBknLxAN")
