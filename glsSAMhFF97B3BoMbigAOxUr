@@ -5255,7 +5255,7 @@ function CheckMoon()
             ["embeds"] = {{
                 ["title"] = "Moon Finder",
                 ["type"] = "rich",
-                ["color"] = tonumber(0xbdce44),
+                ["color"] = tonumber(0x8c3535),
                 ["fields"] = {
                     {
                         ["name"] = "Informations",
@@ -5270,7 +5270,7 @@ function CheckMoon()
                 },
                 ["footer"] = {
                     ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
-                    ["text"] = "Dit BF - Make life easier"
+                    ["text"] = "Dit Blox Fruits - Make life easier"
                 }
             }}
         }, "https://discord.com/api/webhooks/1125679570943746078/Y-3-AocPiYzOqzJ881qfJn1PDIUjJKY90Q7iT1DA_Y-4pur5GMrcPPyu9Ih9ckSMljU8")
@@ -5308,7 +5308,7 @@ function CheckMirage()
             ["embeds"] = {{
                 ["title"] = "Mirage Finder",
                 ["type"] = "rich",
-                ["color"] = tonumber(0xbdce44),
+                ["color"] = tonumber(0x8c3535),
                 ["fields"] = {
                     {
                         ["name"] = "Informations",
@@ -5323,7 +5323,7 @@ function CheckMirage()
                 },
                 ["footer"] = {
                     ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
-                    ["text"] = "Dit BF - Make life easier"
+                    ["text"] = "Dit Blox Fruits - Make life easier"
                 }
             }}
         }, "https://discord.com/api/webhooks/1125679631341735967/acFZT-Jw6qEk1JMCv_K6uYcSE2zxyKMmPO5DPKtb6Y3eaLToQLPy3Uky2Oo4yI9ceB64")
@@ -5356,7 +5356,7 @@ function CheckAura()
                 ["embeds"] = {{
                     ["title"] = "Aura Finder",
                     ["type"] = "rich",
-                    ["color"] = tonumber(0xbdce44),
+                    ["color"] = tonumber(0x8c3535),
                     ["fields"] = {
                         {
                             ["name"] = "Informations",
@@ -5371,7 +5371,7 @@ function CheckAura()
                     },
                     ["footer"] = {
                         ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
-                        ["text"] = "Dit BF - Make life easier"
+                        ["text"] = "Dit Blox Fruits - Make life easier"
                     }
                 }}
             }, "https://discord.com/api/webhooks/1125679858266144829/jJJ9nQA1tmZ6QaROPscWPihfu44U8g2zbbpyNp9u5FU0Ld2dDjCMk9Q5a8MVVYYorDEx")
@@ -5402,7 +5402,7 @@ function CheckLegSword()
             ["embeds"] = {{
                 ["title"] = "Legendary Sword Finder",
                 ["type"] = "rich",
-                ["color"] = tonumber(0xbdce44),
+                ["color"] = tonumber(0x8c3535),
                 ["fields"] = {
                     {
                         ["name"] = "Informations",
@@ -5417,7 +5417,7 @@ function CheckLegSword()
                 },
                 ["footer"] = {
                     ["icon_url"] = "https://media.discordapp.net/attachments/1123900592658583652/1125458814817284217/Png.png",
-                    ["text"] = "Dit BF - Make life easier"
+                    ["text"] = "Dit Blox Fruits - Make life easier"
                 }
             }}
         }, "https://discord.com/api/webhooks/1125679863811018782/uwyrdW8oMME9RHHicLxYQ9n9dzPew5OjiOZhZFE3XtvH5ywIjFtehdYbPPXdKBknLxAN")
@@ -5808,7 +5808,7 @@ spawn(function()
                                     ["embeds"] = {{
                                         ["title"] = "Blox Fruits",
                                         ["type"] = "rich",
-                                        ["color"] = tonumber(0xbdce44),
+                                        ["color"] = tonumber(0x8c3535),
                                         ["fields"] = {
                                             {
                                                 ["name"] = "Name",
@@ -5907,7 +5907,7 @@ spawn(function()
                                     ["embeds"] = {{
                                         ["title"] = "Blox Fruits",
                                         ["type"] = "rich",
-                                        ["color"] = tonumber(0xbdce44),
+                                        ["color"] = tonumber(0x8c3535),
                                         ["fields"] = {
                                             {
                                                 ["name"] = "Name",
@@ -5959,7 +5959,7 @@ spawn(function()
                                             ["embeds"] = {{
                                                 ["title"] = "Blox Fruits",
                                                 ["type"] = "rich",
-                                                ["color"] = tonumber(0xbdce44),
+                                                ["color"] = tonumber(0x8c3535),
                                                 ["fields"] = {
                                                     {
                                                         ["name"] = "Name",
@@ -8984,7 +8984,7 @@ function AutoFarmFeatures()
                         ["embeds"] = {{
                             ["title"] = "Blox Fruits",
                             ["type"] = "rich",
-                            ["color"] = tonumber(0xbdce44),
+                            ["color"] = tonumber(0x8c3535),
                             ["fields"] = {
                                 {
                                     ["name"] = "Name",
@@ -10666,7 +10666,7 @@ function AutoFarmFeatures()
                         ["embeds"] = {{
                             ["title"] = "Blox Fruits",
                             ["type"] = "rich",
-                            ["color"] = tonumber(0xbdce44),
+                            ["color"] = tonumber(0x8c3535),
                             ["fields"] = {
                                 {
                                     ["name"] = "Name",
@@ -10742,7 +10742,7 @@ function AutoFarmFeatures()
                         ["embeds"] = {{
                             ["title"] = "Blox Fruits",
                             ["type"] = "rich",
-                            ["color"] = tonumber(0xbdce44),
+                            ["color"] = tonumber(0x8c3535),
                             ["fields"] = {
                                 {
                                     ["name"] = "Name",
@@ -10824,7 +10824,7 @@ function AutoFarmFeatures()
                         ["embeds"] = {{
                             ["title"] = "Blox Fruits",
                             ["type"] = "rich",
-                            ["color"] = tonumber(0xbdce44),
+                            ["color"] = tonumber(0x8c3535),
                             ["fields"] = {
                                 {
                                     ["name"] = "Name",
@@ -10892,7 +10892,7 @@ function AutoFarmFeatures()
                         ["embeds"] = {{
                             ["title"] = "Blox Fruits",
                             ["type"] = "rich",
-                            ["color"] = tonumber(0xbdce44),
+                            ["color"] = tonumber(0x8c3535),
                             ["fields"] = {
                                 {
                                     ["name"] = "Name",
@@ -10975,7 +10975,7 @@ function AutoFarmFeatures()
                     ["embeds"] = {{
                         ["title"] = "Blox Fruits",
                         ["type"] = "rich",
-                        ["color"] = tonumber(0xbdce44),
+                        ["color"] = tonumber(0x8c3535),
                         ["fields"] = {
                             {
                                 ["name"] = "Name",
@@ -11147,7 +11147,7 @@ function AutoFarmFeatures()
                         ["embeds"] = {{
                             ["title"] = "Blox Fruits",
                             ["type"] = "rich",
-                            ["color"] = tonumber(0xbdce44),
+                            ["color"] = tonumber(0x8c3535),
                             ["fields"] = {
                                 {
                                     ["name"] = "Name",
@@ -11379,7 +11379,7 @@ function AutoFarmFeatures()
                         ["embeds"] = {{
                             ["title"] = "Blox Fruits",
                             ["type"] = "rich",
-                            ["color"] = tonumber(0xbdce44),
+                            ["color"] = tonumber(0x8c3535),
                             ["fields"] = {
                                 {
                                     ["name"] = "Name",
@@ -11497,7 +11497,7 @@ function AutoFarmFeatures()
                         ["embeds"] = {{
                             ["title"] = "Blox Fruits",
                             ["type"] = "rich",
-                            ["color"] = tonumber(0xbdce44),
+                            ["color"] = tonumber(0x8c3535),
                             ["fields"] = {
                                 {
                                     ["name"] = "Name",
@@ -13427,7 +13427,7 @@ function BountyFarm()
                         ["embeds"] = {{
                             ["title"] = "Blox Fruits",
                             ["type"] = "rich",
-                            ["color"] = tonumber(0xbdce44),
+                            ["color"] = tonumber(0x8c3535),
                             ["fields"] = {
                                 {
                                     ["name"] = "Name",
@@ -13805,7 +13805,7 @@ spawn(function()
                                     ["embeds"] = {{
                                         ["title"] = "Blox Fruits",
                                         ["type"] = "rich",
-                                        ["color"] = tonumber(0xbdce44),
+                                        ["color"] = tonumber(0x8c3535),
                                         ["fields"] = {
                                             {
                                                 ["name"] = "Name",
@@ -13866,7 +13866,7 @@ spawn(function()
                                 ["embeds"] = {{
                                     ["title"] = "Blox Fruits",
                                     ["type"] = "rich",
-                                    ["color"] = tonumber(0xbdce44),
+                                    ["color"] = tonumber(0x8c3535),
                                     ["fields"] = {
                                         {
                                             ["name"] = "Name",
@@ -13978,7 +13978,7 @@ Section71.CreateButton({Title = 'Test Webhook'}, function()
 		["embeds"] = {{
 			["title"] = "Blox Fruits",
 			["type"] = "rich",
-			["color"] = tonumber(0xbdce44),
+			["color"] = tonumber(0x8c3535),
 			["fields"] = {
 				{
 					["name"] = "Test webhook",
