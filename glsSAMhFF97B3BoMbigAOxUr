@@ -10595,7 +10595,9 @@ function AutoFarmFeatures()
     end
     if game.PlaceId == 7449423635
     and (Settings.rip_indraFarm or Settings.AutoTushita) then
-        if Settings.AutoTushita and plrLevel >= 2000 and Settings.AFSHopServer and not FindMobExist("rip_indra True Form [Lv. 5000] [Raid Boss]")
+        if Settings.AutoTushita and plrLevel >= 2000
+        and not table.find(SelectedIgnoreHop, "[Main] Server Hop")
+        and Settings.AFSHopServer and not FindMobExist("rip_indra True Form [Lv. 5000] [Raid Boss]")
         and (not SelectedIgnoreAction or not table.find(SelectedIgnoreAction, "Get Cursed Dual Katana")) then
             if Settings.Cuttay and not NotiHopSv then
                 getgenv().NotiHopSv = true
