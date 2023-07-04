@@ -9809,7 +9809,7 @@ function AutoFarmFeatures()
     elseif Settings.AutoDualKatana
     and not DoneDualKatana then
         if CheckMasteryValue("Yama") >= 350 and CheckMasteryValue("Tushita") >= 350 then
-            if Settings.Cuttay then
+            if Settings.Cuttay and not TempDisableDFarm then
                 CT_DisableFarm()
             end
             local cdk = "Cursed Dual Katana"
@@ -9914,6 +9914,7 @@ function AutoFarmFeatures()
                     wait(2)
                 elseif CommF:InvokeServer("CDKQuest", "Progress", "Good").Good == -4 then
                     if PirateRaiding then
+                        getgenv().TempDisableDFarm = false
                         AutoFSSLabel.SetText(LabelTextAFS ..  "Killing Raid Pirates (CDK Quest)")
                         local v = GetPirateRaid()
                         if v then
@@ -9960,6 +9961,7 @@ function AutoFarmFeatures()
                         if Settings.Cuttay then
                             CT_DisableAutoRaid()
                             CT_EnableFarm()
+                            getgenv().TempDisableDFarm = true
                         end
                     elseif Settings.AFSHopServer then
                         HopServer(true)
@@ -9973,6 +9975,7 @@ function AutoFarmFeatures()
                         local x = "Cake Queen"
                         local v = GetMob(x)
                         if v then
+                            getgenv().TempDisableDFarm = false
                             AutoFSSLabel.SetText(LabelTextAFS ..  "Entering Heavenly Dimension (CDK Quest)")
                             repeat task.wait()
                                 AttackMob(v)
@@ -9989,6 +9992,7 @@ function AutoFarmFeatures()
                                 wait(5)
                                 return
                             else
+                                getgenv().TempDisableDFarm = true
                                 if Settings.Cuttay then CT_EnableFarm() end
                                 AutoFSSLabel.SetText(LabelTextAFS ..  "Waiting for " .. x .. " spawn (CDK Quest)")
                             end
