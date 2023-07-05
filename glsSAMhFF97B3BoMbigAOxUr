@@ -10078,6 +10078,7 @@ function AutoFarmFeatures()
                             local v = GetMob(x)
                             if v then
                                 repeat wait()
+                                    plr.Character.Humanoid:UnequipTools()
                                     if plr:DistanceFromCharacter(wOrigin.Locations["Hell Dimension"].Position) < 1000 then return end
                                     if game.Lighting.ExposureCompensation ~= 0 then
                                         getgenv().DisableKen = true
@@ -10138,8 +10139,10 @@ function AutoFarmFeatures()
                                     wait(5)
                                 end
                             else
+                                AutoFSSLabel.SetText(LabelTextAFS ..  "Pre-Farming Bone for random Hallow Essence - in cooldown (CDK Quest)")
                                 AutoFarmLabel.SetText(LabelTextAF ..  "Farming Bone")
                                 FarmLocation({"Reborn Skeleton", "Living Zombie", "Demonic Soul", "Posessed Mummy"}, CFrame.new(-9500.9443359375, 172.10487365722656, 6167.43359375))
+                                return
                             end
                         end
                     end
@@ -11898,7 +11901,7 @@ spawn(function()
     wait(2)
     if TabStatus and TabStatus == "In" then wait(4) end
     repeat wait() until AutoFSSLabel and AutoFarmLabel and S_Timer
-    while wait() do
+    while task.wait(.03) do
         local _, e = pcall(function()
             AutoFarmFeatures()
         end)
